@@ -1,0 +1,8 @@
+
+LOGGING INTO CONTAINERS
+docker exec -it chess-backend-1 bash
+
+
+
+
+
