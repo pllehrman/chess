@@ -3,10 +3,12 @@ const router = express.Router();
 
 const {
     newUser,
-    validateUserEmail
+    validateUserEmail,
+    deleteUser
 } = require('../controllers/users');
 
 router.route('/').post(newUser);
-router.route('/check-email').get(validateUserEmail)
+router.route('/:id').delete(deleteUser);
+router.route('/check-email').get(validateUserEmail);
 
 module.exports = router;

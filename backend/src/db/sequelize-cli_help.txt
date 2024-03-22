@@ -26,7 +26,7 @@ npx sequelize-cli db:seed --seed <seed-file-name> #executing a particular seedin
 #Connecting to the DB to query
 Once you've logged into the terminal of a running container, you can execute:
 
-docker exec -it chess-db-1 psql -U myuser mydatabase
+docker exec -it chessgambit-db-1 psql -U myuser mydatabase
 
 This allows one to query the DB with SQL commands: SELECT * FROM "Users";
 

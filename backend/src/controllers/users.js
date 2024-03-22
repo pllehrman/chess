@@ -36,7 +36,19 @@ const validateUserEmail = asyncWrapper(async (req, res) => {
     }
 })
 
+const deleteUser = asyncWrapper(async (req, res) => {
+    const userId = req.params.id;
+    const user = User.findByPk(userId);
+
+    if (!user){
+        throw createCustomError(`User with id ${userId} unable to be found and deleted.`, 404);
+    }
+    await user.destroy();
+    res.status(200).json({ message : `Game with ${userId} ID succesfully deleted.`})
+})
+
 module.exports = {
     newUser,
-    validateUserEmail
+    validateUserEmail,
+    deleteUser
 }

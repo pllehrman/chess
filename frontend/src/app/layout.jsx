@@ -14,7 +14,8 @@ export default function RootLayout({ children }) {
   return (
     <html>
       <head>
-        <title>My Next.js App</title>
+        <title>chessGambit</title>
+        <script src="https://kit.fontawesome.com/f12e3aa0c0.js" crossorigin="anonymous"></script>
       </head>
       <body>
         <div className="flex flex-col min-h-screen">

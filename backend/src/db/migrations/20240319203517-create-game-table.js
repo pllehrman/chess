@@ -31,18 +31,7 @@ module.exports = {
           0, 0, 0, 0, 0, 0, 0, 0,
           11, 11, 11, 11, 11, 11, 11, 11,
           14, 12, 13, 15, 16, 13, 12, 14,
-        ],
-        validate: {
-          isArray: {
-            msg: 'Position must be an array of integers'
-          },
-          isValidPosition(value) {
-            if (value.length !== 64) {
-              throw new Error('Position array must contain 64 elements');
-            }
-            // Add more validation if needed
-          }
-        }
+        ]
       },
       turn: {
         type: Sequelize.INTEGER,
@@ -58,7 +47,16 @@ module.exports = {
         allowNull: false,
         validate: {
           isInt: {
-            msg: 'PlayerWhite must be an integer'
+            msg: 'PlayerWhite must be an integer.'
+          }
+        }
+      },
+      playerWhiteTimeRemaining: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isInt: {
+            msg: 'PlayerWhite time must be an integer.'
           }
         }
       },
@@ -67,7 +65,16 @@ module.exports = {
         allowNull: false,
         validate: {
           isInt: {
-            msg: 'PlayerBlack must be an integer'
+            msg: 'PlayerBlack must be an integer.'
+          }
+        }
+      },
+      playerBlackTimeRemaining: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isInt: {
+            msg: 'PlayerBlack time must be an integer.'
           }
         }
       },

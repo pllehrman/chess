@@ -16,7 +16,9 @@ const getAllGames = asyncWrapper( async (req, res) => {
 
 //POST
 const newGame = asyncWrapper( async (req, res) => {
-    const game = await Game.create(); //no need to pass in anything here as of now
+    const { gameDetails } = req.body; // turn, playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
+
+    const game = await Game.create(gameDetails); //no need to pass in anything here as of now
     
     if (!game) {
         throw createCustomError('Game unable to be created', 500);
@@ -58,11 +60,10 @@ const deleteGame = asyncWrapper( async (req, res) => {
     res.status(200).json({ message: `Game with ${gameId} ID successfully deleted`});
 })
 
-
 //PUT
 const updateGame = asyncWrapper( async (req, res) => {
     const gameId = req.params.id;
-    const {winner, position, turn } = req.body; //destructure the updated fields
+    const { gameDetails } = req.body; //destructure the updated fields
 
     const game = await Game.findByPk(gameId); //find the game
 
@@ -70,8 +71,8 @@ const updateGame = asyncWrapper( async (req, res) => {
         throw createCustomError(`Game with ${gameId} ID could not be found while trying to update.`, 404);
     }
 
-    await game.update({ winner, turn, position }); //update it
-    res.status(200).json({ data: game }); //send it back to the user
+    await game.update(gameDetails); //update it
+    res.status(200).json(game); //send it back to the user
 });
 
 module.exports = {

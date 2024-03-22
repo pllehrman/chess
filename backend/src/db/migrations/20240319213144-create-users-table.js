@@ -61,7 +61,6 @@ module.exports = {
     });  
 
     // Add indexes after table creation
-    await queryInterface.addIndex('Users', ['id']);
     await queryInterface.addIndex('Users', ['email']);
     
   },

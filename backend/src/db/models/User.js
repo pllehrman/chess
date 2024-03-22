@@ -1,57 +1,50 @@
 // models/user.js
 module.exports = (sequelize, DataTypes) => {
     const User = sequelize.define('User', {
-    id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    firstname: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'First name cannot be empty'
-        },
-        len: {
-          args: [1, 255],
-          msg: 'First name must be between 1 and 255 characters'
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true
+      },
+      firstname: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: 'First name cannot be empty'
+          },
+          len: {
+            args: [1, 255],
+            msg: 'First name must be between 1 and 255 characters'
+          }
         }
-      }
-    },
-    lastname: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'Last name cannot be empty'
-        },
-        len: {
-          args: [1, 255],
-          msg: 'Last name must be between 1 and 255 characters'
+      },
+      lastname: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: 'Last name cannot be empty'
+          },
+          len: {
+            args: [1, 255],
+            msg: 'Last name must be between 1 and 255 characters'
+          }
         }
+      },
+      email: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: true
+      },
+      hashed_password: {
+        type: DataTypes.STRING(255),
+        allowNull: false
       }
-    },
-    email: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: {
-          msg: 'Invalid email address'
-        }
-      }
-    },
-    hashedPassword: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    }
-  }, {
-    timestamps: true, // Enable automatic timestamps
-    sequelize,
-    modelName: 'User'
-  });
+    }, {
+      timestamps: true
+    });
   
   return User;
 };
