@@ -7,7 +7,7 @@ const asyncWrapper = require('../middleware/asyncWrapper');
 // POST
 const newUser = asyncWrapper( async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
-   
+    // console.log(firstname, lastname, email, password);
     try {
         const hashedPassword = await argon2.hash(password);
         
@@ -68,12 +68,14 @@ const validateUserPassword = asyncWrapper(async (req, res) => {
     if (!user) {
         throw createCustomError(`Unable to find user with email ${email}.`, 404);
     } 
-
+   
     const isMatch = await argon2.verify(user.hashed_password, password);
 
     if (isMatch) {
+        // console.log("Passwords do match!")
         res.status(200).json({"isMatch": true});
     } else {
+        // console.log("Password's don't match!")
         res.status(200).json({"isMatch": false});
     }
 });

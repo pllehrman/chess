@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../../src/server'); // Import your Express app
 const { User } = require('../../src/db/models');
+const { newUser } = require('../../src/controllers/users');
 
 describe('User Controller', () => {
   beforeEach(async () => {
@@ -14,7 +15,7 @@ describe('User Controller', () => {
         firstname: 'John',
         lastname: 'Doe',
         email: 'john.doe@example.com',
-        hashed_password: 'HASHED'
+        password: 'HASHED'
       };
 
       const response = await request(app).post('/users').send(newUserDetails);
@@ -58,18 +59,20 @@ describe('User Controller', () => {
   describe('POST /users/check-password', () => {
     it('should validate the user password correctly', async () => {
       // Create a user with a known password
-      const password = 'securepassword';
-      const user = await User.create({
+      const newUserDetails = {
         firstname: 'John',
         lastname: 'Doe',
         email: 'john.doe@example.com',
-        password: password // Ensure the field name matches your database schema
-      });
-  
+        password: 'securepassword' // Ensure the field name matches your database schema
+      };
+
+      //Creating a new user. We assume that the first test case pases in this circumstance.
+      await request(app).post('/users').send(newUserDetails);
+
       // Test correct password
       let response = await request(app)
         .post('/users/check-password')
-        .send({ email: user.email, password });
+        .send({ email: newUserDetails.email, password: newUserDetails.password });
   
       expect(response.status).toBe(200);
       expect(response.body.isMatch).toBe(true);
@@ -77,7 +80,7 @@ describe('User Controller', () => {
       // Test incorrect password
       response = await request(app)
         .post('/users/check-password')
-        .send({ email: user.email, password: 'wrongpassword' });
+        .send({ email: newUserDetails.email, password: 'wrongpassword' });
   
       expect(response.status).toBe(200);
       expect(response.body.isMatch).toBe(false);
