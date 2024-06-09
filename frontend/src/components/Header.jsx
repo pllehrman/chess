@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header className="bg-gray-800 text-white py-4">
       <nav className="container mx-auto flex justify-between items-center">
-        <div className="text-xl font-bold"><i class="fa-solid fa-chess-knight"></i> chessGambit</div>
+        <div className="text-xl font-bold">chessGambit</div>
         <ul className="flex space-x-6">
           <li>
             <Link href="/" className="hover:text-gray-400 transition-colors">

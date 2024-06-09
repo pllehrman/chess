@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
     <html>
       <head>
         <title>chessGambit</title>
-        <script src="https://kit.fontawesome.com/f12e3aa0c0.js" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/f12e3aa0c0.js" crossOrigin="anonymous"></script>
       </head>
       <body>
         <div className="flex flex-col min-h-screen">

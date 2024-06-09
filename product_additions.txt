@@ -1,0 +1,6 @@
+install dotenv and get that working
+
+- Enable sign up page to populate the db with user data
+    - Unique checker API based on email
+
+- Game creation...

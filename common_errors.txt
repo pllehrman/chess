@@ -1,0 +1,1 @@
+TypeError: user.destroy is not a function -> ensure you mention 'await' before the findByPk() call
