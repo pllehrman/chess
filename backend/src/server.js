@@ -9,8 +9,14 @@ const users = require('./routes/users');
 //Middleware 
 const dbConnect = require('./middleware/dbConnect');
 const errorHandler = require('./middleware/errorHandler');
+const generateNonce = require('./middleware/nonceGenerator');
 app.use(express.json()) //middleware to parse JSON bodies
 app.use(cors());
+app.use((generateNonce));
+
+app.get('api/nonce', (req, res) => {
+    res.json({ nonce: res.locals.nonce});
+});
 
 // Serving routes
 app.use('/games', games);
