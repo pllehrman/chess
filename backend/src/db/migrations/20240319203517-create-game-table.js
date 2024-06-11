@@ -20,18 +20,10 @@ module.exports = {
           }
         }
       },
-      position: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
+      fen: {
+        type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: [
-          24, 22, 23, 25, 26, 23, 22, 24,
-          22, 22, 22, 22, 22, 22, 22, 22,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          11, 11, 11, 11, 11, 11, 11, 11,
-          14, 12, 13, 15, 16, 13, 12, 14,
-        ]
+        defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' // Starting position in FEN
       },
       turn: {
         type: Sequelize.INTEGER,
