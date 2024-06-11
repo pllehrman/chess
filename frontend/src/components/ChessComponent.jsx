@@ -1,19 +1,45 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import axios from 'axios';
+import GameResultNotice from './GameResultNotice';
+import WebSocket from 'isomorphic-ws';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export default function ChessComponent({ gameId }) { // Pass gameId as a prop
+export default function ChessComponent({ gameId }) {
   const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
+  const [ws, setWs] = useState(null);
+
+  useEffect(() => {
+    const websocket = new WebSocket('ws://localhost:3000'); // Correct WebSocket constructor
+
+    websocket.onopen = () => {
+      console.log('Connected to WebSocket server.');
+      setWs(websocket);
+    };
+
+    websocket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'move') {
+        const { from, to, promotion } = message.move;
+        game.move({ from, to, promotion });
+        setGame(new Chess(game.fen()));
+      }
+    };
+
+    websocket.onclose = () => {
+      console.log('Disconnected from WebSocket server');
+    };
+
+    return () => websocket.close();
+  }, []);
 
   function safeGameMutate(modify) {
     setGame((g) => {
-      const update = new Chess(g.fen()); // Create a new Chess instance with the current position
+      const update = new Chess(g.fen());
       modify(update);
       return update;
     });
@@ -56,18 +82,8 @@ export default function ChessComponent({ gameId }) { // Pass gameId as a prop
     const updatedGame = new Chess(game.fen());
     setGame(updatedGame);
 
-    // Check if the game is over
-    const result = checkGameOver();
-    if (result) {
-      // Send the final game state to the backend
-      try {
-        await axios.put(`${apiUrl}/games/${gameId}`, {
-          fen: updatedGame.fen(),
-          result: result,
-        });
-      } catch (error) {
-        console.error('Error updating game on the backend:', error);
-      }
+    if (ws) {
+      ws.send(JSON.stringify({ type: 'move', move: { from: sourceSquare, to: targetSquare, promotion: 'q' } }));
     }
 
     return true; // Legal move
