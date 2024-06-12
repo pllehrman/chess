@@ -8,6 +8,10 @@ install dotenv and get that working
     - Websockets w/ Rooms
     - Integration of websockets and individual moves with DB
     - Only once a game has finished do we update the db.
+    - Only allow two connections to the web socket. Generate a particular hash code
+      once a user starts a game (API call) which then only allows one other user
+      to join.
+    - If a third party attempts to join display "The Game is Full"
 - Stockfish integration
     - Play against the computer should be easier than 1v1 playing
 - UI displaying past games against opponents

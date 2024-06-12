@@ -5,6 +5,7 @@ const app = express();
 
 // Services
 const setupWebSocketServer = require('./services/websocket');
+const chatWebSocketServer = require('./services/chatWebSocket');
 
 // Routes
 const games = require('./routes/games');
@@ -46,5 +47,8 @@ if (require.main === module) {
     console.log(`Server running on port ${port}`);
   });
 }
+
+// Let's add the microservices down here for websockets
+chatWebSocketServer();
 
 module.exports = app;
