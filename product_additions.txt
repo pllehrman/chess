@@ -2,5 +2,13 @@ install dotenv and get that working
 
 - Enable sign up page to populate the db with user data
     - Unique checker API based on email
+    - Login
 
-- Game creation...
+- Game creation
+    - Websockets w/ Rooms
+    - Integration of websockets and individual moves with DB
+    - Only once a game has finished do we update the db.
+- Stockfish integration
+    - Play against the computer should be easier than 1v1 playing
+- UI displaying past games against opponents
+- No groups but let's have friends on the platform
