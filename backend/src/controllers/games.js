@@ -16,7 +16,7 @@ const getAllGames = asyncWrapper( async (req, res) => {
 
 //POST
 const newGame = asyncWrapper( async (req, res) => {
-    const { gameDetails } = req.body; // turn, playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
+    const { gameDetails } = req.body; // type (of game), playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
 
     const game = await Game.create(gameDetails); //no need to pass in anything here as of now
     

@@ -35,7 +35,7 @@ const server = http.createServer(app);
 
 // setupChessWebSocketServer(server);
 // setupChatWebSocketServer(server);
-simpleWebSocketServer();
+simpleWebSocketServer(3003);
 
 const port = process.env.PORT || 3001;
 server.listen(port, () => {

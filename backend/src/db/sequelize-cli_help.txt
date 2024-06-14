@@ -9,7 +9,7 @@ npx sequelize-cli db:migrate:status      # Show pending migrations
 npx sequelize-cli db:migrate:status --migrated   # Show executed migrations
 
 # Running Migrations
-             # Run all pending migrations
+npx sequelize-cli db:migrate           # Run all pending migrations
 npx sequelize-cli db:migrate --to XXXXXXXXXXXXXX-create-game.js   # Run a specific migration
 npx sequelize-cli db:migrate:undo        # Undo the last migration
 npx sequelize-cli db:migrate:undo:all    # Undo all migrations

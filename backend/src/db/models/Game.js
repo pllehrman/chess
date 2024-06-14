@@ -6,6 +6,16 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         primaryKey: true
       },
+      type: { // This type refers to computer engine games vs. person to person games
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isInt: {
+            msg: 'Game type must be an integer value'
+          }
+        }
+      },
       winner: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -16,31 +26,19 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      position: {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
+      fen: {
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: [
-          24, 22, 23, 25, 26, 23, 22, 24,
-          22, 22, 22, 22, 22, 22, 22, 22,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          11, 11, 11, 11, 11, 11, 11, 11,
-          14, 12, 13, 15, 16, 13, 12, 14,
-        ]
+        defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' // Starting position in FEN
       },
       turn: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-          isInt: {
-            msg: 'Turn must be an integer'
-          }
-        }
+        defaultValue: "white",
       },
       playerWhite: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerWhite must be an integer.'
@@ -49,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       playerWhiteTimeRemaining: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerWhite time must be an integer.'
@@ -58,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       playerBlack: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerBlack must be an integer.'
@@ -67,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       playerBlackTimeRemaining: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerBlack time must be an integer.'

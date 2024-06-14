@@ -10,6 +10,16 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true
       },
+      type: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isInt: {
+            msg: 'Game type must be an integer value'
+          }
+        }
+      },
       winner: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -26,17 +36,13 @@ module.exports = {
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' // Starting position in FEN
       },
       turn: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
-        validate: {
-          isInt: {
-            msg: 'Turn must be an integer'
-          }
-        }
+        defaultValue: "white",
       },
       playerWhite: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerWhite must be an integer.'
@@ -45,7 +51,7 @@ module.exports = {
       },
       playerWhiteTimeRemaining: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerWhite time must be an integer.'
@@ -54,7 +60,7 @@ module.exports = {
       },
       playerBlack: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerBlack must be an integer.'
@@ -63,7 +69,7 @@ module.exports = {
       },
       playerBlackTimeRemaining: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: 'PlayerBlack time must be an integer.'
