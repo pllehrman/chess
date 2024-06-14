@@ -1,4 +1,3 @@
-// compete/solo/page.js
 import ChessGameComponent from '../../../components/chess_game/MainGame';
 
 export default function SoloChessBoard() {

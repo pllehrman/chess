@@ -1,13 +1,13 @@
 const WebSocketServer = require('ws').Server;
 
-function setupChatWebSocketServer(server) {
-  const wss = new WebSocketServer({ server, path: '/chat' });
+function setupChessWebSocketServer(server) {
+  const wss = new WebSocketServer({ server, path: '/game' });
 
   wss.on('connection', (ws) => {
-    console.log('New chat client connected');
+    console.log('New game client connected');
 
     ws.on('message', (message) => {
-      console.log('Received chat message:', message);
+      console.log('Received message:', message);
       // Broadcast the message to all connected clients
       wss.clients.forEach((client) => {
         if (client.readyState === ws.OPEN) {
@@ -17,9 +17,9 @@ function setupChatWebSocketServer(server) {
     });
 
     ws.on('close', () => {
-      console.log('Chat client disconnected');
+      console.log('Game client disconnected');
     });
   });
 }
 
-module.exports = setupChatWebSocketServer;
+module.exports = setupChessWebSocketServer;

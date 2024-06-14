@@ -4,7 +4,7 @@ services:
     build:
       context: ./frontend
     ports:
-      - "3001:3001"
+      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -16,7 +16,9 @@ services:
     build:
       context: ./backend
     ports:
-      - "3000:3000"
+      - "3001:3001"
+      - "3002:3002" # chess websocket
+      - "3003:3003" # chat websocket
     volumes:
       - ./backend:/app
       - /app/node_modules

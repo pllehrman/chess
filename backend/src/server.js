@@ -1,34 +1,28 @@
 const express = require('express');
 const http = require('http');
-const cors = require('cors');
 const app = express();
+const cors = require('cors');
+const setupChessWebSocketServer = require('./services/chessWebsocket');
+const setupChatWebSocketServer = require('./services/chatWebSocket');
+const simpleWebSocketServer = require('./services/exampleWebSocket');
 
-// Services
-const setupWebSocketServer = require('./services/websocket');
-const chatWebSocketServer = require('./services/chatWebSocket');
+// Middleware
+const dbConnect = require('./middleware/dbConnect');
+const errorHandler = require('./middleware/errorHandler');
+const generateNonce = require('./middleware/nonceGenerator');
+
+app.use(express.json()); // Middleware to parse JSON bodies
+app.use(cors());
+app.use(generateNonce);
 
 // Routes
 const games = require('./routes/games');
 const users = require('./routes/users');
 
-// Middleware 
-const dbConnect = require('./middleware/dbConnect');
-const errorHandler = require('./middleware/errorHandler');
-const generateNonce = require('./middleware/nonceGenerator');
-
-app.use(express.json()); // middleware to parse JSON bodies
-app.use(cors());
-app.use(generateNonce);
-
-app.get('/api/nonce', (req, res) => {
-  res.json({ nonce: res.locals.nonce });
-});
-
-// Serving routes
 app.use('/games', games);
 app.use('/users', users);
 
-// Establishing DB connection
+// Database connection
 dbConnect();
 
 app.get('/', (req, res) => {
@@ -37,18 +31,13 @@ app.get('/', (req, res) => {
 
 app.use(errorHandler);
 
-// WebSocket setup
 const server = http.createServer(app);
-setupWebSocketServer(server);
 
-if (require.main === module) {
-  const port = process.env.PORT || 3000;
-  server.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}
+// setupChessWebSocketServer(server);
+// setupChatWebSocketServer(server);
+simpleWebSocketServer();
 
-// Let's add the microservices down here for websockets
-chatWebSocketServer();
-
-module.exports = app;
+const port = process.env.PORT || 3001;
+server.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
