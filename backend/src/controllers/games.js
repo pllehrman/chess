@@ -16,9 +16,9 @@ const getAllGames = asyncWrapper( async (req, res) => {
 
 //POST
 const newGame = asyncWrapper( async (req, res) => {
-    const { gameDetails } = req.body; // type (of game), playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
-
-    const game = await Game.create(gameDetails); //no need to pass in anything here as of now
+    const details = req.body; // type (of game), playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
+    console.log(details)
+    const game = await Game.create(details); //no need to pass in anything here as of now
     
     if (!game) {
         throw createCustomError('Game unable to be created', 500);

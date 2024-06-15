@@ -3,10 +3,8 @@ const apiUrl = "http://localhost:3001";
 
 // type (engine vs. pvp), playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
 export async function startNewGame(type, playerWhite, playerBlack, timeControl) {
-    console.log("hit")
     try {
-    console.log("hit")
-
+    console.log(type, playerWhite, playerBlack, timeControl);
     const response = await axios.post(`${apiUrl}/games`, {
         type: type,
         playerWhite: playerWhite,

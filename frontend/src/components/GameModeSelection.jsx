@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { startNewGame } from '@/utils/newChessGame';
-import { useUser } from '../components/UseContext';
+import { UserContext } from '../components/Providers';
 
 export default function GameModeSelection() {
   const router = useRouter();
   const [showFriendOptions, setShowFriendOptions] = useState(false);
   const [timeControl, setTimeControl] = useState(10); // Default 10 minutes per side
   const [colorChoice, setColorChoice] = useState('random'); // Default to random
-  const { user } = useUser(); 
+  const { session } = useContext(UserContext); 
 
   const coinFlip = () => {
     return Math.random() < 0.5;
@@ -21,9 +21,9 @@ export default function GameModeSelection() {
     const shouldUserStartAsWhite = (colorChoice === 'white') || (colorChoice === 'random' && coinFlip());
     
     if (shouldUserStartAsWhite) {
-      startNewGame(0, user.id, timeControl, null, timeControl);
+      startNewGame(0, session, 0, null);
     } else {
-      startNewGame(0, null, timeControl, user.id, timeControl);
+      startNewGame(0, 0, session, null);
     }
   
     router.push('/compete/solo');
@@ -35,15 +35,15 @@ export default function GameModeSelection() {
   };
 
   const handleStartGameAgainstFriend = () => {
-    const { user } = useUser(); // Destructure user from useUser hook
-  
-    // Function to determine if user should start as white or black
+     // Function to determine if user should start as white or black
     const shouldUserStartAsWhite = (colorChoice === 'white') || (colorChoice === 'random' && coinFlip());
     
     if (shouldUserStartAsWhite) {
-      startNewGame(1, user.id, null, 0, null);
+      console.log("starting as white")
+      console.log(timeControl)
+      startNewGame(1, session, null, timeControl); //null field gets filled in after a user joins
     } else {
-      startNewGame(1, 0, null, user.id, null);
+      startNewGame(1, null, session, timeControl);
     }
   
     router.push('/compete/solo');
