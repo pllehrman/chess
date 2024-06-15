@@ -9,7 +9,7 @@ export function ChessWebSocket(setGame, checkGameOver) {
 
   useEffect(() => {
     if (!wsRef.current) {
-      const websocket = new WebSocket('ws://localhost:3000');
+      const websocket = new WebSocket(process.env.NEXT_PUBLIC_WS_CHESS_URL);
 
       websocket.onopen = () => {
         console.log('Connected to WebSocket server.');

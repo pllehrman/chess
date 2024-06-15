@@ -20,7 +20,7 @@ export default function SignupForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://localhost:3000/users`, { firstname, lastname, email, password});
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users`, { firstname, lastname, email, password});
       router.push('/'); // Redirect to the home page after successful signup
     } catch (error) {
       router.push('/register');
@@ -30,7 +30,7 @@ export default function SignupForm() {
 
   const checkEmail = async (newEmail) => {
     try {
-      const response = await axios.get(`http://localhost:3000/users/check-email`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/check-email`, {
         params: { email: newEmail }
       });
 

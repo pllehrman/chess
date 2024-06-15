@@ -1,12 +1,14 @@
 const { Sequelize } = require('sequelize');
 
+console.log(process.env.DATABASE_PASSWORD)
+
 // Database connection configuration
 const sequelize = new Sequelize({
     dialect: 'postgres',
     host: 'db',
     database: 'mydatabase',
     username: 'myuser',
-    password: 'mypassword',
+    password: process.env.DATABASE_PASSWORD,
   });
   
 // Helper function to test database connection

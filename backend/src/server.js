@@ -10,10 +10,12 @@ const simpleWebSocketServer = require('./services/exampleWebSocket');
 const dbConnect = require('./middleware/dbConnect');
 const errorHandler = require('./middleware/errorHandler');
 const generateNonce = require('./middleware/nonceGenerator');
+const useSessions = require('./middleware/sessions');
 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors());
 app.use(generateNonce);
+// app.use(useSessions)
 
 // Routes
 const games = require('./routes/games');

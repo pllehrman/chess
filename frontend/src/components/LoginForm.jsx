@@ -18,7 +18,7 @@ export default function LoginForm() {
     setErrorMessage(''); // Clear previous error message
 
     try {
-      const response = await axios.post(`http://localhost:3000/users/check-password`, { email, password });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/check-password`, { email, password });
       
       // Passwords match
       if (response.data.isMatch) {

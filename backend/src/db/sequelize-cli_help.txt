@@ -33,3 +33,5 @@ This allows one to query the DB with SQL commands: SELECT * FROM "Users";
 #Showing DB schema:
     - \d "Games"
 npx sequelize-cli db:migrate
+
+MUST BE AT SRC/DB SHELL IN ORDER TO EXECUTE SEQUELIZE COMMANDS

@@ -13,3 +13,22 @@ export default function Providers({ children, session }) {
 };
 
 
+// "use client";
+
+// import React, { createContext, useState, useContext } from 'react';
+
+// const UserContext = createContext();
+
+// export function useUser() {
+//   return useContext(UserContext);
+// }
+
+// export default function UserProvider({ children, value }) {
+//   const [user, setUser] = useState(value || { id: null, firstname: '', lastname: '', email: '' });
+
+//   return (
+//     <UserContext.Provider value={{ user, setUser }}>
+//       {children}
+//     </UserContext.Provider>
+//   );
+// }
