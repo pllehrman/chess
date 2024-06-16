@@ -1,10 +1,8 @@
 const argon2 = require('argon2');
-const { User } = require('../db/models');
+const { Session, User } = require('../db/models');
 const { createCustomError, CustomAPIError } = require('../middleware/customError');
 const asyncWrapper = require('../middleware/asyncWrapper');
-const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
-const Session = require('../db/models/Session');
 
 // ROUTES -> '/users'
 // POST
@@ -24,13 +22,15 @@ const newUser = asyncWrapper( async (req, res) => {
     if (!user) {
         throw createCustomError(`User unable to be created with provided details.`, 500);
     }
+    
+    const sessionToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
-    const sessionToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log(sessionToken)
 
     const session = await Session.create({
         token: sessionToken,
         userId: user.id,
-        expiresAt: newDate(Date.now() + 1000 * 60 * 60 * 24) //24 hours
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24) //24 hours
     });
 
     // Setting the cookie in the browser's document
@@ -41,7 +41,7 @@ const newUser = asyncWrapper( async (req, res) => {
     });
 
     // Sending the user and sessionToken to frontend
-    res.status(201).json({ user, sessionToken });
+    res.status(201).json({ session });
 
     } catch (error) {
         throw createCustomError(`Error creating user: ${error.message}`, 500);

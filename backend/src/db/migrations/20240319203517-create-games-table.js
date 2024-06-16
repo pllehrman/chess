@@ -93,6 +93,7 @@ module.exports = {
     queryInterface.addIndex('Games', ['playerBlack']);
 
   },
+  
 
   async down (queryInterface, Sequelize) {
     await queryInterface.dropTable('Games');

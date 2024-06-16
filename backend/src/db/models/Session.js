@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true
     },
-    sessionToken: {
+    token: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -33,7 +33,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Session.associate = function(models) {
-    Session.belongsTo(models.User, { foreignKey: 'userId' });
+    Session.belongsTo(models.User, { 
+      foreignKey: 'userId',
+      as: 'user'
+    });
   };
 
   return Session;
