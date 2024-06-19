@@ -2,11 +2,18 @@
 import { useState, useMemo } from 'react';
 import { Chess } from 'chess.js';
 
-export function ChessGameLogic() {
-  const [game, setGame] = useState(new Chess());
+export function ChessGameLogic(gameData) {
+  const initialFen = gameData?.fen || 'start';
+  const [game, setGame] = useState(new Chess(initialFen));
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
+
+  useEffect(() => {
+    if (gameData) {
+      setGame(new Chess(gameData.fen));
+    }
+  }, [gameData]);
 
   function safeGameMutate(modify) {
     setGame((g) => {

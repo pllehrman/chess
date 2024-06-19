@@ -60,6 +60,6 @@ LOGGING INTO CONTAINERS
 docker exec -it chessgambit-backend-1 bash
 
 docker exec -it chessgambit-db-1 psql -U myuser mydatabase
-
+docker exec -it chessgambit-db-1 psql -U myuser -d mydatabase
 
 

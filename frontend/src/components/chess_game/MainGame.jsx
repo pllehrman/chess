@@ -1,14 +1,37 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 import Board from './Board';
 import Controls from './Controls';
 import ResultNotice from './ResultNotice';
 import { ChessGameLogic } from '../../hooks/ChessGameLogic';
-import { ChessWebSocket } from '../../hooks/ChessWebSocket';
-import { Chess } from 'chess.js';
+import fetchGameState from '../../hooks/fetchGameState';
+import onDrop from '../../utils/onDrop';
 
 export default function MainGame({ gameId }) {
+  const [gameData, setGameData] = useState(null);
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchGameState(gameId);
+        setGameData(data);
+      } catch (error) {
+        throw error;
+      }
+    };
+    if (!hasFetched.current) {
+      fetchData();
+      hasFetched.current = true;
+    }
+  }, [gameId]);
+
+  if (!gameData) {
+    return <h1>Game is loading</h1>; // or some other fallback UI
+  }
+  
+  console.log(gameData);
   const {
     game,
     setGame,
@@ -20,42 +43,17 @@ export default function MainGame({ gameId }) {
     setGameOver,
     setResult,
     setWinner,
-  } = ChessGameLogic();
+  } = ChessGameLogic(gameData);
 
-  const { ws, setGameRef } = ChessWebSocket(setGame, checkGameOver);
 
-  useEffect(() => {
-    setGameRef(game);
-  }, [game, setGameRef]);
 
-  async function onDrop(sourceSquare, targetSquare) {
-    console.log(`Attempting move from ${sourceSquare} to ${targetSquare}`); // Debug log
-    const move = game.move({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: 'q', // always promote to a queen for simplicity
-    });
+  // const { ws, setGameRef } = ChessWebSocket(setGame, checkGameOver);
 
-    if (move === null) {
-      console.error(`Invalid move: ${JSON.stringify({ from: sourceSquare, to: targetSquare })}`);
-      return false; // Illegal move
-    }
+  // useEffect(() => {
+  //   setGameRef(game);
+  // }, [game, setGameRef]);
 
-    // Update the game state with the new position
-    const updatedGame = new Chess(game.fen());
-    setGame(updatedGame);
 
-    if (ws) {
-      console.log(`Sending move to WebSocket: ${JSON.stringify({ from: sourceSquare, to: targetSquare, promotion: 'q' })}`); // Debug log
-      ws.send(JSON.stringify({ type: 'move', move: { from: sourceSquare, to: targetSquare, promotion: 'q' } }));
-    } else {
-      console.error('WebSocket connection not established'); // Debug log
-    }
-
-    checkGameOver();
-
-    return true; // Legal move
-  }
 
   const pieces = [
     'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',

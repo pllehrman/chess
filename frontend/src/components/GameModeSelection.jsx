@@ -8,6 +8,7 @@ import { UserContext } from '../components/Providers';
 export default function GameModeSelection() {
   const router = useRouter();
   const [showFriendOptions, setShowFriendOptions] = useState(false);
+  const [showComputerOptions, setShowComputerOptions] = useState(false);
   const [timeControl, setTimeControl] = useState(10); // Default 10 minutes per side
   const [colorChoice, setColorChoice] = useState('random'); // Default to random
   const { session } = useContext(UserContext); 
@@ -17,37 +18,28 @@ export default function GameModeSelection() {
   }
 
   const handlePlayAgainstComputer = () => {
-    // Function to determine if user should start as white or black
-    const shouldUserStartAsWhite = (colorChoice === 'white') || (colorChoice === 'random' && coinFlip());
-    
-    if (shouldUserStartAsWhite) {
-      startNewGame(0, session, 0, null);
-    } else {
-      startNewGame(0, 0, session, null);
-    }
-  
-    router.push('/compete/solo');
+    // Show computer options and Hide Friend Options
+    setShowComputerOptions(true);
+    setShowFriendOptions(false);
   };
 
   const handlePlayAgainstFriend = () => {
-    // Show friend options
+    // Show friend options and hide computer options
     setShowFriendOptions(true);
+    setShowComputerOptions(false);
   };
 
-  const handleStartGameAgainstFriend = () => {
+  async function handleStartGame() {
      // Function to determine if user should start as white or black
-    const shouldUserStartAsWhite = (colorChoice === 'white') || (colorChoice === 'random' && coinFlip());
+    const playerWhite = (colorChoice === 'white') || (colorChoice === 'random' && coinFlip()) ? session : null;
+    const playerBlack = (colorChoice === 'black') ? null : session;
+    const type = showFriendOptions ? 1 : 0;
+
+    const gameData = await startNewGame(type, playerWhite, playerBlack, timeControl);
+    const gameId = gameData.id
     
-    if (shouldUserStartAsWhite) {
-      console.log("starting as white")
-      console.log(timeControl)
-      startNewGame(1, session, null, timeControl); //null field gets filled in after a user joins
-    } else {
-      startNewGame(1, null, session, timeControl);
-    }
-  
-    router.push('/compete/solo');
-  };
+    router.push(`/compete/${gameId}`);
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -60,6 +52,54 @@ export default function GameModeSelection() {
           >
             Play Against Computer
           </button>
+          {showComputerOptions && (
+          <div className="mt-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Choose Your Color:</label>
+              <div className="mt-2 space-x-4">
+                <label>
+                  <input
+                    type="radio"
+                    name="colorChoice"
+                    value="white"
+                    checked={colorChoice === 'white'}
+                    onChange={() => setColorChoice('white')}
+                    className="mr-2"
+                  />
+                  White
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="colorChoice"
+                    value="black"
+                    checked={colorChoice === 'black'}
+                    onChange={() => setColorChoice('black')}
+                    className="mr-2"
+                  />
+                  Black
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="colorChoice"
+                    value="random"
+                    checked={colorChoice === 'random'}
+                    onChange={() => setColorChoice('random')}
+                    className="mr-2"
+                  />
+                  Random
+                </label>
+              </div>
+            </div>
+            <button
+              onClick={handleStartGame}
+              className="w-full bg-blue-600 text-white rounded-md py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Start Game
+            </button>
+          </div>
+        )}
           <button
             onClick={handlePlayAgainstFriend}
             className="w-full bg-green-600 text-white rounded-md py-2 font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -120,7 +160,7 @@ export default function GameModeSelection() {
               </div>
             </div>
             <button
-              onClick={handleStartGameAgainstFriend}
+              onClick={handleStartGame}
               className="w-full bg-blue-600 text-white rounded-md py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Start Game
