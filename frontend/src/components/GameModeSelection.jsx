@@ -38,7 +38,7 @@ export default function GameModeSelection() {
     const gameData = await startNewGame(type, playerWhite, playerBlack, timeControl);
     const gameId = gameData.id
     
-    router.push(`/compete/${gameId}`);
+    router.push(`/compete/${gameId}/${colorChoice}`);
 }
 
   return (

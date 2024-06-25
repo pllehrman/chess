@@ -5,6 +5,7 @@
     "database": "mydatabase",
     "host": "db",
     "dialect": "postgres",
+    "timezone": "America/Los_Angeles",
     "logging": false
   },
   "test": {

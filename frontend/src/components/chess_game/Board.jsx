@@ -2,12 +2,12 @@
 import { Chessboard } from 'react-chessboard';
 import React from 'react';
 
-export default function Board({ game, onDrop, customPieces }) {
+export default function Board({ orientation, position, onDrop, customPieces }) {
   return (
     <Chessboard
       id="StyledBoard"
-      boardOrientation="black"
-      position={game.fen()}
+      boardOrientation={orientation} // "white" or "black"
+      position={position}
       onPieceDrop={onDrop}
       customBoardStyle={{
         borderRadius: '4px',

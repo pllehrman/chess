@@ -7,10 +7,11 @@ const {
     deleteAllGames,
     getGame,
     deleteGame,
-    updateGame
+    updateGame,
+    joinGame
 } = require('../controllers/games');
 
 router.route('/').get(getAllGames).post(newGame).delete(deleteAllGames); 
-router.route('/:id').get(getGame).delete(deleteGame).put(updateGame);
+router.route('/:id').get(getGame).post(joinGame).delete(deleteGame).put(updateGame);
 
 module.exports = router;

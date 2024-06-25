@@ -1,6 +1,7 @@
 const { Game } = require('../db/models'); // Assuming your models' index.js is in ../db/models
-const asyncWrapper = require('../middleware/asyncWrapper')
-const { createCustomError } = require('../middleware/customError')
+const asyncWrapper = require('../middleware/asyncWrapper');
+const { createCustomError } = require('../middleware/customError');
+const sequelize = require('../db/models/index').sequelize;
 
 //ROUTES -> '/games'
 // GET
@@ -74,11 +75,43 @@ const updateGame = asyncWrapper( async (req, res) => {
     res.status(200).json(game); //send it back to the user
 });
 
+// POST
+const joinGame = asyncWrapper( async (req, res) => {
+    const gameId = req.params.id;
+
+    const transaction = await sequelize.transaction();
+    
+    try {
+        const game = await Game.findByPk(gameId, { transaction } )
+
+        if(!game) {
+            throw createCustomError('Game could not be found', 404);
+        }
+
+        // Game is available
+        if (game.num_players < 2) {
+            game.num_players += 1
+            await game.save({ transaction });
+
+            await transaction.commit();
+
+            res.status(200).json({isAvailable: true});
+        } else {
+            await transaction.rollback();
+            res.status(200).json({isAvailable: false});
+        }
+    } catch (error) {
+        await transaction.rollback();
+        throw createCustomError("Transaction failed")
+    }
+});
+
 module.exports = {
     getAllGames,
     newGame,
     deleteAllGames,
     getGame,
     deleteGame,
-    updateGame
+    updateGame,
+    joinGame
 }

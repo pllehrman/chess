@@ -1,43 +1,25 @@
 'use client';
 
-import { useMemo, useEffect, useState, useRef } from 'react';
+// import { useMemo, useEffect, useState, useRef } from 'react';
 import Board from './Board';
 import Controls from './Controls';
 import ResultNotice from './ResultNotice';
 import { ChessGameLogic } from '../../hooks/ChessGameLogic';
-import fetchGameState from '../../hooks/fetchGameState';
-import onDrop from '../../utils/onDrop';
+import { useFetchGameState } from '../../hooks/useFetchGameState';
+import { useChessPieces } from '../../hooks/useChessPieces';
+import { useControlsLogic } from '../../hooks/useControlsLogic';
+import { onDropHandler } from '../../utils/onDropHandler';
 
-export default function MainGame({ gameId }) {
-  const [gameData, setGameData] = useState(null);
-  const hasFetched = useRef(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchGameState(gameId);
-        setGameData(data);
-      } catch (error) {
-        throw error;
-      }
-    };
-    if (!hasFetched.current) {
-      fetchData();
-      hasFetched.current = true;
-    }
-  }, [gameId]);
+export default function MainGame({ gameId, orientation }) {
+  const { gameData, loading, error } = useFetchGameState(gameId);
+  const customPieces = useChessPieces()
 
-  if (!gameData) {
-    return <h1>Game is loading</h1>; // or some other fallback UI
-  }
-  
-  console.log(gameData);
   const {
     game,
-    setGame,
-    gameOver,
     result,
     winner,
+    setGame,
     safeGameMutate,
     checkGameOver,
     setGameOver,
@@ -45,57 +27,15 @@ export default function MainGame({ gameId }) {
     setWinner,
   } = ChessGameLogic(gameData);
 
+  const { resetGame, undoMove } = useControlsLogic(safeGameMutate, setGameOver, setResult, setWinner)
 
-
-  // const { ws, setGameRef } = ChessWebSocket(setGame, checkGameOver);
-
-  // useEffect(() => {
-  //   setGameRef(game);
-  // }, [game, setGameRef]);
-
-
-
-  const pieces = [
-    'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',
-    'bP', 'bN', 'bB', 'bR', 'bQ', 'bK',
-  ];
-
-  const customPieces = useMemo(() => {
-    const pieceComponents = {};
-    pieces.forEach((piece) => {
-      pieceComponents[piece] = ({ squareWidth }) => (
-        <div
-          className="bg-no-repeat bg-center"
-          style={{
-            width: squareWidth,
-            height: squareWidth,
-            backgroundImage: `url(/${piece}.png)`,
-            backgroundSize: '100%',
-          }}
-        />
-      );
-    });
-    return pieceComponents;
-  }, []);
+   if (loading) return <p>Loading...</p>
+  if (error) return <p>Error: {error.message}</p>
 
   return (
     <div className="flex flex-col items-center">
-      <Board game={game} onDrop={onDrop} customPieces={customPieces} />
-      <Controls
-        resetGame={() => {
-          safeGameMutate((game) => {
-            game.reset();
-          });
-          setGameOver(false);
-          setResult(null);
-          setWinner(null);
-        }}
-        undoMove={() => {
-          safeGameMutate((game) => {
-            game.undo();
-          });
-        }}
-      />
+      <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver)} customPieces={customPieces} />
+      <Controls resetGame={resetGame} undoMove={undoMove} />
       <ResultNotice result={result} winner={winner} />
     </div>
   );

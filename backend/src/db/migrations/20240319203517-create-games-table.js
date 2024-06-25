@@ -35,11 +35,6 @@ module.exports = {
         allowNull: false,
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' // Starting position in FEN
       },
-      turn: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: "white",
-      },
       playerWhite: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -73,6 +68,16 @@ module.exports = {
         validate: {
           isInt: {
             msg: 'PlayerBlack time must be an integer.'
+          }
+        }
+      },
+      num_players: {
+        allowNull: False,
+        type: Sequelize.INTEGER,
+        defaultValue: 0, 
+        validate: {
+          isInt: {
+            msg : 'num_players must be an integer.'
           }
         }
       },

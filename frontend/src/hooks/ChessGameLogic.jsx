@@ -1,10 +1,8 @@
-// hooks/useChessGame.js
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Chess } from 'chess.js';
 
 export function ChessGameLogic(gameData) {
-  const initialFen = gameData?.fen || 'start';
-  const [game, setGame] = useState(new Chess(initialFen));
+  const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
@@ -12,8 +10,10 @@ export function ChessGameLogic(gameData) {
   useEffect(() => {
     if (gameData) {
       setGame(new Chess(gameData.fen));
+      console.log("game position has been set.")
     }
   }, [gameData]);
+
 
   function safeGameMutate(modify) {
     setGame((g) => {

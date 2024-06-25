@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const setupChessWebSocketServer = require('./services/chessWebsocket');
 const setupChatWebSocketServer = require('./services/chatWebSocket');
-const simpleWebSocketServer = require('./services/exampleWebSocket');
+const chatWebSocketServer = require('./services/chatWebSocket');
 
 // Middleware
 const dbConnect = require('./middleware/dbConnect');
@@ -37,7 +37,7 @@ const server = http.createServer(app);
 
 // setupChessWebSocketServer(server);
 // setupChatWebSocketServer(server);
-simpleWebSocketServer(3003);
+chatWebSocketServer(3003);
 
 const port = process.env.PORT || 3001;
 server.listen(port, () => {

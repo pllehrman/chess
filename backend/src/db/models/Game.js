@@ -31,11 +31,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' // Starting position in FEN
       },
-      turn: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "white",
-      },
       playerWhite: {
         type: DataTypes.INTEGER,
         allowNull: true,
