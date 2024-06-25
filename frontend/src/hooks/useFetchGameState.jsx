@@ -1,11 +1,21 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { fetchGameState } from '../utils/fetchGameState';
+// import { fetchGameState } from '../utils/fetchGameState';
+
+
+async function fetchGameState(gameId) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/${gameId}`);
+    if (!response.ok) {
+        throw new Error(`HTTP error!, status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+};  
 
 export function useFetchGameState(gameId) {
     const [gameData, setGameData] = useState(null);
-    const [loading, setLoading] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const hasFetched = useRef(false);
 
@@ -30,5 +40,4 @@ export function useFetchGameState(gameId) {
   }, [gameId]);
 
   return {gameData, loading, error};
-}
-    
+};

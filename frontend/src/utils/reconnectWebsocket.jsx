@@ -1,29 +1,32 @@
-import useWebSocket, {ReadyState} from "react-use-websocket";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { useRef } from 'react';
 
-export const reconnectWebSocket = (WS_URL, username, maxRetries = 3) => {
-    let retryCount = 0;
+export const reconnectWebSocket = (WS_URL, username, gameId, maxRetries = 3) => {
+  const retryCount = useRef(0);
 
-    const connect = () => {
-        const { sendMessage, readyState, connect, lastMessage } = useWebSocket(WS_URL, {
-            queryParams: { username },
-            shouldReconnect: () => retryCount < maxRetries
-        });
+  const { sendMessage, readyState, lastMessage, getWebSocket } = useWebSocket(WS_URL, {
+    queryParams: { username, gameId },
+    shouldReconnect: (closeEvent) => retryCount.current < maxRetries,
+    onClose: () => {
+      if (readyState === ReadyState.CLOSED && retryCount < maxRetries) {
+        console.log(`Attempting to reconnect... (${retryCount.current + 1}/${maxRetries})`);
+        retryCount.current += 1;
+      }
+    }
+  });
 
-        const handleReconnection = () => {
-            if (readyState === ReadyState.CLOSED && retryCount < maxRetries) {
-                console.log(`Attempting to reconnect... (${retryCount + 1}/${maxRetries})`);
-                retryCount += 1;
-                // connect();
-            }
-        };
+  const handleReconnection = () => {
+    if (readyState === ReadyState.CLOSED && retryCount.current < maxRetries) {
+      console.log(`Attempting to reconnect... (${retryCount.current + 1}/${maxRetries})`);
+      retryCount.current += 1;
+      getWebSocket(); // Reconnect manually if needed
+    }
+  };
 
-        return {
-            sendMessage,
-            readyState,
-            lastMessage,
-            handleReconnection
-        };
-    };
-    
-    return connect();
-}; 
+  return {
+    sendMessage,
+    readyState,
+    lastMessage,
+    handleReconnection
+  };
+};

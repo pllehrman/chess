@@ -66,7 +66,17 @@ module.exports = (sequelize, DataTypes) => {
             msg: 'PlayerBlack time must be an integer.'
           }
         }
-      }
+      },
+      numPlayers: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0, 
+        validate: {
+          isInt: {
+            msg : 'num_players must be an integer.'
+          }
+        }
+      },
     }, {
       timestamps: true,
     });

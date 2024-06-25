@@ -1,6 +1,5 @@
 'use client';
 
-// import { useMemo, useEffect, useState, useRef } from 'react';
 import Board from './Board';
 import Controls from './Controls';
 import ResultNotice from './ResultNotice';

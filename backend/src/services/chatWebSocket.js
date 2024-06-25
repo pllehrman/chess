@@ -5,22 +5,33 @@ const uuidv4 = require("uuid").v4
 
 const server = http.createServer();
 const wsServer = new WebSocketServer({ server });
+const { joinGame,leaveGame } = require('../controllers/games');
 
 const users = {}
 const connections = {}
 
 
-
-function chatWebSocketServer(port) {
-    wsServer.on("connection", (connection, request) => {
+async function chatWebSocketServer(port) {
+    wsServer.on("connection", async (connection, request) => {
         // client side -> ws://localhost:8000?username=Alex
-        const { username } = url.parse(request.url, true).query
-        const uuid = uuidv4()
+        const { username, gameId } = url.parse(request.url, true).query
 
+        try {
+            // Join the game in the db
+            await joinGame(gameId);
+            console.log("successfully joined the game");
+        } catch (error) {
+            console.log(`Error joining game: ${error.message}`);
+            connection.close();
+            return;
+        }
+        
+        const uuid = uuidv4()
         console.log(`${username} is now connected to the web socket with ${uuid}.`)
 
         connections[uuid] = connection;
         users[uuid] = {
+            gameId: gameId,
             username: username,
             state: {
                 typing: false,
@@ -36,8 +47,22 @@ function chatWebSocketServer(port) {
             broadcastMessage(uuid, message);
         });
 
-        connection.on('close', () => {
+        // connection.on('move', (move) => {
+        //     console.log(`recieved move from ${username}: ${move}`);
+        //     console.log();
+        //     broadcastMove(uuid, move);
+        // });
+
+        connection.on('close', async () => {
             console.log(`${username} disconnected`);
+
+            try {
+                await leaveGame(users[uuid].gameId); 
+                console.log("successfully left the game");
+            } catch (error) {
+                console.error(`Error leaving game: ${error.message}`)
+            }
+            // Call to leave game method in games controller;
             delete connections[uuid];
             delete users[uuid];
         });
@@ -63,6 +88,10 @@ function broadcastMessage(senderUuid, message) {
             connections[uuid].send(messageString);
         }
     });
+}
+
+function broadcastMove(senderUuid, move) {
+
 }
 
 module.exports = chatWebSocketServer;

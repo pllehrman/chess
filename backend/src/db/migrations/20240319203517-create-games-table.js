@@ -71,9 +71,9 @@ module.exports = {
           }
         }
       },
-      num_players: {
-        allowNull: False,
+      numPlayers: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         defaultValue: 0, 
         validate: {
           isInt: {

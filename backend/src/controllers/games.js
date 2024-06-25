@@ -1,6 +1,6 @@
 const { Game } = require('../db/models'); // Assuming your models' index.js is in ../db/models
 const asyncWrapper = require('../middleware/asyncWrapper');
-const { createCustomError } = require('../middleware/customError');
+const { createCustomError, CustomAPIError } = require('../middleware/customError');
 const sequelize = require('../db/models/index').sequelize;
 
 //ROUTES -> '/games'
@@ -18,7 +18,7 @@ const getAllGames = asyncWrapper( async (req, res) => {
 //POST
 const newGame = asyncWrapper( async (req, res) => {
     const details = req.body; // type (of game), playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
-    console.log(details)
+    
     const game = await Game.create(details); //no need to pass in anything here as of now
     
     if (!game) {
@@ -75,34 +75,60 @@ const updateGame = asyncWrapper( async (req, res) => {
     res.status(200).json(game); //send it back to the user
 });
 
-// POST
-const joinGame = asyncWrapper( async (req, res) => {
-    const gameId = req.params.id;
+// GET
+const isGameAvailable = asyncWrapper( async(req, res) => {
+    const gameId = req.query.id;
+    const game = await Game.findByPk(gameId);
 
+    if (!game) {
+        throw createCustomError(`Game could not be found with id ${gameId}`, 404);
+    }
+
+    if (game.numPlayers < 2) {
+        res.status(200).json({isAvailable: true});
+    } else {
+        res.status(200).json({isAvailable: false});
+    }
+});
+
+// INTERNAL METHOD
+const joinGame = asyncWrapper( async (gameId) => {
     const transaction = await sequelize.transaction();
     
     try {
         const game = await Game.findByPk(gameId, { transaction } )
-
+        
         if(!game) {
             throw createCustomError('Game could not be found', 404);
         }
 
         // Game is available
-        if (game.num_players < 2) {
-            game.num_players += 1
+        if (game.numPlayers < 2) {
+            game.numPlayers += 1
             await game.save({ transaction });
 
             await transaction.commit();
-
-            res.status(200).json({isAvailable: true});
         } else {
             await transaction.rollback();
-            res.status(200).json({isAvailable: false});
         }
     } catch (error) {
         await transaction.rollback();
         throw createCustomError("Transaction failed")
+    }
+});
+
+const leaveGame = asyncWrapper( async(gameId) => {
+    const game = await Game.findByPk(gameId);
+    
+    if (!game) {
+        throw createCustomError(`Game with id ${gameId} could not be found.`, 404);
+    }
+
+    if (game.numPlayers > 0) {
+        game.numPlayers -= 1;
+        await game.save();
+    } else {
+        throw createCustomError(`Game with id ${gameId} already has no players.`, 400);
     }
 });
 
@@ -113,5 +139,7 @@ module.exports = {
     getGame,
     deleteGame,
     updateGame,
-    joinGame
+    joinGame,
+    leaveGame,
+    isGameAvailable
 }

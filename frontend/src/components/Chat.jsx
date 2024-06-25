@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { ReadyState } from "react-use-websocket";
 import { useChat } from '../hooks/useChat'
 
-export function Chat() {
+export function Chat({ gameId }) {
   const WS_URL = process.env.NEXT_PUBLIC_WS_CHAT_URL;
   const username = "Alex";
 
@@ -13,7 +12,7 @@ export function Chat() {
     currentMessage,
     setCurrentMessage,
     handleSendMessage,
-    readyState } = useChat(WS_URL, username);
+    readyState } = useChat(WS_URL, username, gameId);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]:'Connecting',
