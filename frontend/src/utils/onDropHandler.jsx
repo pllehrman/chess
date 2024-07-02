@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 
-export function onDropHandler(game, setGame, checkGameOver) {
+export function onDropHandler(game, setGame, checkGameOver, handleSendMove) {
   return (sourceSquare, targetSquare) => {
     console.log(`Attempting move from ${sourceSquare} to ${targetSquare}`); // Debug log
 
@@ -16,8 +16,10 @@ export function onDropHandler(game, setGame, checkGameOver) {
     }
 
     // Update the game state with the new position
-    const updatedGame = new Chess(game.fen());
-    setGame(updatedGame);
+    setGame(new Chess(game.fen()));
+
+    // Send the move over the web socket
+    handleSendMove(move);
 
     // Check for game over conditions
     checkGameOver();

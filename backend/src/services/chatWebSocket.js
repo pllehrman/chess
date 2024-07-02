@@ -40,7 +40,10 @@ async function chatWebSocketServer(port) {
         };
 
         connection.on('message', (message) => {
-            const parsedMessage = JSON.parse(message)
+            const messageString = message.toString('utf-8');
+            console.log(messageString);
+
+            const parsedMessage = JSON.parse(messageString)
             if (parsedMessage.type === 'chat') {
                 broadcastMessage(uuid, parsedMessage.message);
             } else if (parsedMessage.type === 'move') {

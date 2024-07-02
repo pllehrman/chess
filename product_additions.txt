@@ -18,4 +18,4 @@ install dotenv and get that working
 - No groups but let's have friends on the platform
 
 
-NEED VALIDATION OF WHITE PLAYER AND BLACK PLAYER NOT JUST TWO PLAYERS
+ONTO MOVEMENT WITH WEBSOCKETS

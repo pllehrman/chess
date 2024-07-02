@@ -81,25 +81,23 @@ const isGameAvailable = asyncWrapper( async(req, res) => {
     const orientation = req.query.orientation; //white or black
     const game = await Game.findByPk(gameId);
 
-    console.log("here")
     if (!game) {
-        throw createCustomError(`Game could not be found with id ${gameId}`, 404);
+        return res.status(404).json({ message: `Game could not be found with id ${gameId}` });
     }
+
+    let isAvailable = false;
 
     // Does the game have less than two players and is the player color occupied?
     if (orientation === 'white') {
         if (game.numPlayers < 2 && game.playerWhite === null) {
-            res.status(200).json({isAvailable: true});
+            isAvailable = true;
         }
     } else if (orientation === 'black') {
         if (game.numPlayers < 2 && game.playerBlack === null) {
-            res.status(200).json({isAvailable: true});
+           isAvailable = true;
         }
-    } else {
-        return res.status(200).json({isAvailable: false});
     }
-
-    res.status(200).json({isAvailable: false});
+    res.status(200).json({isAvailable: isAvailable});
 });
 
 // INTERNAL METHOD

@@ -37,7 +37,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation) => {
     const handleSendMessage = useCallback(() => {
         if (currentMessage) {
             const messageData = JSON.stringify({ type: 'chat', message: currentMessage });
-            sendMessage(currentMessage);
+            sendMessage(messageData);
             setCurrentMessage('');
         }
     }, [currentMessage, sendMessage]);

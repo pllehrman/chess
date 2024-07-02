@@ -52,13 +52,14 @@ export default function MainGame({ gameId, orientation }) {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 mb-8">
         <div className="flex flex-col items-center">
-          <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver)} customPieces={customPieces} />
+          <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver, handleSendMove)} customPieces={customPieces} />
           <Controls resetGame={resetGame} undoMove={undoMove} />
           <ResultNotice result={result} winner={winner} />
         </div>
       </div>
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <Chat 
+            username={username}
             messageHistory={messageHistory} 
             currentMessage={currentMessage} 
             setCurrentMessage={setCurrentMessage} 

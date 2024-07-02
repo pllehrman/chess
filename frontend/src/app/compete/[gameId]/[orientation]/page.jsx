@@ -2,7 +2,6 @@
 
 import MainGame from '../../../../components/chess_game/MainGame';
 import { usePathname } from 'next/navigation';
-import { Chat } from "../../../../components/Chat";
 import { checkGameAvailability } from '../../../../utils/checkGameAvailability';
 import { useEffect, useState, useRef } from 'react';
 

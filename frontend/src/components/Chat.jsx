@@ -2,7 +2,7 @@
 
 import { ReadyState } from "react-use-websocket";
 
-export function Chat({ messageHistory, currentMessage, setCurrentMessage, handleSendMessage, readyState}) {
+export function Chat({ username, messageHistory, currentMessage, setCurrentMessage, handleSendMessage, readyState}) {
 
   const connectionStatus = {
     [ReadyState.CONNECTING]:'Connecting',
