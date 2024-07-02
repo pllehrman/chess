@@ -20,9 +20,7 @@ services:
     env_file:
       - backend/.env
     ports:
-      - "3001:3001"
-      - "3002:3002" # chess websocket
-      - "3003:3003" # chat websocket
+      - "3001:3001" #Websocket and app listening here
     volumes:
       - ./backend:/app
       - /app/node_modules

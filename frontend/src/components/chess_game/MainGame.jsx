@@ -15,7 +15,7 @@ export default function MainGame({ gameId, orientation }) {
   const { gameData, loading, error } = useFetchGameState(gameId);
   const customPieces = useChessPieces()
 
-  const WS_URL = process.env.NEXT_PUBLIC_WS_CHAT_URL;
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
   const username = "Alex";
 
   // WEBSOCKET FUNCTIONALITY

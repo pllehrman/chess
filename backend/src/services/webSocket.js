@@ -2,16 +2,15 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const url = require('url');
 const uuidv4 = require("uuid").v4
-
-const server = http.createServer();
-const wsServer = new WebSocketServer({ server });
 const { joinGame,leaveGame } = require('../controllers/games');
 
 const users = {}
 const connections = {}
 
 
-async function chatWebSocketServer(port) {
+async function webSocketServer(server) {
+    const wsServer = new WebSocketServer({ server });
+
     wsServer.on("connection", async (connection, request) => {
         // client side -> ws://localhost:8000?username=Alex
         const { username, gameId, orientation } = url.parse(request.url, true).query
@@ -66,9 +65,7 @@ async function chatWebSocketServer(port) {
         });
     });
 
-    server.listen(port, () => {
-        console.log(`Chat WebSocket server listending on port ${port}`);
-    });
+    console.log('Websocket initialized.');
 }
 
 function broadcastMessage(senderUuid, message) {
@@ -106,4 +103,4 @@ function broadcastMove(senderUuid, move) {
 }
 
 
-module.exports = chatWebSocketServer;
+module.exports = webSocketServer;

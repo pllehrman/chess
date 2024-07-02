@@ -2,9 +2,7 @@ const express = require('express');
 const http = require('http');
 const app = express();
 const cors = require('cors');
-const setupChessWebSocketServer = require('./services/chessWebsocket');
-const setupChatWebSocketServer = require('./services/chatWebSocket');
-const chatWebSocketServer = require('./services/chatWebSocket');
+const webSocketServer = require('./services/webSocket');
 
 // Middleware
 const dbConnect = require('./middleware/dbConnect');
@@ -34,10 +32,9 @@ app.get('/', (req, res) => {
 app.use(errorHandler);
 
 const server = http.createServer(app);
+webSocketServer(server);
 
-// setupChessWebSocketServer(server);
-// setupChatWebSocketServer(server);
-chatWebSocketServer(3003);
+
 
 const port = process.env.PORT || 3001;
 server.listen(port, () => {
