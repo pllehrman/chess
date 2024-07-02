@@ -16,3 +16,6 @@ install dotenv and get that working
     - Play against the computer should be easier than 1v1 playing
 - UI displaying past games against opponents
 - No groups but let's have friends on the platform
+
+
+NEED VALIDATION OF WHITE PLAYER AND BLACK PLAYER NOT JUST TWO PLAYERS

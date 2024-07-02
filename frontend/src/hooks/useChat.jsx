@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { reconnectWebSocket } from '../utils/reconnectWebsocket';
 
-export const useChat = (WS_URL, username, gameId) => {
+export const useChat = (WS_URL, username, gameId, orientation) => {
     const [messageHistory, setMessageHistory] = useState([])
     const [currentMessage, setCurrentMessage] = useState('');
-    const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId);
+    const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId, orientation);
 
     useEffect(() => {
         if (lastMessage !== null) {

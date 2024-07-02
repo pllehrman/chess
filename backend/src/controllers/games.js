@@ -78,21 +78,32 @@ const updateGame = asyncWrapper( async (req, res) => {
 // GET
 const isGameAvailable = asyncWrapper( async(req, res) => {
     const gameId = req.query.id;
+    const orientation = req.query.orientation; //white or black
     const game = await Game.findByPk(gameId);
 
+    console.log("here")
     if (!game) {
         throw createCustomError(`Game could not be found with id ${gameId}`, 404);
     }
 
-    if (game.numPlayers < 2) {
-        res.status(200).json({isAvailable: true});
+    // Does the game have less than two players and is the player color occupied?
+    if (orientation === 'white') {
+        if (game.numPlayers < 2 && game.playerWhite === null) {
+            res.status(200).json({isAvailable: true});
+        }
+    } else if (orientation === 'black') {
+        if (game.numPlayers < 2 && game.playerBlack === null) {
+            res.status(200).json({isAvailable: true});
+        }
     } else {
-        res.status(200).json({isAvailable: false});
+        return res.status(200).json({isAvailable: false});
     }
+
+    res.status(200).json({isAvailable: false});
 });
 
 // INTERNAL METHOD
-const joinGame = asyncWrapper( async (gameId) => {
+const joinGame = asyncWrapper( async (gameId, orientation) => {
     const transaction = await sequelize.transaction();
     
     try {
@@ -104,6 +115,13 @@ const joinGame = asyncWrapper( async (gameId) => {
 
         // Game is available
         if (game.numPlayers < 2) {
+            if (orientation === "white") {
+                game.playerWhite = 0; // for now just set to mean an unidentified player
+            } else if (orientation === "black") {
+                game.playerBlack = 0;
+            } else {
+                throw createCustomError("Invalid orientation value. It should be 'white' or 'black'.", 400);
+            }
             game.numPlayers += 1
             await game.save({ transaction });
 
@@ -117,7 +135,8 @@ const joinGame = asyncWrapper( async (gameId) => {
     }
 });
 
-const leaveGame = asyncWrapper( async(gameId) => {
+// INTERNAL METHOD
+const leaveGame = asyncWrapper( async(gameId, orientation) => {
     const game = await Game.findByPk(gameId);
     
     if (!game) {
@@ -125,6 +144,13 @@ const leaveGame = asyncWrapper( async(gameId) => {
     }
 
     if (game.numPlayers > 0) {
+        if (orientation === "white") {
+            game.playerWhite = null; // reset the datapoint to null
+        } else if (orientation === "black") {
+            game.playerBlack = null;
+        } else {
+            throw createCustomError("Invalid orientation value. It should be 'white' or 'black'.", 400);
+        }
         game.numPlayers -= 1;
         await game.save();
     } else {

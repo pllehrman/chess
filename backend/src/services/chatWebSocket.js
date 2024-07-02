@@ -14,11 +14,11 @@ const connections = {}
 async function chatWebSocketServer(port) {
     wsServer.on("connection", async (connection, request) => {
         // client side -> ws://localhost:8000?username=Alex
-        const { username, gameId } = url.parse(request.url, true).query
+        const { username, gameId, orientation } = url.parse(request.url, true).query
 
         try {
             // Join the game in the db
-            await joinGame(gameId);
+            await joinGame(gameId, orientation);
             console.log("successfully joined the game");
         } catch (error) {
             console.log(`Error joining game: ${error.message}`);
@@ -32,6 +32,7 @@ async function chatWebSocketServer(port) {
         connections[uuid] = connection;
         users[uuid] = {
             gameId: gameId,
+            orientation: orientation,
             username: username,
             state: {
                 typing: false,
@@ -57,7 +58,7 @@ async function chatWebSocketServer(port) {
             console.log(`${username} disconnected`);
 
             try {
-                await leaveGame(users[uuid].gameId); 
+                await leaveGame(users[uuid].gameId, users[uuid].orientation); 
                 console.log("successfully left the game");
             } catch (error) {
                 console.error(`Error leaving game: ${error.message}`)

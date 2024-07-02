@@ -17,7 +17,8 @@ export default function SoloChessBoard() {
 
   useEffect(() => {
     const fetchGameAvailability = async () => {
-      const available = await checkGameAvailability(gameId);
+      const available = await checkGameAvailability(gameId, orientation);
+      console.log(available)
       setIsGameAvailable(available);
       hasCheckedAvailability.current = true;
     }
@@ -41,7 +42,7 @@ export default function SoloChessBoard() {
         <MainGame gameId={gameId} orientation={orientation} />
       </div>
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <Chat gameId={gameId}/>
+        <Chat gameId={gameId} orientation={orientation}/>
       </div>
     </div>
   );
