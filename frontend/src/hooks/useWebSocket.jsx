@@ -4,9 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { reconnectWebSocket } from '../utils/reconnectWebsocket';
 
-export const useChat = (WS_URL, username, gameId, orientation) => {
+export const useWebSocket = (WS_URL, username, gameId, orientation) => {
     const [messageHistory, setMessageHistory] = useState([])
     const [currentMessage, setCurrentMessage] = useState('');
+    const [moveHistory, setMoveHistory] = useState([]);
+    const [currentMove, setCurrentMove] = useState(null);
     const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId, orientation);
 
     useEffect(() => {
@@ -16,7 +18,12 @@ export const useChat = (WS_URL, username, gameId, orientation) => {
             if (messageData.message && messageData.message.type === 'Buffer') {
                 messageData.message = String.fromCharCode(...messageData.message.data);
             }
-            setMessageHistory((prev) => [...prev, messageData]);
+            if (messageData.type === 'chat') {
+                setMessageHistory((prev) => [...prev, messageData]);
+            } else if (messageData.type === 'move') {
+                setMoveHistory((prev) => [...prev, messageData]);
+            }
+            
             }
         }, [lastMessage]);
     
@@ -29,16 +36,27 @@ export const useChat = (WS_URL, username, gameId, orientation) => {
 
     const handleSendMessage = useCallback(() => {
         if (currentMessage) {
+            const messageData = JSON.stringify({ type: 'chat', message: currentMessage });
             sendMessage(currentMessage);
             setCurrentMessage('');
         }
     }, [currentMessage, sendMessage]);
+
+    const handleSendMove = useCallback((move) => {
+        const moveData = JSON.stringify({type: 'move', move});
+        sendMessage(moveData);
+        setCurrentMove(null);
+    }, [sendMessage]);
 
     return {
         messageHistory,
         currentMessage,
         setCurrentMessage,
         handleSendMessage,
+        moveHistory, 
+        currentMove,
+        setCurrentMove,
+        handleSendMove,
         readyState
     };
 };

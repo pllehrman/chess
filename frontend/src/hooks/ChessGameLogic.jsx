@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
 
-export function ChessGameLogic(gameData) {
+export function ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMove, handleSendMove) {
   const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
@@ -14,14 +14,36 @@ export function ChessGameLogic(gameData) {
     }
   }, [gameData]);
 
+  // This function handles the case when move history changes or a move is made AGAINST the player.
+  useEffect(() => {
+    if (moveHistory.length > 0) {
+      const lastMove = moveHistory[moveHistory.length];
+      safeGameMutate((g) => {
+        g.move(lastMove.move);
+      });
+    }
+  }, [moveHistory]);
 
-  function safeGameMutate(modify) {
+  // This function handles the case when the current player makes a move and it needs to be sent to the ws.
+  useEffect(() => {
+    if (currentMove) {
+      safeGameMutate((g) => {
+        g.move(currentMove);
+      });
+      handleSendMove(currentMove);
+      setCurrentMove(null);
+    }
+  }, [currentMove, safeGameMutate, handleSendMove, setCurrentMove]);
+
+  // useCallback ensures safeGameMutate maintains the same reference across re-renders
+  const safeGameMutate = useCallback(() => {
     setGame((g) => {
       const update = new Chess(g.fen());
       modify(update);
       return update;
     });
-  }
+
+  }, []);
 
   function checkGameOver() {
     let gameResult = null;

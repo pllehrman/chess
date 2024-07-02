@@ -37,13 +37,8 @@ export default function SoloChessBoard() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 mb-8">
-        <MainGame gameId={gameId} orientation={orientation} />
-      </div>
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <Chat gameId={gameId} orientation={orientation}/>
-      </div>
+    <div>
+      <MainGame gameId={gameId} orientation={orientation} />
     </div>
   );
 }

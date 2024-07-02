@@ -40,19 +40,13 @@ async function chatWebSocketServer(port) {
         };
 
         connection.on('message', (message) => {
-            // if (Buffer.isBuffer(message)) {
-            //     message.toString('utf-8');
-            // }
-            console.log(`recieved message from ${username}: ${message}`);
-            console.log(message);
-            broadcastMessage(uuid, message);
+            const parsedMessage = JSON.parse(message)
+            if (parsedMessage.type === 'chat') {
+                broadcastMessage(uuid, parsedMessage.message);
+            } else if (parsedMessage.type === 'move') {
+                broadcastMove(uuid, parsedMessage.move);
+            }
         });
-
-        // connection.on('move', (move) => {
-        //     console.log(`recieved move from ${username}: ${move}`);
-        //     console.log();
-        //     broadcastMove(uuid, move);
-        // });
 
         connection.on('close', async () => {
             console.log(`${username} disconnected`);
@@ -75,11 +69,11 @@ async function chatWebSocketServer(port) {
 }
 
 function broadcastMessage(senderUuid, message) {
-    console.log(message);
     const messageData = {
+        type: 'chat',
         username: users[senderUuid].username,
         message: message,
-    }
+    };
 
     const messageString = JSON.stringify(messageData);
 
@@ -92,7 +86,21 @@ function broadcastMessage(senderUuid, message) {
 }
 
 function broadcastMove(senderUuid, move) {
+    const moveData = {
+        type: 'move',
+        username: users[senderUuid].username,
+        move: move,
+    };
 
+    const moveString = JSON.stringify(moveData);
+
+    Object.keys(connections).forEach((uuid) => {
+        // Don't want to broadcast the move to the sender
+        if (uuid !== senderUuid) {
+            connections[uuid].send(moveString);
+        }
+    });
 }
+
 
 module.exports = chatWebSocketServer;
