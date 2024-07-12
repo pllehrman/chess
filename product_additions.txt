@@ -17,5 +17,7 @@ install dotenv and get that working
 - UI displaying past games against opponents
 - No groups but let's have friends on the platform
 
-
-ONTO MOVEMENT WITH WEBSOCKETS
+July 2nd Product Updates:
+- Permissions -> only white can move white pieces during its turn.
+- Sessions and Context
+- Improved UI

@@ -1,4 +1,3 @@
-// components/ControlsComponent.jsx
 import React from 'react';
 
 export default function Controls({ resetGame, undoMove }) {

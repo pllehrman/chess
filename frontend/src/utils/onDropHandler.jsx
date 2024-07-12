@@ -1,7 +1,14 @@
 import { Chess } from 'chess.js';
 
-export function onDropHandler(game, setGame, checkGameOver, handleSendMove) {
+export function onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation) {
   return (sourceSquare, targetSquare) => {
+    const piece = game.get(sourceSquare);
+
+    if (!piece || piece.color !== orientation[0]) {
+      console.error(`Invalid move: ${orientation} cannot move ${piece ? piece.color : 'empty square'}`);
+      return false; // Illegal move
+    }
+
     console.log(`Attempting move from ${sourceSquare} to ${targetSquare}`); // Debug log
 
     const move = game.move({

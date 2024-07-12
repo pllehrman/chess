@@ -4,6 +4,8 @@ import MainGame from '../../../../components/chess_game/MainGame';
 import { usePathname } from 'next/navigation';
 import { checkGameAvailability } from '../../../../utils/checkGameAvailability';
 import { useEffect, useState, useRef } from 'react';
+import { GameUnavailable } from '@/components/chess_game/GameUnavailable';
+import { Loading } from '@/components/Loading';
 
 export default function SoloChessBoard() {
   const pathname = usePathname();
@@ -28,11 +30,11 @@ export default function SoloChessBoard() {
   },[gameId]);
 
   if (isGameAvailable === null) {
-    return <h1>Loading...</h1>
+    return <Loading />
   }
 
   if (!isGameAvailable) {
-    return <h1>Game is unavailable</h1>
+    return <GameUnavailable />
   }
 
   return (
