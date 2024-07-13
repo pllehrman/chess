@@ -10,7 +10,6 @@ export function ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMov
   useEffect(() => {
     if (gameData) {
       setGame(new Chess(gameData.fen));
-      console.log("game position has been set.")
     }
   }, [gameData]);
 

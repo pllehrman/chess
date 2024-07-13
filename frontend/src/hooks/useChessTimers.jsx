@@ -9,7 +9,7 @@ export function useChessTimers(currentMove, gameData) {
         if (gameData) {
           setWhiteTime(gameData.playerWhiteTimeRemaining);
           setBlackTime(gameData.playerBlackTimeRemaining);
-          console.log("game timers have been set.")
+        //   console.log("game timers have been set.")
         }
       }, [gameData]);
 

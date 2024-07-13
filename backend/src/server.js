@@ -34,8 +34,6 @@ app.use(errorHandler);
 const server = http.createServer(app);
 webSocketServer(server);
 
-
-
 const port = process.env.PORT || 3001;
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);

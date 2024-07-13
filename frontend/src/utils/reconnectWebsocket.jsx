@@ -9,7 +9,7 @@ export const reconnectWebSocket = (WS_URL, username, gameId, orientation, maxRet
     shouldReconnect: (closeEvent) => retryCount.current < maxRetries,
     onClose: () => {
       if (readyState === ReadyState.CLOSED && retryCount < maxRetries) {
-        console.log(`Attempting to reconnect... (${retryCount.current + 1}/${maxRetries})`);
+        // console.log(`Attempting to reconnect... (${retryCount.current + 1}/${maxRetries})`);
         retryCount.current += 1;
       }
     }
@@ -17,7 +17,7 @@ export const reconnectWebSocket = (WS_URL, username, gameId, orientation, maxRet
 
   const handleReconnection = () => {
     if (readyState === ReadyState.CLOSED && retryCount.current < maxRetries) {
-      console.log(`Attempting to reconnect... (${retryCount.current + 1}/${maxRetries})`);
+      // console.log(`Attempting to reconnect... (${retryCount.current + 1}/${maxRetries})`);
       retryCount.current += 1;
       getWebSocket(); // Reconnect manually if needed
     }

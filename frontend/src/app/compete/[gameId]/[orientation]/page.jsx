@@ -19,7 +19,6 @@ export default function SoloChessBoard() {
   useEffect(() => {
     const fetchGameAvailability = async () => {
       const available = await checkGameAvailability(gameId, orientation);
-      console.log(available)
       setIsGameAvailable(available);
       hasCheckedAvailability.current = true;
     }

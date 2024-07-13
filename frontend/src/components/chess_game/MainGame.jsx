@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Board from './Board';
 import Controls from './Controls';
 import ResultNotice from './ResultNotice';
@@ -13,10 +14,11 @@ import { Chat } from '../../components/Chat';
 import { GameUnavailable } from '@/components/chess_game/GameUnavailable';
 import { Loading } from '@/components/Loading';
 import { useChessTimers } from '@/hooks/useChessTimers';
+import { useOpponentPresent } from '@/hooks/useOpponentPresent';
 
 export default function MainGame({ gameId, orientation }) {
   const { gameData, loading, error } = useFetchGameState(gameId);
-  const customPieces = useChessPieces()
+  const customPieces = useChessPieces();
 
   const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
   const username = "Alex";
@@ -29,9 +31,13 @@ export default function MainGame({ gameId, orientation }) {
     handleSendMessage,
     moveHistory, 
     currentMove,
+    opponentJoined,
     setCurrentMove,
     handleSendMove,
-    readyState } = useWebSocket(WS_URL, username, gameId, orientation);
+    readyState 
+  } = useWebSocket(WS_URL, username, gameId, orientation);
+
+  const opponentPresent = useOpponentPresent(gameData, orientation, opponentJoined)
 
   // CHESS GAME LOGIC
   const {
@@ -46,17 +52,22 @@ export default function MainGame({ gameId, orientation }) {
     setWinner,
   } = ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMove, handleSendMove);
 
-  const { resetGame, undoMove } = useControlsLogic(safeGameMutate, setGameOver, setResult, setWinner)
+  const { resetGame, undoMove } = useControlsLogic(safeGameMutate, setGameOver, setResult, setWinner);
 
-  // IDEALLY THIS LINE IS CONDITIONALLY RENDERED BASED ON IF COMPUTER IS PLAYING
+  // Use the custom hook for timers
   const { whiteTime, blackTime, currentTurn } = useChessTimers(currentMove, gameData);
 
-  if (loading) return <GameUnavailable />
-  if (error) return <Loading />
+  if (loading) return <Loading />;
+  if (error) return <GameUnavailable />;
 
-
+  console.log(opponentPresent);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+      {!opponentPresent && (
+        <div className="animate-flash text-2xl font-bold text-red-500 mb-4">
+          Waiting for opponent to connect...
+        </div>
+      )}
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 mb-8">
         <div className="flex flex-col items-center">
           <h2 className={`text-2xl font-bold mb-4 ${currentTurn === 'white' ? 'text-gray-900' : 'text-gray-400'}`}>
@@ -80,13 +91,13 @@ export default function MainGame({ gameId, orientation }) {
       </div>
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <Chat 
-            username={username}
-            messageHistory={messageHistory} 
-            currentMessage={currentMessage} 
-            setCurrentMessage={setCurrentMessage} 
-            handleSendMessage={handleSendMessage} 
-            readyState={readyState} 
-          /> 
+          username={username}
+          messageHistory={messageHistory} 
+          currentMessage={currentMessage} 
+          setCurrentMessage={setCurrentMessage} 
+          handleSendMessage={handleSendMessage} 
+          readyState={readyState} 
+        /> 
       </div>
     </div>
   );

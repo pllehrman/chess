@@ -9,12 +9,17 @@ module.exports = {
     extend: {
       animation: {
         bounce: 'bounce 1s infinite',
+        flash: 'flash 2s infinite', // Adjusted duration to 2 seconds
       },
       keyframes: {
         bounce: {
           '0%, 100%': { transform: 'translateY(0)', opacity: '1' },
           '50%': { transform: 'translateY(-15px)', opacity: '0.5' },
         },
+        flash: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
+        }
       },
     },
   },

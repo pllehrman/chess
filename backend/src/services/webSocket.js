@@ -1,52 +1,57 @@
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const url = require('url');
-const uuidv4 = require("uuid").v4
-const { joinGame,leaveGame } = require('../controllers/games');
+const uuidv4 = require("uuid").v4;
+const { joinGame, leaveGame } = require('../controllers/games');
 
-const users = {}
-const connections = {}
-
+const users = {};
+const connections = {};
 
 async function webSocketServer(server) {
     const wsServer = new WebSocketServer({ server });
 
     wsServer.on("connection", async (connection, request) => {
         // client side -> ws://localhost:8000?username=Alex
-        const { username, gameId, orientation } = url.parse(request.url, true).query
+        const { username, gameId, orientation } = url.parse(request.url, true).query;
+
+        let userUuid;
 
         try {
             // Join the game in the db
             await joinGame(gameId, orientation);
+
+            // Notify the client of the join event
+            broadcastMessage('join', null, { gameId, status: true });
             console.log("successfully joined the game");
         } catch (error) {
             console.log(`Error joining game: ${error.message}`);
             connection.close();
             return;
         }
-        
-        const uuid = uuidv4()
-        console.log(`${username} is now connected to the web socket with ${uuid}.`)
 
-        connections[uuid] = connection;
-        users[uuid] = {
+        userUuid = uuidv4();
+        console.log(`${username} is now connected to the web socket with ${userUuid}.`);
+
+        connections[userUuid] = connection;
+        users[userUuid] = {
             gameId: gameId,
             orientation: orientation,
             username: username,
-            state: {
-                typing: false,
-            },
         };
 
         connection.on('message', (message) => {
             const messageString = message.toString('utf-8');
             console.log(messageString);
 
-            const parsedMessage = JSON.parse(messageString)
-            if (parsedMessage.type === 'chat') {
-                broadcastMessage(uuid, parsedMessage.message);
-            } else if (parsedMessage.type === 'move') {
-                broadcastMove(uuid, parsedMessage.move);
+            try {
+                const parsedMessage = JSON.parse(messageString);
+                if (parsedMessage.type === 'chat') {
+                    broadcastMessage('chat', userUuid, parsedMessage.message);
+                } else if (parsedMessage.type === 'move') {
+                    broadcastMessage('move', userUuid, parsedMessage.move);
+                }
+            } catch (error) {
+                console.error(`Error parsing message: ${error.message}`);
             }
         });
 
@@ -54,24 +59,27 @@ async function webSocketServer(server) {
             console.log(`${username} disconnected`);
 
             try {
-                await leaveGame(users[uuid].gameId, users[uuid].orientation); 
+                await leaveGame(users[userUuid].gameId, users[userUuid].orientation);
                 console.log("successfully left the game");
             } catch (error) {
-                console.error(`Error leaving game: ${error.message}`)
+                console.error(`Error leaving game: ${error.message}`);
             }
-            // Call to leave game method in games controller;
-            delete connections[uuid];
-            delete users[uuid];
+
+            broadcastMessage('join', null, { gameId, status: false });
+
+            // Clean up
+            delete connections[userUuid];
+            delete users[userUuid];
         });
     });
 
-    console.log('Websocket initialized.');
+    console.log('WebSocket initialized.');
 }
 
-function broadcastMessage(senderUuid, message) {
+function broadcastMessage(type, senderUuid, message) {
     const messageData = {
-        type: 'chat',
-        username: users[senderUuid].username,
+        type: type,
+        ...(users[senderUuid] && { username: users[senderUuid].username }),
         message: message,
     };
 
@@ -84,23 +92,5 @@ function broadcastMessage(senderUuid, message) {
         }
     });
 }
-
-function broadcastMove(senderUuid, move) {
-    const moveData = {
-        type: 'move',
-        username: users[senderUuid].username,
-        move: move,
-    };
-
-    const moveString = JSON.stringify(moveData);
-
-    Object.keys(connections).forEach((uuid) => {
-        // Don't want to broadcast the move to the sender
-        if (uuid !== senderUuid) {
-            connections[uuid].send(moveString);
-        }
-    });
-}
-
 
 module.exports = webSocketServer;
