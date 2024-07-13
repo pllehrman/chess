@@ -62,43 +62,42 @@ export default function MainGame({ gameId, orientation }) {
 
   console.log(opponentPresent);
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      {!opponentPresent && (
-        <div className="animate-flash text-2xl font-bold text-red-500 mb-4">
-          Waiting for opponent to connect...
-        </div>
-      )}
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 mb-8">
-        <div className="flex flex-col items-center">
-          <h2 className={`text-2xl font-bold mb-4 ${currentTurn === 'white' ? 'text-gray-900' : 'text-gray-400'}`}>
-            {currentTurn === 'white' ? 'White to Move' : 'Black to Move'}
-          </h2>
-          <div className="flex justify-between w-full mb-4">
-            <div className="text-center">
-              <p className="text-lg font-bold">White</p>
-              <p>{Math.floor(whiteTime / 60)}:{('0' + (whiteTime % 60)).slice(-2)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold">Black</p>
-              <p>{Math.floor(blackTime / 60)}:{('0' + (blackTime % 60)).slice(-2)}</p>
-            </div>
-          </div>
-          <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver, 
-                 handleSendMove, orientation)} customPieces={customPieces} />
-          <Controls resetGame={resetGame} undoMove={undoMove} />
-          <ResultNotice result={result} winner={winner} />
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
+    {!opponentPresent && (
+      <div className="animate-flash text-2xl font-bold text-red-500 dark:text-red-300 mb-4">
+        Waiting for opponent to connect...
       </div>
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <Chat 
-          username={username}
-          messageHistory={messageHistory} 
-          currentMessage={currentMessage} 
-          setCurrentMessage={setCurrentMessage} 
-          handleSendMessage={handleSendMessage} 
-          readyState={readyState} 
-        /> 
+    )}
+    <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8">
+      <div className="flex flex-col items-center">
+        <h2 className={`text-2xl font-bold mb-4 ${currentTurn === 'white' ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}`}>
+          {currentTurn === 'white' ? 'White to Move' : 'Black to Move'}
+        </h2>
+        <div className="flex justify-between w-full mb-4">
+          <div className="text-center">
+            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">White</p>
+            <p className="text-gray-900 dark:text-gray-100">{Math.floor(whiteTime / 60)}:{('0' + (whiteTime % 60)).slice(-2)}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">Black</p>
+            <p className="text-gray-900 dark:text-gray-100">{Math.floor(blackTime / 60)}:{('0' + (blackTime % 60)).slice(-2)}</p>
+          </div>
+        </div>
+        <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation)} customPieces={customPieces} />
+        <Controls resetGame={resetGame} undoMove={undoMove} />
+        <ResultNotice result={result} winner={winner} />
       </div>
     </div>
+    <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+      <Chat 
+        username={username}
+        messageHistory={messageHistory} 
+        currentMessage={currentMessage} 
+        setCurrentMessage={setCurrentMessage} 
+        handleSendMessage={handleSendMessage} 
+        readyState={readyState} 
+      /> 
+    </div>
+  </div>
   );
 }

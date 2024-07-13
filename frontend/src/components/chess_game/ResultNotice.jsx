@@ -1,4 +1,3 @@
-// components/GameResultNotice.jsx
 import React from 'react';
 
 export default function ResultNotice({ result, winner }) {
@@ -16,7 +15,7 @@ export default function ResultNotice({ result, winner }) {
   }
 
   return (
-    <div className="fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-50 text-center">
+    <div className="fixed top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4 bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-200 p-4 rounded-lg shadow-lg z-50 text-center">
       <h2 className="text-2xl font-bold">{message}</h2>
     </div>
   );

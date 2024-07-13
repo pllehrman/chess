@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import DarkModeToggle from './DarkModeToggle';
 
 export default function Header() {
   return (
-    <header className="bg-gray-800 text-white py-4">
+    <header className="bg-gray-800 text-white py-4 dark:bg-gray-900">
       <nav className="container mx-auto flex justify-between items-center">
         <div className="text-xl font-bold">chessGambit</div>
         <ul className="flex space-x-6">
@@ -27,6 +30,7 @@ export default function Header() {
             </Link>
           </li>
         </ul>
+        <DarkModeToggle />
       </nav>
     </header>
   );

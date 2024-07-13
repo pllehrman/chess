@@ -1,5 +1,8 @@
+// tailwind.config.js
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class', // or 'media'
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,7 +12,7 @@ module.exports = {
     extend: {
       animation: {
         bounce: 'bounce 1s infinite',
-        flash: 'flash 2s infinite', // Adjusted duration to 2 seconds
+        flash: 'flash 2s infinite',
       },
       keyframes: {
         bounce: {
