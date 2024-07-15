@@ -9,7 +9,7 @@ export function onDropHandler(game, setGame, checkGameOver, handleSendMove, orie
       return false; // Illegal move
     }
 
-    console.log(`Attempting move from ${sourceSquare} to ${targetSquare}`); // Debug log
+    // console.log(`Attempting move from ${sourceSquare} to ${targetSquare}`); // Debug log
 
     const move = game.move({
       from: sourceSquare,

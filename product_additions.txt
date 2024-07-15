@@ -21,3 +21,6 @@ July 2nd Product Updates:
 - Permissions -> only white can move white pieces during its turn.
 - Sessions and Context
 - Improved UI
+ 
+- Timers -> should only start after first move
+- Game ending logic -> wanna play again?

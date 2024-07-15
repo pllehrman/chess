@@ -2,7 +2,8 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const url = require('url');
 const uuidv4 = require("uuid").v4;
-const { joinGame, leaveGame } = require('../controllers/games');
+const { joinGame, leaveGame, gameCapacity } = require('../controllers/games');
+const { exit } = require('process');
 
 const users = {};
 const connections = {};
@@ -19,9 +20,10 @@ async function webSocketServer(server) {
         try {
             // Join the game in the db
             await joinGame(gameId, orientation);
-
+        
             // Notify the client of the join event
-            broadcastMessage('join', null, { gameId, status: true });
+            const entryCapacity = await gameCapacity(gameId);
+            broadcastMessage('capacityUpdate', null, { gameId, capacity: entryCapacity });
             console.log("successfully joined the game");
         } catch (error) {
             console.log(`Error joining game: ${error.message}`);
@@ -64,8 +66,8 @@ async function webSocketServer(server) {
             } catch (error) {
                 console.error(`Error leaving game: ${error.message}`);
             }
-
-            broadcastMessage('join', null, { gameId, status: false });
+            const exitCapacity = await gameCapacity(users[userUuid].gameId);
+            broadcastMessage('capacityUpdate', null, { gameId, capacity: exitCapacity });
 
             // Clean up
             delete connections[userUuid];

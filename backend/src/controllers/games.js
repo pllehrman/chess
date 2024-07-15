@@ -79,6 +79,7 @@ const updateGame = asyncWrapper( async (req, res) => {
 const isGameAvailable = asyncWrapper( async(req, res) => {
     const gameId = req.query.id;
     const orientation = req.query.orientation; //white or black
+    // console.log(gameId, orientation)
     const game = await Game.findByPk(gameId);
 
     if (!game) {
@@ -101,10 +102,30 @@ const isGameAvailable = asyncWrapper( async(req, res) => {
 });
 
 // INTERNAL METHOD
+const gameCapacity = asyncWrapper ( async(gameId) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        game = await Game.findByPk(gameId, { transaction });
+        
+        if (!game) {
+            throw createCustomError('Game could not be found', 404)
+        }
+        
+        await transaction.commit();
+        return game.numPlayers;
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        throw createCustomError("Transaction could not be completed");
+    }
+    
+});
+
+// INTERNAL METHOD
 const joinGame = asyncWrapper( async (gameId, orientation) => {
     const transaction = await sequelize.transaction();
-    
-    try {
+    console.log("inside join game.")
+   try {
         const game = await Game.findByPk(gameId, { transaction } )
         
         if(!game) {
@@ -113,6 +134,7 @@ const joinGame = asyncWrapper( async (gameId, orientation) => {
 
         // Game is available
         if (game.numPlayers < 2) {
+            console.log("game is available.")
             if (orientation === "white") {
                 game.playerWhite = 0; // for now just set to mean an unidentified player
             } else if (orientation === "black") {
@@ -165,5 +187,6 @@ module.exports = {
     updateGame,
     joinGame,
     leaveGame,
-    isGameAvailable
+    isGameAvailable,
+    gameCapacity
 }

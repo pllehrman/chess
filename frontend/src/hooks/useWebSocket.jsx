@@ -9,7 +9,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation) => {
     const [currentMessage, setCurrentMessage] = useState('');
     const [moveHistory, setMoveHistory] = useState([]);
     const [currentMove, setCurrentMove] = useState(null);
-    const [opponentJoined, setOpponentJoined] = useState(true); //non-intuitively this should be set to true to ensure the logic works correctly
+    const [twoPeoplePresent, setTwoPeoplePresent] = useState(false); //non-intuitively this should be set to true to ensure the logic works correctly
     const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId, orientation);
 
     useEffect(() => {
@@ -23,8 +23,13 @@ export const useWebSocket = (WS_URL, username, gameId, orientation) => {
                 setMessageHistory((prev) => [...prev, messageData]);
             } else if (messageData.type === 'move') {
                 setMoveHistory((prev) => [...prev, messageData]);
-            } else if (messageData.type === 'join') {
-                setOpponentJoined(messageData.message.status);
+            } else if (messageData.type === 'capacityUpdate') {
+                console.log(messageData.message.capacity);
+                if (messageData.message.capacity == 2) {
+                    setTwoPeoplePresent(true);
+                } else {
+                    setTwoPeoplePresent(false);
+                }
             } 
             
             }
@@ -58,7 +63,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation) => {
         handleSendMessage,
         moveHistory, 
         currentMove,
-        opponentJoined,
+        twoPeoplePresent,
         setCurrentMove,
         handleSendMove,
         readyState

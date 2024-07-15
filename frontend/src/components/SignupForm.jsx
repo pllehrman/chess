@@ -28,7 +28,7 @@ export default function SignupForm() {
 
   const checkEmail = async (newEmail) => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/check-email`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC__API_URL}/users/check-email`, {
         params: { email: newEmail }
       });
 

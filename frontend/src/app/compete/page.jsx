@@ -1,6 +1,6 @@
 import GameModeSelection from '../../components/GameModeSelection';
 
-export default function CompetePage() {
+export default function Page() {
 
   return (
     <div>
