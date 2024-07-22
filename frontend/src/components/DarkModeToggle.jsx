@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faToggleOn, faToggleOff } from '@fortawesome/free-solid-svg-icons';
 
 export default function DarkModeToggle() {
   const [darkMode, setDarkMode] = useState(false);
@@ -25,8 +27,14 @@ export default function DarkModeToggle() {
   };
 
   return (
-    <button onClick={toggleDarkMode}>
-      {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-    </button>
+    <div className="relative">
+      <button
+        onClick={toggleDarkMode}
+        className="relative z-10 p-1 rounded-lg transition-colors duration-300 focus:outline-none bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-2xl"
+      >
+        <FontAwesomeIcon icon={darkMode ? faToggleOn : faToggleOff} size="2x" />
+      </button>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 rounded-lg blur-md opacity-30 animate-pulse"></div>
+    </div>
   );
 }

@@ -9,37 +9,50 @@ const getCurrentTurnFromFEN = (fen) => {
 }
 
 export function useChessTimers(currentMove, gameData, twoPeoplePresent) {
-    const [whiteTime, setWhiteTime] = useState(gameData.playerWhiteTimeRemaining) //Add 1 second to whatever the decided time is to account for errorsz
-    const [blackTime, setBlackTime] = useState(gameData.playerBlackTimeRemaining)
+    // Convert minutes to seconds for internal calculations
+    const [whiteTime, setWhiteTime] = useState(gameData.playerWhiteTimeRemaining * 60); 
+    const [blackTime, setBlackTime] = useState(gameData.playerBlackTimeRemaining * 60);
     const [currentTurn, setCurrentTurn] = useState(getCurrentTurnFromFEN(gameData.fen));
 
     useEffect(() => {
         if (gameData) {
-          setWhiteTime(gameData.playerWhiteTimeRemaining);
-          setBlackTime(gameData.playerBlackTimeRemaining);
-        //   console.log("game timers have been set.")
+          setWhiteTime(gameData.playerWhiteTimeRemaining * 60);
+          setBlackTime(gameData.playerBlackTimeRemaining * 60);
         }
-      }, [gameData]);
+    }, [gameData]);
 
     // Timer effect
     useEffect(() => {
+        if (!twoPeoplePresent) return;
+
         const timer = setInterval(() => {
-        if (currentTurn === 'white') {
-            setWhiteTime((prev) => (prev > 0 ? prev - 1 : 0));
-        } else {
-            setBlackTime((prev) => (prev > 0 ? prev - 1 : 0));
-        }
+            if (currentTurn === 'white') {
+                setWhiteTime((prev) => (prev > 0 ? prev - 1 : 0));
+            } else if (currentTurn === 'black') {
+                setBlackTime((prev) => (prev > 0 ? prev - 1 : 0));
+            }
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [currentTurn]);
+    }, [currentTurn, twoPeoplePresent]);
 
-    // Update turn and reset the timer when a move is made
+    // Update turn when a move is made
     useEffect(() => {
         if (currentMove) {
-        setCurrentTurn((prev) => (prev === 'white' ? 'black' : 'white'));
+            setCurrentTurn((prev) => (prev === 'white' ? 'black' : 'white'));
         }
     }, [currentMove]);
 
-    return { whiteTime, blackTime, currentTurn };
+    // Convert seconds back to minutes and seconds for display purposes
+    const formatTime = (timeInSeconds) => {
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = timeInSeconds % 60;
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
+    return { 
+        whiteTime: formatTime(whiteTime), 
+        blackTime: formatTime(blackTime), 
+        currentTurn 
+    };
 }
