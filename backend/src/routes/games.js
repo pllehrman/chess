@@ -7,7 +7,7 @@ const {
     deleteAllGames,
     getGame,
     deleteGame,
-    updateGame,
+    getAllGamesByUserId,
     isGameAvailable
 } = require('../controllers/games');
 
@@ -16,6 +16,7 @@ router.route('/check-game-availability').get(isGameAvailable);
 
 router.route('/').get(getAllGames).post(newGame).delete(deleteAllGames); 
 router.route('/:id').get(getGame).delete(deleteGame);
+router.route('/user/:id').get(getAllGamesByUserId);
 
 
 module.exports = router;

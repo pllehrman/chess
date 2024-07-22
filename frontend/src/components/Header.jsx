@@ -20,8 +20,8 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link href="/about" className="hover:text-gray-400 transition-colors">
-              About
+            <Link href="/history" className="hover:text-gray-400 transition-colors">
+              History
             </Link>
           </li>
           <li>

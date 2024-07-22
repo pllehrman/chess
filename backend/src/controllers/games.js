@@ -2,6 +2,7 @@ const { Game } = require('../db/models'); // Assuming your models' index.js is i
 const asyncWrapper = require('../middleware/asyncWrapper');
 const { createCustomError, CustomAPIError } = require('../middleware/customError');
 const sequelize = require('../db/models/index').sequelize;
+const { Op } = require('sequelize');
 
 //ROUTES -> '/games'
 // GET
@@ -86,6 +87,25 @@ const isGameAvailable = asyncWrapper( async(req, res) => {
     res.status(200).json({isAvailable: isAvailable, gameData: game});
 });
 
+
+// GET 
+const getAllGamesByUserId = asyncWrapper(async (req, res) => {
+    const userId = req.params.id;
+    
+    const games = await Game.findAll({
+        where: {
+            [Op.or]: [
+                { playerWhite: userId},
+                { playerBlack: userId}
+            ]
+        }
+    });
+
+    res.status(200).json({games})
+})
+
+
+// FOR THESE INTERNAL METHODS USE TRANSACTIONS
 // INTERNAL METHOD
 const gameCapacity = async(gameId) => {
     const transaction = await sequelize.transaction();
@@ -196,5 +216,6 @@ module.exports = {
     leaveGame,
     isGameAvailable,
     gameCapacity,
-    updateGame
+    updateGame,
+    getAllGamesByUserId
 }
