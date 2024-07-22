@@ -15,7 +15,7 @@ const {
 router.route('/check-game-availability').get(isGameAvailable);
 
 router.route('/').get(getAllGames).post(newGame).delete(deleteAllGames); 
-router.route('/:id').get(getGame).delete(deleteGame).put(updateGame);
+router.route('/:id').get(getGame).delete(deleteGame);
 
 
 module.exports = router;

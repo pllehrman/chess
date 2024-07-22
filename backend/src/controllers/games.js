@@ -60,26 +60,11 @@ const deleteGame = asyncWrapper( async (req, res) => {
     res.status(200).json({ message: `Game with ${gameId} ID successfully deleted`});
 })
 
-//PUT
-const updateGame = asyncWrapper( async (req, res) => {
-    const gameId = req.params.id;
-    const { gameDetails } = req.body; //destructure the updated fields
-
-    const game = await Game.findByPk(gameId); //find the game
-
-    if (!game){
-        throw createCustomError(`Game with ${gameId} ID could not be found while trying to update.`, 404);
-    }
-
-    await game.update(gameDetails); //update it
-    res.status(200).json(game); //send it back to the user
-});
-
 // GET 
 const isGameAvailable = asyncWrapper( async(req, res) => {
     const gameId = req.query.id;
     const orientation = req.query.orientation; //white or black
-    // console.log(gameId, orientation)
+
     const game = await Game.findByPk(gameId);
     if (!game) {
         return res.status(404).json({ message: `Game could not be found with id ${gameId}` });
@@ -117,7 +102,6 @@ const gameCapacity = async(gameId) => {
         if (transaction) await transaction.rollback();
         throw createCustomError("Transaction could not be completed");
     }
-    console.log(game.numPlayers);
     return game.numPlayers;
 };
 
@@ -183,6 +167,24 @@ const leaveGame = async(gameId, orientation) => {
     
 };
 
+// INTERNAL METHOD
+const updateGame = async (gameId, fen, whiteTime, blackTime) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const game = await Game.findByPk(gameId); //find the game
+
+        if (!game){
+            throw createCustomError(`Game with ${gameId} ID could not be found while trying to update.`, 404);
+        }
+
+        await game.update({ fen, whiteTime, blackTime});
+        transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        throw createCustomError("Transaction failed.")
+    }
+};
+
 module.exports = {
     getAllGames,
     newGame,
@@ -193,5 +195,6 @@ module.exports = {
     joinGame,
     leaveGame,
     isGameAvailable,
-    gameCapacity
+    gameCapacity,
+    updateGame
 }

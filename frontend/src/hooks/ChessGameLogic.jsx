@@ -7,6 +7,8 @@ export function ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMov
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
 
+  // Integrate CHESS TIMERS HERE and just send back the game state 
+
   useEffect(() => {
     if (gameData) {
       setGame(new Chess(gameData.fen));
@@ -26,9 +28,13 @@ export function ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMov
   // This function handles the case when move history changes or a move is made AGAINST the player.
   useEffect(() => {
     if (moveHistory.length > 0) {
-      const lastMove = moveHistory[moveHistory.length - 1];
+      const lastMove = moveHistory[moveHistory.length - 1].message;
+      console.log("Applying last move from move history:", lastMove);
       safeGameMutate((g) => {
-        g.move(lastMove.move);
+        const result = g.move(lastMove);
+        if (result === null) {
+          console.error("Invalid move detected:", lastMove);
+        }
       });
     }
   }, [moveHistory, safeGameMutate]);

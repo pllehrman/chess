@@ -2,7 +2,7 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const url = require('url');
 const uuidv4 = require("uuid").v4;
-const { joinGame, leaveGame, gameCapacity } = require('../controllers/games');
+const { joinGame, leaveGame, gameCapacity, updateGame } = require('../controllers/games');
 const { exit } = require('process');
 
 const users = {};
@@ -49,9 +49,8 @@ async function webSocketServer(server) {
             username: username,
         };
 
-        connection.on('message', (message) => {
+        connection.on('message', async (message) => {
             const messageString = message.toString('utf-8');
-            console.log(messageString);
 
             try {
                 const parsedMessage = JSON.parse(messageString);
@@ -59,6 +58,7 @@ async function webSocketServer(server) {
                     broadcastMessage('chat', userUuid, parsedMessage.message);
                 } else if (parsedMessage.type === 'move') {
                     broadcastMessage('move', userUuid, parsedMessage.move);
+                    await updateGame(users[userUuid].gameId, parsedMessage.fen, parsedMessage.whiteTime, parsedMessage.blackTime);
                 }
             } catch (error) {
                 console.error(`Error parsing message: ${error.message}`);

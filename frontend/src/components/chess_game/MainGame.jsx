@@ -1,4 +1,3 @@
-import { fetchGameState } from '@/utils/fetchGameState';
 import { fetchGameAvailability } from '@/utils/fetchGameAvailability';
 
 import { GameUnavailable } from './GameUnavailable';

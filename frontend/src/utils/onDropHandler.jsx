@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 
-export function onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation) {
+export function onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation, whiteTime, blackTime) {
   return (sourceSquare, targetSquare) => {
     const piece = game.get(sourceSquare);
 
@@ -26,7 +26,7 @@ export function onDropHandler(game, setGame, checkGameOver, handleSendMove, orie
     setGame(new Chess(game.fen()));
 
     // Send the move over the web socket
-    handleSendMove(move);
+    handleSendMove(move, game.fen(), whiteTime, blackTime);
 
     // Check for game over conditions
     checkGameOver();

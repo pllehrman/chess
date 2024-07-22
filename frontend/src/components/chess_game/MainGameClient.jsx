@@ -11,7 +11,6 @@ import { onDropHandler } from '../../utils/onDropHandler';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Chat } from '../../components/Chat';
 import { useChessTimers } from '@/hooks/useChessTimers';
-import { useOpponentPresent } from '@/hooks/useOpponentPresent';
 
 export function MainGameClient({ gameData, orientation }) {
   const customPieces = useChessPieces();
@@ -53,7 +52,7 @@ export function MainGameClient({ gameData, orientation }) {
   const { resetGame, undoMove } = useControlsLogic(safeGameMutate, setGameOver, setResult, setWinner);
 
   // Use the custom hook for timers
-  const { whiteTime, blackTime, currentTurn } = useChessTimers(currentMove, gameData);
+  const { whiteTime, blackTime, currentTurn } = useChessTimers(currentMove, gameData, twoPeoplePresent);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -77,7 +76,7 @@ export function MainGameClient({ gameData, orientation }) {
               <p className="text-gray-900 dark:text-gray-100">{Math.floor(blackTime / 60)}:{('0' + (blackTime % 60)).slice(-2)}</p>
             </div>
           </div>
-          <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation)} customPieces={customPieces} />
+          <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation, whiteTime, blackTime)} customPieces={customPieces} />
           <Controls resetGame={resetGame} undoMove={undoMove} />
           <ResultNotice result={result} winner={winner} />
         </div>

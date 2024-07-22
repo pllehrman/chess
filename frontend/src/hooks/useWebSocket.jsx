@@ -8,7 +8,6 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) =>
     const [messageHistory, setMessageHistory] = useState([])
     const [currentMessage, setCurrentMessage] = useState('');
     const [moveHistory, setMoveHistory] = useState([]);
-    const [currentMove, setCurrentMove] = useState(null);
     const [twoPeoplePresent, setTwoPeoplePresent] = useState(false); //non-intuitively this should be set to true to ensure the logic works correctly
     const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId, orientation);
 
@@ -48,10 +47,9 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) =>
         }
     }, [currentMessage, sendMessage]);
 
-    const handleSendMove = useCallback((move) => {
-        const moveData = JSON.stringify({type: 'move', move});
+    const handleSendMove = useCallback((move, fen, whiteTime, blackTime) => {
+        const moveData = JSON.stringify({type: 'move', move, fen, whiteTime, blackTime});
         sendMessage(moveData);
-        setCurrentMove(null);
     }, [sendMessage]);
 
     return {
@@ -60,9 +58,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) =>
         setCurrentMessage,
         handleSendMessage,
         moveHistory, 
-        currentMove,
         twoPeoplePresent,
-        setCurrentMove,
         handleSendMove,
         readyState
     };

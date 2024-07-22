@@ -1,9 +1,17 @@
 import { useState, useEffect } from 'react';
 
-export function useChessTimers(currentMove, gameData) {
-    const [whiteTime, setWhiteTime] = useState(600) //Add 1 second to whatever the decided time is to account for errorsz
-    const [blackTime, setBlackTime] = useState(600)
-    const [currentTurn, setCurrentTurn] = useState('white');
+const getCurrentTurnFromFEN = (fen) => {
+    const parts = fen.split(' ');
+    if (parts.length > 1) {
+        return parts[1] === 'w' ? 'white' : 'black';
+    }
+    return 'white'; 
+}
+
+export function useChessTimers(currentMove, gameData, twoPeoplePresent) {
+    const [whiteTime, setWhiteTime] = useState(gameData.playerWhiteTimeRemaining) //Add 1 second to whatever the decided time is to account for errorsz
+    const [blackTime, setBlackTime] = useState(gameData.playerBlackTimeRemaining)
+    const [currentTurn, setCurrentTurn] = useState(getCurrentTurnFromFEN(gameData.fen));
 
     useEffect(() => {
         if (gameData) {

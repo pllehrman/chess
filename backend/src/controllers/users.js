@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 // POST
 const newUser = asyncWrapper( async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
-    // console.log(firstname, lastname, email, password);
     try {
         const hashedPassword = await argon2.hash(password);
         
