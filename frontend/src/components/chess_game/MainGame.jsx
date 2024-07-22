@@ -7,24 +7,23 @@ import { MainGameClient } from './MainGameClient';
 
 
 export async function MainGame({ gameId, orientation }) {
-  let isGameAvailable;
-  let gameData;
-  let error;
+  let isGameAvailable = false;
+  let gameData = null;
+  let error = null;
 
   try {
-    isGameAvailable = await fetchGameAvailability(gameId, orientation);
-    if (isGameAvailable) {
-      gameData = await fetchGameState(gameId);
-    }
+    const result = await fetchGameAvailability(gameId, orientation);
+    isGameAvailable = result.isAvailable;
+    gameData = result.game;
   } catch (err) {
     error = err;
   }
-  
+
   if (error) {
     return <GameUnavailable />;
   } else if (!isGameAvailable) {
     return <GameUnavailable />;
-  } else if (gameData.fen === null) {
+  } else if (!gameData || gameData.fen === null) {
     return <Loading />;
   }
 

@@ -75,13 +75,12 @@ const updateGame = asyncWrapper( async (req, res) => {
     res.status(200).json(game); //send it back to the user
 });
 
-// GET
+// GET 
 const isGameAvailable = asyncWrapper( async(req, res) => {
     const gameId = req.query.id;
     const orientation = req.query.orientation; //white or black
     // console.log(gameId, orientation)
     const game = await Game.findByPk(gameId);
-
     if (!game) {
         return res.status(404).json({ message: `Game could not be found with id ${gameId}` });
     }
@@ -90,6 +89,7 @@ const isGameAvailable = asyncWrapper( async(req, res) => {
 
     // Does the game have less than two players and is the player color occupied?
     if (orientation === 'white') {
+        console.log("Num Players:", game.numPlayers, "Player White:", game.playerWhite);
         if (game.numPlayers < 2 && game.playerWhite === null) {
             isAvailable = true;
         }
@@ -98,34 +98,33 @@ const isGameAvailable = asyncWrapper( async(req, res) => {
            isAvailable = true;
         }
     }
-    res.status(200).json({isAvailable: isAvailable});
+    res.status(200).json({isAvailable: isAvailable, gameData: game});
 });
 
 // INTERNAL METHOD
-const gameCapacity = asyncWrapper ( async(gameId) => {
+const gameCapacity = async(gameId) => {
     const transaction = await sequelize.transaction();
+    let game;
 
     try {
         game = await Game.findByPk(gameId, { transaction });
-        
         if (!game) {
             throw createCustomError('Game could not be found', 404)
         }
         
         await transaction.commit();
-        return game.numPlayers;
     } catch (error) {
         if (transaction) await transaction.rollback();
         throw createCustomError("Transaction could not be completed");
     }
-    
-});
+    console.log(game.numPlayers);
+    return game.numPlayers;
+};
 
 // INTERNAL METHOD
-const joinGame = asyncWrapper( async (gameId, orientation) => {
+const joinGame = async (gameId, orientation) => {
     const transaction = await sequelize.transaction();
-    console.log("inside join game.")
-   try {
+    try {
         const game = await Game.findByPk(gameId, { transaction } )
         
         if(!game) {
@@ -134,7 +133,6 @@ const joinGame = asyncWrapper( async (gameId, orientation) => {
 
         // Game is available
         if (game.numPlayers < 2) {
-            console.log("game is available.")
             if (orientation === "white") {
                 game.playerWhite = 0; // for now just set to mean an unidentified player
             } else if (orientation === "black") {
@@ -144,39 +142,46 @@ const joinGame = asyncWrapper( async (gameId, orientation) => {
             }
             game.numPlayers += 1
             await game.save({ transaction });
-
             await transaction.commit();
         } else {
             await transaction.rollback();
         }
     } catch (error) {
         await transaction.rollback();
-        throw createCustomError("Transaction failed")
+        throw createCustomError("Transaction failed");
     }
-});
+};
 
 // INTERNAL METHOD
-const leaveGame = asyncWrapper( async(gameId, orientation) => {
-    const game = await Game.findByPk(gameId);
-    
-    if (!game) {
-        throw createCustomError(`Game with id ${gameId} could not be found.`, 404);
-    }
+const leaveGame = async(gameId, orientation) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const game = await Game.findByPk(gameId);
 
-    if (game.numPlayers > 0) {
-        if (orientation === "white") {
-            game.playerWhite = null; // reset the datapoint to null
-        } else if (orientation === "black") {
-            game.playerBlack = null;
-        } else {
-            throw createCustomError("Invalid orientation value. It should be 'white' or 'black'.", 400);
+        if (!game) {
+            throw createCustomError(`Game with id ${gameId} could not be found.`, 404);
         }
-        game.numPlayers -= 1;
-        await game.save();
-    } else {
-        throw createCustomError(`Game with id ${gameId} already has no players.`, 400);
+    
+        if (game.numPlayers > 0) {
+            if (orientation === "white") {
+                game.playerWhite = null; // reset the datapoint to null
+            } else if (orientation === "black") {
+                game.playerBlack = null;
+            } else {
+                throw createCustomError("Invalid orientation value. It should be 'white' or 'black'.", 400);
+            }
+            game.numPlayers -= 1;
+            await game.save({ transaction });
+            await transaction.commit();
+        } else {
+            await transaction.rollback();
+        }
+    } catch (error) {
+        await transaction.rollback();
+        throw createCustomError("Transaction failed");
     }
-});
+    
+};
 
 module.exports = {
     getAllGames,

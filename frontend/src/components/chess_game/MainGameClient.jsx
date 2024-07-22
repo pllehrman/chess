@@ -32,7 +32,7 @@ export function MainGameClient({ gameData, orientation }) {
     setCurrentMove,
     handleSendMove,
     readyState 
-  } = useWebSocket(WS_URL, username, gameData.id, orientation);
+  } = useWebSocket(WS_URL, username, gameData.id, orientation, gameData);
 
   // Don't necessary need this here and just have it cetralized in useWebSocket
   // const opponentPresent = useOpponentPresent(gameData, orientation, opponentJoined);

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { reconnectWebSocket } from '../utils/reconnectWebsocket';
 
-export const useWebSocket = (WS_URL, username, gameId, orientation) => {
+export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) => {
     const [messageHistory, setMessageHistory] = useState([])
     const [currentMessage, setCurrentMessage] = useState('');
     const [moveHistory, setMoveHistory] = useState([]);
@@ -16,24 +16,22 @@ export const useWebSocket = (WS_URL, username, gameId, orientation) => {
         if (lastMessage !== null) {
             const messageData = JSON.parse(lastMessage.data);
             // Convert buffer to string
-            if (messageData.message && messageData.message.type === 'Buffer') {
-                messageData.message = String.fromCharCode(...messageData.message.data);
+
+            switch(messageData.type) {
+                case 'chat':
+                    setMessageHistory((prev) => [...prev, messageData]);
+                    break;
+                case 'move':
+                    setMoveHistory((prev) => [...prev, messageData]);
+                    break;
+                case 'capacityUpdate':
+                    setTwoPeoplePresent(messageData.message.capacity === 2);
+                    break;
+                default:
+                    console.warn(`Unhandled message type: ${messageData.type}`);
             }
-            if (messageData.type === 'chat') {
-                setMessageHistory((prev) => [...prev, messageData]);
-            } else if (messageData.type === 'move') {
-                setMoveHistory((prev) => [...prev, messageData]);
-            } else if (messageData.type === 'capacityUpdate') {
-                console.log(messageData.message.capacity);
-                if (messageData.message.capacity == 2) {
-                    setTwoPeoplePresent(true);
-                } else {
-                    setTwoPeoplePresent(false);
-                }
-            } 
-            
-            }
-        }, [lastMessage]);
+        }
+    }, [lastMessage]);
     
     useEffect(() => {
         if (readyState === ReadyState.CLOSED) {

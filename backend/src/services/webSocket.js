@@ -20,10 +20,18 @@ async function webSocketServer(server) {
         try {
             // Join the game in the db
             await joinGame(gameId, orientation);
-        
+
             // Notify the client of the join event
             const entryCapacity = await gameCapacity(gameId);
+            console.log("Entry capacity:", entryCapacity)
+            
             broadcastMessage('capacityUpdate', null, { gameId, capacity: entryCapacity });
+           
+            // Resend the message on a delay to ensure all clients are up to date.
+            setTimeout(() => {
+                broadcastMessage('capacityUpdate', null, { gameId, capacity: entryCapacity });
+            }, 3000);
+
             console.log("successfully joined the game");
         } catch (error) {
             console.log(`Error joining game: ${error.message}`);
@@ -67,11 +75,17 @@ async function webSocketServer(server) {
                 console.error(`Error leaving game: ${error.message}`);
             }
             const exitCapacity = await gameCapacity(users[userUuid].gameId);
-            broadcastMessage('capacityUpdate', null, { gameId, capacity: exitCapacity });
-
-            // Clean up
-            delete connections[userUuid];
-            delete users[userUuid];
+            console.log("Exit capacity:", exitCapacity);
+            broadcastMessage('capacityUpdate', null, { gameId: users[userUuid].gameId, capacity: exitCapacity });
+            
+            // Resend the message on a delay to ensure all clients are up to date.
+            setTimeout(() => {
+                broadcastMessage('capacityUpdate', null, { gameId: users[userUuid].gameId, capacity: exitCapacity });
+                // Clean up
+                delete connections[userUuid];
+                delete users[userUuid];
+            }, 3000);
+            
         });
     });
 
