@@ -18,8 +18,7 @@ export function MainGameClient({ gameData, orientation }) {
   const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
   const username = "Alex";
   
-  // WEBSOCKET FUNCTIONALITY
-  // Integrate the "waiting for the opponent to connect logic in here...."
+//  Need to add current move
   const {
     messageHistory, 
     currentMessage,
@@ -53,6 +52,9 @@ export function MainGameClient({ gameData, orientation }) {
 
   // Use the custom hook for timers
   const { whiteTime, blackTime, currentTurn } = useChessTimers(currentMove, gameData, twoPeoplePresent);
+
+  console.log("Current move:", currentMove)
+  console.log("Current turn:", currentTurn)
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">

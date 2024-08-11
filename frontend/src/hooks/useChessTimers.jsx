@@ -53,6 +53,6 @@ export function useChessTimers(currentMove, gameData, twoPeoplePresent) {
     return { 
         whiteTime: formatTime(whiteTime), 
         blackTime: formatTime(blackTime), 
-        currentTurn 
+        currentTurn: currentTurn,
     };
 }
