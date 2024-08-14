@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
 
-export function ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMove, handleSendMove) {
+export function ChessGameLogic(gameData, moveHistory) {
+
   const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
@@ -38,17 +39,6 @@ export function ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMov
       });
     }
   }, [moveHistory, safeGameMutate]);
-
-  // This function handles the case when the current player makes a move and it needs to be sent to the ws.
-  useEffect(() => {
-    if (currentMove) {
-      safeGameMutate((g) => {
-        g.move(currentMove);
-      });
-      handleSendMove(currentMove);
-      setCurrentMove(null);
-    }
-  }, [currentMove, safeGameMutate, handleSendMove, setCurrentMove]);
 
   function checkGameOver() {
     let gameResult = null;

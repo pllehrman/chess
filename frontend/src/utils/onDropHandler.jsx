@@ -27,7 +27,7 @@ export function onDropHandler(game, setGame, checkGameOver, handleSendMove, orie
 
     // Send the move over the web socket
     handleSendMove(move, game.fen(), whiteTime, blackTime);
-
+    
     // Check for game over conditions
     checkGameOver();
 

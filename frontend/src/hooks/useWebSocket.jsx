@@ -4,12 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { ReadyState } from 'react-use-websocket';
 import { reconnectWebSocket } from '../utils/reconnectWebsocket';
 
-export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) => {
+export const useWebSocket = (WS_URL, username, gameId, orientation, gameData, setCurrentTurn) => {
     const [messageHistory, setMessageHistory] = useState([])
     const [currentMessage, setCurrentMessage] = useState('');
     const [moveHistory, setMoveHistory] = useState([]);
     const [twoPeoplePresent, setTwoPeoplePresent] = useState(false); //non-intuitively this should be set to true to ensure the logic works correctly
     const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId, orientation);
+
 
     useEffect(() => {
         if (lastMessage !== null) {
@@ -22,6 +23,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) =>
                     break;
                 case 'move':
                     setMoveHistory((prev) => [...prev, messageData]);
+                    setCurrentTurn((prev) => prev === "white" ? "black" : "white")
                     break;
                 case 'capacityUpdate':
                     setTwoPeoplePresent(messageData.message.capacity === 2);
@@ -50,7 +52,8 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) =>
     const handleSendMove = useCallback((move, fen, whiteTime, blackTime) => {
         const moveData = JSON.stringify({type: 'move', move, fen, whiteTime, blackTime});
         sendMessage(moveData);
-    }, [sendMessage]);
+        setCurrentTurn((prev) => prev === "white" ? "black" : "white")
+    }, [sendMessage, readyState]);
 
     return {
         messageHistory,
@@ -60,6 +63,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData) =>
         moveHistory, 
         twoPeoplePresent,
         handleSendMove,
-        readyState
+        readyState,
     };
 };
+

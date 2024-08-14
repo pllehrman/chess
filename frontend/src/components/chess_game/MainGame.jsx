@@ -1,5 +1,4 @@
 import { fetchGameAvailability } from '@/utils/fetchGameAvailability';
-
 import { GameUnavailable } from './GameUnavailable';
 import { Loading } from '../Loading';
 import { MainGameClient } from './MainGameClient';

@@ -56,6 +56,7 @@ module.exports = {
       playerBlack: {
         type: Sequelize.INTEGER,
         allowNull: true,
+        defaultValue: 0,
         validate: {
           isInt: {
             msg: 'PlayerBlack must be an integer.'
@@ -68,6 +69,15 @@ module.exports = {
         validate: {
           isInt: {
             msg: 'PlayerBlack time must be an integer.'
+          }
+        }
+      },
+      timeIncrement: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        validate: {
+          isInt: {
+            msg: 'TimeIncrement must be an integer.'
           }
         }
       },

@@ -4,6 +4,7 @@
 import Board from './Board';
 import Controls from './Controls';
 import ResultNotice from './ResultNotice';
+import { Timers } from './Timers'
 import { ChessGameLogic } from '../../hooks/chessGameLogic';
 import { useChessPieces } from '../../hooks/useChessPieces';
 import { useControlsLogic } from '../../hooks/useControlsLogic';
@@ -11,10 +12,11 @@ import { onDropHandler } from '../../utils/onDropHandler';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Chat } from '../../components/Chat';
 import { useChessTimers } from '@/hooks/useChessTimers';
+import { updateChessTimers } from '@/hooks/updateChessTimers';
 
 export function MainGameClient({ gameData, orientation }) {
   const customPieces = useChessPieces();
-
+  const {whiteTime, setWhiteTime, blackTime, setBlackTime, currentTurn, setCurrentTurn} = useChessTimers(gameData);
   const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
   const username = "Alex";
   
@@ -25,15 +27,10 @@ export function MainGameClient({ gameData, orientation }) {
     setCurrentMessage,
     handleSendMessage,
     moveHistory, 
-    currentMove,
-    twoPeoplePresent,
-    setCurrentMove,
+    twoPeoplePresent, 
     handleSendMove,
-    readyState 
-  } = useWebSocket(WS_URL, username, gameData.id, orientation, gameData);
-
-  // Don't necessary need this here and just have it cetralized in useWebSocket
-  // const opponentPresent = useOpponentPresent(gameData, orientation, opponentJoined);
+    readyState,
+  } = useWebSocket(WS_URL, username, gameData.id, orientation, gameData, setCurrentTurn);
 
   // CHESS GAME LOGIC
   const {
@@ -46,16 +43,13 @@ export function MainGameClient({ gameData, orientation }) {
     setGameOver,
     setResult,
     setWinner,
-  } = ChessGameLogic(gameData, moveHistory, currentMove, setCurrentMove, handleSendMove);
+  } = ChessGameLogic(gameData, moveHistory);
 
   const { resetGame, undoMove } = useControlsLogic(safeGameMutate, setGameOver, setResult, setWinner);
 
-  // Use the custom hook for timers
-  const { whiteTime, blackTime, currentTurn } = useChessTimers(currentMove, gameData, twoPeoplePresent);
-
-  console.log("Current move:", currentMove)
-  console.log("Current turn:", currentTurn)
-
+  console.log("current turn:", currentTurn)
+  updateChessTimers(setWhiteTime, setBlackTime, gameData.timeIncrement, currentTurn, twoPeoplePresent);
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
       {!twoPeoplePresent && (
@@ -68,31 +62,14 @@ export function MainGameClient({ gameData, orientation }) {
           <h2 className={`text-2xl font-bold mb-4 ${currentTurn === 'white' ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}`}>
             {currentTurn === 'white' ? 'White to Move' : 'Black to Move'}
           </h2>
-          <div className="flex justify-between w-full mb-4">
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100">White</p>
-              <p className="text-gray-900 dark:text-gray-100">{Math.floor(whiteTime / 60)}:{('0' + (whiteTime % 60)).slice(-2)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100">Black</p>
-              <p className="text-gray-900 dark:text-gray-100">{Math.floor(blackTime / 60)}:{('0' + (blackTime % 60)).slice(-2)}</p>
-            </div>
-          </div>
+          <Timers whiteTime={whiteTime} blackTime={blackTime}/>
           <Board orientation={orientation} position={game.fen()} onDrop={onDropHandler(game, setGame, checkGameOver, handleSendMove, orientation, whiteTime, blackTime)} customPieces={customPieces} />
           <Controls resetGame={resetGame} undoMove={undoMove} />
           <ResultNotice result={result} winner={winner} />
         </div>
       </div>
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <Chat 
-          username={username}
-          messageHistory={messageHistory} 
-          currentMessage={currentMessage} 
-          setCurrentMessage={setCurrentMessage} 
-          handleSendMessage={handleSendMessage} 
-          readyState={readyState} 
-        /> 
-      </div>
+      <Chat username={username} messageHistory={messageHistory} currentMessage={currentMessage} setCurrentMessage={setCurrentMessage} 
+        handleSendMessage={handleSendMessage} readyState={readyState} /> 
     </div>
   );
 }

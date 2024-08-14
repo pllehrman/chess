@@ -14,7 +14,7 @@ export function Chat({ username, messageHistory, currentMessage, setCurrentMessa
 
 
   return (
-    <div>
+    <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
       <h1>Hello, {username}</h1>
       <div>Status: {connectionStatus}</div>
       <div>

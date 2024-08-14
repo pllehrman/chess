@@ -10,6 +10,7 @@ export default function GameModeSelection() {
   const [showFriendOptions, setShowFriendOptions] = useState(false);
   const [showComputerOptions, setShowComputerOptions] = useState(false);
   const [timeControl, setTimeControl] = useState(10); // Default 10 minutes per side
+  const [increment, setIncrement] = useState(0);
   const [colorChoice, setColorChoice] = useState('random'); // Default to random
   const { session } = useContext(UserContext);
 
@@ -30,7 +31,7 @@ export default function GameModeSelection() {
     const playerBlack = (colorChoice === 'black') ? null : session;
     const type = showFriendOptions ? 1 : 0;
 
-    const gameData = await startNewGame(type, playerWhite, playerBlack, timeControl);
+    const gameData = await startNewGame(type, playerWhite, playerBlack, timeControl, increment);
     const gameId = gameData.id;
 
     router.push(`/compete/${gameId}/${colorChoice}`);
@@ -115,6 +116,18 @@ export default function GameModeSelection() {
                 min="1"
                 max="60"
               />
+            </div>
+            <div>
+            <label htmlFor="increment" className="block text-sm font-medium text-gray-900 dark:text-gray-300">Increment (seconds per move):</label>
+            <input
+                type="number"
+                id="increment"
+                value={increment}
+                onChange={(e) => setIncrement(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-lg p-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                min="0"
+                max="10"
+            />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">Choose Your Color:</label>

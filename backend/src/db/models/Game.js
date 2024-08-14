@@ -67,6 +67,16 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
+      timeIncrement: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isInt: {
+            msg: 'TimeIncrement must be an integer.'
+          }
+        }
+      },
       numPlayers: {
         type: DataTypes.INTEGER,
         allowNull: false,
