@@ -8,7 +8,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData, se
     const [messageHistory, setMessageHistory] = useState([])
     const [currentMessage, setCurrentMessage] = useState('');
     const [moveHistory, setMoveHistory] = useState([]);
-    const [twoPeoplePresent, setTwoPeoplePresent] = useState(false); //non-intuitively this should be set to true to ensure the logic works correctly
+    const [twoPeoplePresent, setTwoPeoplePresent] = useState(gameData.numPlayers == 1); //non-intuitively this should be set to true to ensure the logic works correctly
     const { sendMessage, readyState, lastMessage, handleReconnection } = reconnectWebSocket(WS_URL, username, gameId, orientation);
 
 
@@ -26,7 +26,7 @@ export const useWebSocket = (WS_URL, username, gameId, orientation, gameData, se
                     setCurrentTurn((prev) => prev === "white" ? "black" : "white")
                     break;
                 case 'capacityUpdate':
-                    setTwoPeoplePresent(messageData.message.capacity === 2);
+                    setTwoPeoplePresent(messageData.message.capacity == 2);
                     break;
                 default:
                     console.warn(`Unhandled message type: ${messageData.type}`);
