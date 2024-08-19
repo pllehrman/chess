@@ -1,8 +1,7 @@
-import { fetchGameAvailability } from './fetchGameAvailability';
-import { GameUnavailable } from './GameUnavailable';
-import { Loading } from '../formatting/Loading';
-import { MainGameClient } from './MainGameClient';
-
+import { fetchGameAvailability } from "./fetchGameAvailability";
+import { GameUnavailable } from "./GameUnavailable";
+import { Loading } from "../formatting/Loading";
+import { MainGameClient } from "./MainGameClient";
 
 export async function MainGame({ gameId, orientation }) {
   let isGameAvailable = false;
@@ -11,6 +10,7 @@ export async function MainGame({ gameId, orientation }) {
 
   try {
     const result = await fetchGameAvailability(gameId, orientation);
+    console.log(result);
     isGameAvailable = result.isAvailable;
     gameData = result.game;
   } catch (err) {

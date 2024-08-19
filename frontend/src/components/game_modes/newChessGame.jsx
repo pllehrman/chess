@@ -1,19 +1,38 @@
-import axios from 'axios';
-
-// type (engine vs. pvp), playerWhite, playerWhiteTimeRemaining, playerBlack, playerBlackTimeRemaining
-export async function startNewGame(type, playerWhite, playerBlack, timeControl, increment) {
-    try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
-        type: type,
-        playerWhite: playerWhite,
-        playerWhiteTimeRemaining: timeControl * 60, // convert to seconds
-        playerBlack: playerBlack,
-        playerBlackTimeRemaining: timeControl * 60, //convert to seconds
-        timeIncrement: increment
+export async function newChessGame(
+  type,
+  playerColor,
+  timeRemaining,
+  timeIncrement,
+  username,
+  sessionId
+) {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/games`;
+    console.log(url);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type,
+        playerColor,
+        playerWhiteTimeRemaining: timeRemaining * 60, // convert to seconds
+        playerBlackTimeRemaining: timeRemaining * 60, // convert to seconds
+        timeIncrement,
+        username,
+        sessionId,
+      }),
     });
-    return response.data.game;
+
+    if (!response.ok) {
+      throw new Error(`Error starting new game: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.game;
   } catch (error) {
-    console.error('Error starting new game:', error);
+    console.error("Error starting new game:", error);
     throw error;
   }
 }

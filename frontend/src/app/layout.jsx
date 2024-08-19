@@ -1,9 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from '../components/formatting/Header'
-import Footer from '../components/formatting/Footer'
-import Providers from '../components/Providers';
-import { auth } from '../utils/auth';
+import Header from "../components/formatting/Header";
+import Footer from "../components/formatting/Footer";
+import { cookies } from "next/headers"; // Next.js API to get cookies
+import { SessionProvider } from "../components/formatting/SessionContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,20 +13,24 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const { session } = await auth(); //auth should be a server action
+  // Extract cookies on the server side
+  const sessionCookie = cookies().get("session_token");
+
+  // Get the session token from the cookie (if it exists)
+  const session = sessionCookie ? { token: sessionCookie.value } : null;
 
   return (
     <html>
       <head>
-      <title>chessGambit</title>
+        <title>chessGambit</title>
       </head>
-      <Providers session = {session}>
-      <body>
-      <Header />
-        {children}
-      <Footer />
-      </body>
-      </Providers>
+      <SessionProvider session={session}>
+        <body>
+          <Header />
+          {children}
+          <Footer />
+        </body>
+      </SessionProvider>
     </html>
   );
 }

@@ -1,43 +1,25 @@
+// models/session.js
 module.exports = (sequelize, DataTypes) => {
-  const Session = sequelize.define('Session', {
+  const Session = sequelize.define("Session", {
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true,
       autoIncrement: true,
-      primaryKey: true
     },
-    token: {
+    username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Users', // 'Users' refers to table name
-        key: 'id'
-      },
-      validate: {
-        isInt: {
-          msg: 'UserId must be an integer.'
-        }
-      }
+      defaultValue: "Unnamed Grand Master",
     },
     expiresAt: {
       type: DataTypes.DATE,
-      allowNull: false
-    }
-  }, {
-    timestamps: true
-  })
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  });
 
-  Session.associate = function (models) {
-    Session.belongsTo(models.User, {
-      foreignKey: 'userId',
-      as: 'user'
-    })
-  }
-
-  return Session
-}
+  return Session;
+};

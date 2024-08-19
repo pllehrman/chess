@@ -35,3 +35,5 @@ This allows one to query the DB with SQL commands: SELECT * FROM "Users";
 npx sequelize-cli db:migrate
 
 MUST BE AT SRC/DB SHELL IN ORDER TO EXECUTE SEQUELIZE COMMANDS
+
+npx sequelize-cli db:migrate:undo --name 20240319203517-create-games-table.js
