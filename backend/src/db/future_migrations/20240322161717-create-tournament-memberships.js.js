@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up (queryInterface, Sequelize) {
     await queryInterface.createTable('TournamentMemberships', {
       id: {
         allowNull: false,
@@ -23,7 +23,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users', 
+          model: 'Users',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -39,22 +39,21 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
-    });
+    })
 
     // Add indexes
-    await queryInterface.addIndex('TournamentMemberships', ['tournamentId']);
-    await queryInterface.addIndex('TournamentMemberships', ['userId']);
+    await queryInterface.addIndex('TournamentMemberships', ['tournamentId'])
+    await queryInterface.addIndex('TournamentMemberships', ['userId'])
 
     // Add unique constraint on tournamentId and userId
     await queryInterface.addConstraint('TournamentMemberships', {
       fields: ['tournamentId', 'userId'],
       type: 'unique',
       name: 'unique_tournament_membership_constraint' // Name of the constraint
-    });
-
+    })
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('TournamentMemberships');
+  async down (queryInterface, Sequelize) {
+    await queryInterface.dropTable('TournamentMemberships')
   }
-};
+}

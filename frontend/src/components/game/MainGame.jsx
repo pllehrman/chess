@@ -1,6 +1,6 @@
-import { fetchGameAvailability } from '@/utils/fetchGameAvailability';
+import { fetchGameAvailability } from './fetchGameAvailability';
 import { GameUnavailable } from './GameUnavailable';
-import { Loading } from '../Loading';
+import { Loading } from '../formatting/Loading';
 import { MainGameClient } from './MainGameClient';
 
 

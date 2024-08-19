@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import Header from '../components/formatting/Header'
+import Footer from '../components/formatting/Footer'
 import Providers from '../components/Providers';
 import { auth } from '../utils/auth';
 
@@ -18,16 +18,13 @@ export default async function RootLayout({ children }) {
   return (
     <html>
       <head>
-        <title>chessGambit</title>
-        <script src="https://kit.fontawesome.com/f12e3aa0c0.js" crossOrigin="anonymous"></script>
+      <title>chessGambit</title>
       </head>
       <Providers session = {session}>
       <body>
-        <div className="flex flex-col min-h-screen">
-            <Header />
-              <main className="flex-grow">{children}</main>
-            <Footer />
-        </div>
+      <Header />
+        {children}
+      <Footer />
       </body>
       </Providers>
     </html>

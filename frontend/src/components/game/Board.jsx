@@ -1,6 +1,5 @@
-// components/ChessboardComponent.jsx
+'use client';
 import { Chessboard } from 'react-chessboard';
-import React from 'react';
 
 export default function Board({ orientation, position, onDrop, customPieces }) {
   return (

@@ -43,15 +43,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     timestamps: true
-  });
+  })
 
-  User.associate = function(models) {
+  User.associate = function (models) {
     // User has many sessions
     User.hasMany(models.Session, {
       foreignKey: 'userId',
       as: 'sessions'
-    });
-  };
+    })
+  }
 
-  return User;
-};
+  return User
+}

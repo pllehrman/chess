@@ -1,5 +1,5 @@
 // register/page.js
-import SignupForm from '../../components/SignupForm';
+import SignupForm from '../../components/register/SignupForm';
 
 export default function SignupPage() {
   return (

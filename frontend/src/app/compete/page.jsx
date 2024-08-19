@@ -1,4 +1,4 @@
-import GameModeSelection from '../../components/GameModeSelection';
+import GameModeSelection from '@/components/game_modes/GameModeSelection'
 
 export default function Page() {
 

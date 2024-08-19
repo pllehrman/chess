@@ -6,9 +6,9 @@ export async function startNewGame(type, playerWhite, playerBlack, timeControl, 
     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
         type: type,
         playerWhite: playerWhite,
-        playerWhiteTimeRemaining: timeControl, 
+        playerWhiteTimeRemaining: timeControl * 60, // convert to seconds
         playerBlack: playerBlack,
-        playerBlackTimeRemaining: timeControl,
+        playerBlackTimeRemaining: timeControl * 60, //convert to seconds
         timeIncrement: increment
     });
     return response.data.game;

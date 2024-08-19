@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     token: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: true
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -26,18 +26,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     expiresAt: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: false
     }
   }, {
-    timestamps: true,
-  });
+    timestamps: true
+  })
 
-  Session.associate = function(models) {
-    Session.belongsTo(models.User, { 
+  Session.associate = function (models) {
+    Session.belongsTo(models.User, {
       foreignKey: 'userId',
       as: 'user'
-    });
-  };
+    })
+  }
 
-  return Session;
-};
+  return Session
+}

@@ -31,3 +31,10 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Prevent scrolling globally */
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
+

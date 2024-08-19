@@ -29,7 +29,7 @@ export function ChessGameLogic(gameData, moveHistory) {
   // This function handles the case when move history changes or a move is made AGAINST the player.
   useEffect(() => {
     if (moveHistory.length > 0) {
-      const lastMove = moveHistory[moveHistory.length - 1].message;
+      const lastMove = moveHistory[moveHistory.length - 1];
       console.log("Applying last move from move history:", lastMove);
       safeGameMutate((g) => {
         const result = g.move(lastMove);

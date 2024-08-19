@@ -87,7 +87,6 @@ const isGameAvailable = asyncWrapper( async(req, res) => {
     res.status(200).json({isAvailable: isAvailable, gameData: game});
 });
 
-
 // GET 
 const getAllGamesByUserId = asyncWrapper(async (req, res) => {
     const userId = req.params.id;
@@ -102,6 +101,28 @@ const getAllGamesByUserId = asyncWrapper(async (req, res) => {
     });
 
     res.status(200).json({games})
+});
+
+// UPDATE
+const updateGameByID = asyncWrapper(async (req, res) => {
+    const gameId = req.params.id
+    const {fen, whiteTime, blackTime } = req.body
+    const transaction = await sequelize.transaction();
+    try {
+        const game = await Game.findByPk(gameId); //find the game
+
+        if (!game){
+            throw createCustomError(`Game with ${gameId} ID could not be found while trying to update.`, 404);
+        }
+
+        await game.update({ fen, playerWhiteTimeRemaining: whiteTime, playerBlackTimeRemaining: blackTime});
+        transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        throw createCustomError("Transaction failed.")
+    }
+
+    res.status(200).json({ message: `Game with id ${gameId} successfully updated.`})
 })
 
 
@@ -189,6 +210,7 @@ const leaveGame = async(gameId, orientation) => {
 
 // INTERNAL METHOD
 const updateGame = async (gameId, fen, whiteTime, blackTime) => {
+    console.log("here in the backend!")
     const transaction = await sequelize.transaction();
     try {
         const game = await Game.findByPk(gameId); //find the game
@@ -197,7 +219,7 @@ const updateGame = async (gameId, fen, whiteTime, blackTime) => {
             throw createCustomError(`Game with ${gameId} ID could not be found while trying to update.`, 404);
         }
 
-        await game.update({ fen, whiteTime, blackTime});
+        await game.update({ fen, playerWhiteTimeRemaining: whiteTime, playerBlackTimeRemaining: blackTime});
         transaction.commit();
     } catch (error) {
         await transaction.rollback();
@@ -211,6 +233,7 @@ module.exports = {
     deleteAllGames,
     getGame,
     deleteGame,
+    updateGameByID,
     updateGame,
     joinGame,
     leaveGame,

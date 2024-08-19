@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -84,10 +84,10 @@ module.exports = {
       numPlayers: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 0, 
+        defaultValue: 0,
         validate: {
           isInt: {
-            msg : 'num_players must be an integer.'
+            msg: 'num_players must be an integer.'
           }
         }
       },
@@ -101,16 +101,14 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
-    });
+    })
 
-    queryInterface.addIndex('Games', ['winner']);
-    queryInterface.addIndex('Games', ['playerWhite']);
-    queryInterface.addIndex('Games', ['playerBlack']);
-
+    queryInterface.addIndex('Games', ['winner'])
+    queryInterface.addIndex('Games', ['playerWhite'])
+    queryInterface.addIndex('Games', ['playerBlack'])
   },
-  
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('Games');
+    await queryInterface.dropTable('Games')
   }
-};
+}

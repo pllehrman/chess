@@ -1,5 +1,5 @@
 // login/page.js
-import LoginForm from '../../components/LoginForm';
+import LoginForm from '../../components/register/LoginForm';
 
 export default function LoginPage() {
   return (

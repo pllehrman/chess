@@ -1,4 +1,4 @@
-import { getAllGamesByUserId } from "@/utils/getAllGamesByUserId";
+import { getAllGamesByUserId } from "@/components/history/getAllGamesByUserId";
 
 export async function History() {
     const userId = 0;

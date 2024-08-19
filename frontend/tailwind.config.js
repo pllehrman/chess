@@ -13,6 +13,7 @@ module.exports = {
       animation: {
         bounce: 'bounce 1s infinite',
         flash: 'flash 2s infinite',
+        fadeIn: 'fadeIn 1s ease-in-out'
       },
       keyframes: {
         bounce: {
@@ -22,7 +23,11 @@ module.exports = {
         flash: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
-        }
+        },
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
       },
     },
   },
