@@ -4,7 +4,7 @@ const {
   createCustomError,
   CustomAPIError,
 } = require("../middleware/customError");
-const { createSession } = require("./session");
+const { checkCurrentSession } = require("./session");
 const sequelize = require("../db/models/index").sequelize;
 const { Op } = require("sequelize");
 
@@ -20,7 +20,6 @@ const getAllGames = asyncWrapper(async (req, res) => {
   res.status(200).json(games);
 });
 
-//POST
 // POST
 const newGame = asyncWrapper(async (req, res) => {
   const {
@@ -30,30 +29,15 @@ const newGame = asyncWrapper(async (req, res) => {
     playerBlackTimeRemaining,
     timeIncrement,
     sessionId,
+    username,
   } = req.body;
 
   let playerWhiteSession = null;
   let playerBlackSession = null;
-  let session = null;
 
-  if (!sessionId) {
-    // Create a new session if no sessionId is provided
-    const { username } = req.body;
-    session = await createSession(username);
+  // Handle session creation or username update
+  let session = await checkCurrentSession(sessionId, username, res);
 
-    // Set the session cookie in the response
-    res.cookie("session_token", session.token, {
-      httpOnly: true,
-      expires: session.expiresAt,
-      secure: process.env.NODE_ENV === "production", // Ensures the cookie is only sent over HTTPS in production
-      sameSite: "strict", // Mitigate CSRF attacks
-    });
-  } else {
-    // Use the provided sessionId
-    session = { id: sessionId };
-  }
-
-  // Set playerWhiteSession or playerBlackSession based on playerColor
   if (playerColor === "white") {
     playerWhiteSession = session.id;
   } else if (playerColor === "black") {
@@ -119,6 +103,7 @@ const isGameAvailable = asyncWrapper(async (req, res) => {
   console.log("hello from the backend!");
   const gameId = req.query.id;
   const orientation = req.query.orientation; //white or black
+  const sessionId = req.query.sessionId;
 
   const game = await Game.findByPk(gameId);
   if (!game) {
@@ -135,19 +120,17 @@ const isGameAvailable = asyncWrapper(async (req, res) => {
       "Num Players:",
       game.numPlayers,
       "Player White:",
-      game.playerWhite,
-      "game.numplayers:",
-      game.numPlayers < 2,
-      "game.playerWhite",
-      game.playerWhite === null
+      game.playerWhiteSession,
+      "Session ID:",
+      sessionId
     );
 
     // is game available based on whether the correct session id is present ont he game table. Do this tomorrow...
-    if (game.numPlayers < 2 && !game.playerWhiteSession === null) {
+    if (!game.playerWhiteSession || game.playerWhiteSession === sessionId) {
       isAvailable = true;
     }
   } else if (orientation === "black") {
-    if (game.numPlayers < 2 && game.playerBlackSession === null) {
+    if (!game.playerBlackSession || game.playerBlackSession === sessionId) {
       isAvailable = true;
     }
   }
@@ -223,7 +206,7 @@ const gameCapacity = async (gameId) => {
 };
 
 // INTERNAL METHOD
-const joinGame = async (gameId, orientation, sessionId) => {
+const setGameSessionId = async (gameId, orientation, sessionId) => {
   const transaction = await sequelize.transaction();
   try {
     const game = await Game.findByPk(gameId, { transaction });
@@ -233,31 +216,46 @@ const joinGame = async (gameId, orientation, sessionId) => {
     }
 
     // Game is available
-    if (game.numPlayers < 2) {
-      if (orientation === "white") {
-        game.playerWhite = 0; // for now just set to mean an unidentified player
-      } else if (orientation === "black") {
-        game.playerBlack = 0;
-      } else {
-        throw createCustomError(
-          "Invalid orientation value. It should be 'white' or 'black'.",
-          400
-        );
-      }
-      game.numPlayers += 1;
-      await game.save({ transaction });
-      await transaction.commit();
-    } else {
-      await transaction.rollback();
+    if (orientation === "white" && !game.playerWhiteSession) {
+      game.playerWhiteSession = sessionId; // for now just set to mean an unidentified player
+    } else if (orientation === "black" && !game.playerBlackSession) {
+      game.playerBlackSession = sessionId;
     }
+
+    await game.save({ transaction });
+    await transaction.commit();
   } catch (error) {
     await transaction.rollback();
     throw createCustomError("Transaction failed");
   }
 };
 
+const increaseNumPlayers = async (gameId) => {
+  const transaction = sequelize.transaction();
+
+  try {
+    const game = await Game.findByPk(gameId, { transaction });
+
+    if (!game) {
+      throw createCustomError("Game could not be found", 404);
+    }
+
+    if (game.numPlayers < 2) {
+      game.numPlayers += 1;
+    }
+
+    await game.save({ transaction });
+    await transaction.commit();
+
+    return game.numPlayers;
+  } catch (error) {
+    await transaction.rollback();
+    throw createCustomError(`Transaction failed: ${error.message}`, 500);
+  }
+};
+
 // INTERNAL METHOD
-const leaveGame = async (gameId, orientation) => {
+const decreaseNumPlayers = async (gameId) => {
   const transaction = await sequelize.transaction();
   try {
     const game = await Game.findByPk(gameId);
@@ -270,22 +268,13 @@ const leaveGame = async (gameId, orientation) => {
     }
 
     if (game.numPlayers > 0) {
-      if (orientation === "white") {
-        game.playerWhite = null; // reset the datapoint to null
-      } else if (orientation === "black") {
-        game.playerBlack = null;
-      } else {
-        throw createCustomError(
-          "Invalid orientation value. It should be 'white' or 'black'.",
-          400
-        );
-      }
       game.numPlayers -= 1;
-      await game.save({ transaction });
-      await transaction.commit();
-    } else {
-      await transaction.rollback();
     }
+
+    await game.save({ transaction });
+    await transaction.commit();
+
+    return game.numPlayers;
   } catch (error) {
     await transaction.rollback();
     throw createCustomError("Transaction failed");
@@ -326,8 +315,9 @@ module.exports = {
   deleteGame,
   updateGameByID,
   updateGame,
-  joinGame,
-  leaveGame,
+  setGameSessionId,
+  increaseNumPlayers,
+  decreaseNumPlayers,
   isGameAvailable,
   gameCapacity,
   updateGame,

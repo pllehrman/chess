@@ -4,31 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { newChessGame } from "./newChessGame";
 
-export default function GameModeSelection({ session }) {
+export default function GameModeSelection({ sessionId, sessionUsername }) {
   const router = useRouter();
   const [showFriendOptions, setShowFriendOptions] = useState(false);
   const [showComputerOptions, setShowComputerOptions] = useState(false);
   const [timeControl, setTimeControl] = useState(10);
   const [increment, setIncrement] = useState(0);
   const [colorChoice, setColorChoice] = useState("random");
-  const [username, setUsername] = useState(session?.username);
-  const [sessionId, setSessionId] = useState(null);
-
-  // Check for the existence of a session cookie
-  useEffect(() => {
-    const checkCookie = () => {
-      const sessionToken = getCookie("session_token");
-      setSessionId(sessionToken); // Store the session token in state
-    };
-    checkCookie();
-  }, []);
-
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-    return null;
-  }
+  const [username, setUsername] = useState(sessionUsername);
 
   const coinFlip = () => Math.random() < 0.5;
 
@@ -41,7 +24,7 @@ export default function GameModeSelection({ session }) {
     setShowFriendOptions(true);
     setShowComputerOptions(false);
   };
-
+  // THERE needs to be a way of storing the browser cookie. Currently 'undefined' on the client side.
   async function handleStartGame() {
     let playerColor =
       colorChoice === "random" ? (coinFlip() ? "white" : "black") : colorChoice;

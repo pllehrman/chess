@@ -1,34 +1,33 @@
-export async function fetchGameAvailability(gameId, orientation) {
-  // Note the use of cache-busting parameters with date
+export async function fetchGameAvailability(gameId, orientation, sessionId) {
   const url = `${
     process.env.NEXT_PUBLIC_BACKEND_URL
-  }/games/check-game-availability?id=${gameId}&orientation=${orientation}&t=${new Date().getTime()}`;
-
+  }/games/check-game-availability?id=${gameId}&orientation=${orientation}&sessionId=${sessionId}&t=${new Date().getTime()}`;
   const maxRetries = 3;
-  let attempt = 0;
+  const retryDelay = 1500;
 
-  while (attempt < maxRetries) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log("Trying to fetch...");
+      console.log(`Attempt ${attempt}: Fetching game availability...`);
       const response = await fetch(url);
-      console.log(response.json());
+
       if (!response.ok) {
-        throw new Error(`HTTP error!, status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log(data);
+
       if (data.isAvailable) {
         return { isAvailable: data.isAvailable, game: data.gameData };
       }
-      attempt++;
     } catch (error) {
-      console.error(`Fetch error on attempt ${attempt + 1}: ${error.message}`);
-      attempt++;
+      console.error(`Fetch error on attempt ${attempt}: ${error.message}`);
     }
 
     if (attempt < maxRetries) {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
     }
   }
+
   return { isAvailable: false, gameData: null };
 }

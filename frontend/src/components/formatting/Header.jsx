@@ -5,9 +5,7 @@ import DarkModeToggle from "./DarkModeToggle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChessKnight } from "@fortawesome/free-solid-svg-icons";
 
-export default function Header({ session }) {
-  const username = session?.username; // Extract username if session is present
-
+export default function Header({ sessionUsername }) {
   return (
     <header className="bg-gray-800 text-white flex items-center justify-between dark:bg-gray-900 shadow-lg py-2 sticky top-0 z-50">
       <div className="flex items-center space-x-4 pl-6">
@@ -20,7 +18,7 @@ export default function Header({ session }) {
         </Link>
       </div>
       <div className="flex items-center space-x-4 pr-6">
-        {username && (
+        {sessionUsername && (
           <div className="text-lg px-4 py-2 text-gray-200">
             Welcome, {username}
           </div>

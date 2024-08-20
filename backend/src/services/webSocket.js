@@ -1,8 +1,9 @@
 const { WebSocketServer } = require("ws");
 const url = require("url");
 const {
-  joinGame,
-  leaveGame,
+  setGameSessionId,
+  increaseNumPlayers,
+  decreaseNumPlayers,
   gameCapacity,
   updateGame,
 } = require("../controllers/games");
@@ -61,10 +62,10 @@ class WebSocketManager {
 
   async handleJoinGame(gameId, orientation, connection, sessionId) {
     // Join the game in the database
-    await joinGame(gameId, orientation, sessionId);
+    await setGameSessionId(gameId, orientation, sessionId);
+    const entryCapacity = await increaseNumPlayers(gameId);
 
     // Notify the client of the join event
-    const entryCapacity = await gameCapacity(gameId);
     this.broadcastMessage("capacityUpdate", sessionId, gameId, {
       gameId,
       capacity: entryCapacity,
@@ -120,13 +121,12 @@ class WebSocketManager {
     );
 
     try {
-      await leaveGame(user.gameId, user.orientation);
+      const exitCapacity = await decreaseNumPlayers(user.gameId);
       console.log("Successfully left the game");
     } catch (error) {
       console.error(`Error leaving game: ${error.message}`);
     }
 
-    const exitCapacity = await gameCapacity(user.gameId);
     this.broadcastMessage("capacityUpdate", sessionId, gameId, {
       gameId: user.gameId,
       capacity: exitCapacity,
