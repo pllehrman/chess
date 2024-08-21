@@ -1,8 +1,8 @@
-import { retrieveCookie } from "@/components/formatting/retrieveCookie";
+import { retrieveSession } from "@/components/formatting/retrieveSession";
 import GameModeSelection from "@/components/game_modes/GameModeSelection";
 
 export default function Page() {
-  const { sessionId, sessionUsername } = retrieveCookie();
+  const { sessionId, sessionUsername } = retrieveSesssion();
 
   return (
     <div>

@@ -10,15 +10,17 @@ export async function MainGame({
   sessionUsername,
 }) {
   let isAvailable = false;
-  let gameData = null;
+  let game = null;
   let error = null;
 
-  console.log("Session ID:", sessionId);
-
   try {
-    response = await fetchGameAvailability(gameId, orientation, sessionId);
+    const response = await fetchGameAvailability(
+      gameId,
+      orientation,
+      sessionId
+    );
     isAvailable = response.isAvailable;
-    gameData = response.gameData;
+    game = response.game;
   } catch (err) {
     error = err;
   }
@@ -27,13 +29,13 @@ export async function MainGame({
     return <GameUnavailable />;
   } else if (!isAvailable) {
     return <GameUnavailable />;
-  } else if (!gameData || gameData.fen === null) {
+  } else if (!game || game.fen === null) {
     return <Loading />;
   }
 
   return (
     <MainGameClient
-      gameData={gameData}
+      gameData={game}
       orientation={orientation}
       sessionId={sessionId}
       sessionUsername={sessionUsername}

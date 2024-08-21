@@ -1,21 +1,29 @@
-'use client';
+"use client";
 
 import { ReadyState } from "react-use-websocket";
 
-export function Chat({ username, messageHistory, currentMessage, setCurrentMessage, sendChat, readyState }) {
-
+export function Chat({
+  username,
+  messageHistory,
+  currentMessage,
+  setCurrentMessage,
+  sendChat,
+  readyState,
+}) {
   const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-gray-900 dark:text-gray-100">
-      <h1 className="text-xl font-semibold">Hello, {username}</h1>
-      <div className="text-gray-700 dark:text-gray-300">Status: {connectionStatus}</div>
+      <h1 className="text-xl font-semibold">{username}</h1>
+      <div className="text-gray-700 dark:text-gray-300">
+        Status: {connectionStatus}
+      </div>
       <div className="mt-4 flex space-x-2">
         <input
           type="text"
@@ -28,7 +36,9 @@ export function Chat({ username, messageHistory, currentMessage, setCurrentMessa
           onClick={sendChat}
           disabled={readyState !== ReadyState.OPEN}
           className={`px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors duration-300 ${
-            readyState !== ReadyState.OPEN ? 'opacity-50 cursor-not-allowed' : ''
+            readyState !== ReadyState.OPEN
+              ? "opacity-50 cursor-not-allowed"
+              : ""
           }`}
         >
           Send

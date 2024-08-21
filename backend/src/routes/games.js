@@ -17,6 +17,6 @@ router.route("/check-game-availability").get(isGameAvailable);
 
 router.route("/").get(getAllGames).post(newGame).delete(deleteAllGames);
 router.route("/:id").get(getGame).delete(deleteGame).patch(updateGameByID);
-router.route("/user/:id").get(getAllGamesBySessionId);
+router.route("/session/:sessionId").get(getAllGamesBySessionId);
 
 module.exports = router;

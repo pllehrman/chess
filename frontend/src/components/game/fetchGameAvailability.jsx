@@ -15,10 +15,9 @@ export async function fetchGameAvailability(gameId, orientation, sessionId) {
       }
 
       const data = await response.json();
-      console.log(data);
-
+      console.log("DATA:", data);
       if (data.isAvailable) {
-        return { isAvailable: data.isAvailable, game: data.gameData };
+        return { isAvailable: data.isAvailable, game: data.game };
       }
     } catch (error) {
       console.error(`Fetch error on attempt ${attempt}: ${error.message}`);

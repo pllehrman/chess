@@ -10,12 +10,20 @@ const errorHandler = require("./middleware/errorHandler");
 const generateNonce = require("./middleware/nonceGenerator");
 
 app.use(express.json()); // Middleware to parse JSON bodies
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Set this to your frontend URL
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Enable sending cookies
+  })
+);
 app.use(generateNonce);
 
 // Routes
 const games = require("./routes/games");
+const sessions = require("./routes/sessions");
 app.use("/games", games);
+app.use("/sessions", sessions);
 
 // Database connection
 dbConnect();

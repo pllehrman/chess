@@ -1,6 +1,14 @@
 const { Session } = require("../db/models");
 const crypto = require("crypto");
+const asyncWrapper = require("../middleware/asyncWrapper");
 const { createCustomError } = require("../middleware/customError");
+
+const createSessionAPI = asyncWrapper(async (req, res) => {
+  const session = await createSession("Unnamed Grand Master");
+  setSessionCookie(res, session);
+
+  res.status(200).json({ session });
+});
 
 async function createSession(username) {
   try {
@@ -95,6 +103,7 @@ async function setSessionCookie(res, session) {
 }
 
 module.exports = {
+  createSessionAPI,
   createSession,
   getUsernameBySessionId,
   updateUsernameBySessionId,

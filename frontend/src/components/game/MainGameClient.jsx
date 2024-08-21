@@ -14,9 +14,13 @@ import { Chat } from "./Chat";
 import { MoveHistory } from "./MoveHistory";
 import { TwoPeoplePresent } from "./TwoPeoplePresent";
 
-export function MainGameClient({ gameData, orientation }) {
+export function MainGameClient({
+  gameData,
+  orientation,
+  sessionId,
+  sessionUsername,
+}) {
   const customPieces = useChessPieces();
-  const username = "Alex";
 
   //  Need to add current move
   const {
@@ -34,7 +38,13 @@ export function MainGameClient({ gameData, orientation }) {
     setBlackTime,
     currentTurn,
     setMoveHistory,
-  } = useWebSocket(username, gameData.id, orientation, gameData);
+  } = useWebSocket(
+    sessionId,
+    sessionUsername,
+    gameData.id,
+    orientation,
+    gameData
+  );
 
   // CHESS GAME LOGIC
   const {
@@ -116,7 +126,7 @@ export function MainGameClient({ gameData, orientation }) {
           {" "}
           {/* Reduced width */}
           <Chat
-            username={username}
+            username={sessionUsername}
             messageHistory={messageHistory}
             currentMessage={currentMessage}
             setCurrentMessage={setCurrentMessage}

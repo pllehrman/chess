@@ -23,7 +23,7 @@ class WebSocketManager {
   }
 
   async onConnection(connection, request) {
-    const { sessionId, username, gameId, orientation } = url.parse(
+    const { sessionId, sessionUsername, gameId, orientation } = url.parse(
       request.url,
       true
     ).query;
@@ -43,13 +43,13 @@ class WebSocketManager {
     }
 
     console.log(
-      `${username} is now connected to the WebSocket with sessionId: ${sessionId}.`
+      `${sessionUsername} is now connected to the WebSocket with sessionId: ${sessionId}.`
     );
 
     // Store the connection and user data by sessionId and gameId
     if (!this.connections[sessionId]) {
       this.connections[sessionId] = {}; // Initialize an object to hold connections per game
-      this.users[sessionId] = { username }; // Initialize user data
+      this.users[sessionId] = { sessionUsername }; // Initialize user data
     }
 
     // Store the connection for the specific game
@@ -117,7 +117,7 @@ class WebSocketManager {
     if (!user) return;
 
     console.log(
-      `${this.users[sessionId].username} disconnected from game ${gameId}`
+      `${this.users[sessionId].sessionUsername} disconnected from game ${gameId}`
     );
 
     try {
@@ -159,7 +159,7 @@ class WebSocketManager {
     const messageData = {
       type,
       ...(this.users[senderSessionId] && {
-        username: this.users[senderSessionId].username,
+        sessionUsername: this.users[senderSessionId].sessionUsername,
       }),
       message,
     };

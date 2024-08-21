@@ -2,7 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "../components/formatting/Header";
 import Footer from "../components/formatting/Footer";
-import { retrieveCookie } from "@/components/formatting/retrieveCookie";
+import { retrieveSession } from "@/components/formatting/retrieveSession";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const { sessionId, sessionUsername } = retrieveCookie();
+  const { sessionId, sessionUsername } = await retrieveSession();
 
   return (
     <html>

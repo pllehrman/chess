@@ -135,7 +135,7 @@ const isGameAvailable = asyncWrapper(async (req, res) => {
     }
   }
   console.log(isAvailable, game);
-  res.status(200).json({ isAvailable: isAvailable, gameData: game });
+  res.status(200).json({ isAvailable, game });
 });
 
 // GET
@@ -231,7 +231,7 @@ const setGameSessionId = async (gameId, orientation, sessionId) => {
 };
 
 const increaseNumPlayers = async (gameId) => {
-  const transaction = sequelize.transaction();
+  const transaction = await sequelize.transaction();
 
   try {
     const game = await Game.findByPk(gameId, { transaction });
