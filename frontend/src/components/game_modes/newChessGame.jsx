@@ -25,8 +25,8 @@ export async function newChessGame(
     });
 
     // Inspecting the Set-Cookie header
-    const setCookieHeader = response.headers.get("Set-Cookie");
-    console.log("Set-Cookie header:", setCookieHeader);
+    // const setCookieHeader = response.headers.get("Set-Cookie");
+    // console.log("Set-Cookie header:", setCookieHeader);
 
     if (!response.ok) {
       throw new Error(`Error starting new game: ${response.statusText}`);

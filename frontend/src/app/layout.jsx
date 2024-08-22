@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const { sessionId, sessionUsername } = await retrieveSession();
+  const { sessionId, sessionUsername } = retrieveSession();
 
   return (
     <html>

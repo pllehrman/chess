@@ -17,7 +17,8 @@ app.use(
     credentials: true, // Enable sending cookies
   })
 );
-app.use(generateNonce);
+
+// app.use(generateNonce);
 
 // Routes
 const games = require("./routes/games");

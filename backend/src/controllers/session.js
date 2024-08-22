@@ -89,7 +89,8 @@ async function checkCurrentSession(sessionId, username, res) {
   }
 }
 
-async function setSessionCookie(res, session) {
+function setSessionCookie(res, session) {
+  console.log("ISSUING A NEW COOKIE");
   res.cookie(
     "session_token",
     JSON.stringify({ id: session.id, username: session.username }),
@@ -97,7 +98,7 @@ async function setSessionCookie(res, session) {
       httpOnly: true,
       expires: session.expiresAt,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     }
   );
 }

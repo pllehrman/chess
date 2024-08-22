@@ -2,6 +2,7 @@ import { fetchGameAvailability } from "./fetchGameAvailability";
 import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
+import { checkForCookie } from "../formatting/checkForCookie";
 
 export async function MainGame({
   gameId,
@@ -41,4 +42,16 @@ export async function MainGame({
       sessionUsername={sessionUsername}
     />
   );
+}
+
+// Start working here. Gather all the server side information needed ahead of time...
+export async function getServerSideProps({ req, res }) {
+  const { sessionId, sessionUsername } = await checkForCookie(req, res);
+
+  return {
+    props: {
+      sessionId,
+      sessionUsername,
+    },
+  };
 }
