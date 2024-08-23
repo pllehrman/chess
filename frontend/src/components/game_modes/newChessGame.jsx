@@ -20,7 +20,6 @@ export async function newChessGame(
         playerBlackTimeRemaining: timeRemaining * 60, // convert to seconds
         timeIncrement,
         username,
-        sessionId,
       }),
     });
 

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 // NEEDS TO BE REWORKED. COOKIES AREN'T STICKING IN INCOGNITO MODE -> Investigate
-export const checkForCookie = async (req, res) => {
+export const checkForCookie = async () => {
   const cookie = cookies().get("session_token");
   let sessionId = null;
   let sessionUsername = null;
@@ -25,7 +25,7 @@ export const checkForCookie = async (req, res) => {
   return { sessionId, sessionUsername };
 };
 
-async function requestNewSession(res) {
+async function requestNewSession() {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/sessions`,
@@ -44,15 +44,15 @@ async function requestNewSession(res) {
 
     const data = await response.json();
 
-    const cookieValue = JSON.stringify({
-      id: data.session.id,
-      username: data.session.username,
-    });
+    // const cookieValue = JSON.stringify({
+    //   id: data.session.id,
+    //   username: data.session.username,
+    // });
 
-    res.setHeader(
-      "Set-Cookie",
-      `session_token=${cookieValue}; Path=/; HttpOnly; SameSite=Lax`
-    );
+    // res.setHeader(
+    //   "Set-Cookie",
+    //   `session_token=${cookieValue}; Path=/; HttpOnly; SameSite=Lax`
+    // );
 
     return {
       sessionId: data.session.id,

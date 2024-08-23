@@ -6,21 +6,34 @@ import Controls from "./Controls";
 import ResultNotice from "./ResultNotice";
 import { Timers } from "./timers/Timers";
 import { ChessGameLogic } from "./chessGameLogic";
-import { useChessPieces } from "./useChessPieces";
 import { useControlsLogic } from "./useControlsLogic";
 import { onDropHandler } from "./onDropHandler";
 import { useWebSocket } from "./websocket/useWebSocket";
 import { Chat } from "./Chat";
 import { MoveHistory } from "./MoveHistory";
 import { TwoPeoplePresent } from "./TwoPeoplePresent";
+import { joinGame } from "./joinGame";
 
 export function MainGameClient({
   gameData,
   orientation,
   sessionId,
   sessionUsername,
+  chessPieces,
 }) {
-  const customPieces = useChessPieces();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const asyncJoinGame = async () => {
+      await joinGame(gameData.id);
+      setIsLoading(false);
+    };
+    asyncJoinGame();
+  }, [gameData.id]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   //  Need to add current move
   const {
@@ -115,7 +128,7 @@ export function MainGameClient({
                 whiteTime,
                 blackTime
               )}
-              customPieces={customPieces}
+              customPieces={chessPieces}
             />
             <ResultNotice result={result} winner={winner} />
           </div>

@@ -120,8 +120,10 @@ class WebSocketManager {
       `${this.users[sessionId].sessionUsername} disconnected from game ${gameId}`
     );
 
+    let exitCapacity;
+
     try {
-      const exitCapacity = await decreaseNumPlayers(user.gameId);
+      exitCapacity = await decreaseNumPlayers(user.gameId);
       console.log("Successfully left the game");
     } catch (error) {
       console.error(`Error leaving game: ${error.message}`);

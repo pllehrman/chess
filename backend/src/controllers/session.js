@@ -2,9 +2,10 @@ const { Session } = require("../db/models");
 const crypto = require("crypto");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const { createCustomError } = require("../middleware/customError");
+const defaultUsername = "Unnamed Grand Master";
 
 const createSessionAPI = asyncWrapper(async (req, res) => {
-  const session = await createSession("Unnamed Grand Master");
+  const session = await createSession(defaultUsername);
   setSessionCookie(res, session);
 
   res.status(200).json({ session });
@@ -12,12 +13,13 @@ const createSessionAPI = asyncWrapper(async (req, res) => {
 
 async function createSession(username) {
   try {
+    const currentUsername = username || defaultUsername;
     const id = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
 
     const session = await Session.create({
       id,
-      username: username,
+      username: defaultUsername,
       expiresAt,
     });
 
@@ -70,14 +72,19 @@ async function updateUsernameBySessionId(sessionId, newUsername) {
   }
 }
 
-async function checkCurrentSession(sessionId, username, res) {
-  if (!sessionId) {
+async function checkAndUpdateCurrentSession(username, req, res) {
+  const cookie = req.headers.cookie;
+  let parsedCookie, currentUsername, sessionId;
+
+  if (!cookie) {
     const session = await createSession(username);
 
     setSessionCookie(res, session);
     return session;
   } else {
-    const currentUsername = await getUsernameBySessionId(sessionId);
+    parsedCookie = parseCookie(cookie);
+    currentUsername = parsedCookie.username;
+    sessionId = parsedCookie.id;
 
     if (currentUsername !== username) {
       const session = await updateUsernameBySessionId(sessionId, username);
@@ -103,10 +110,18 @@ function setSessionCookie(res, session) {
   );
 }
 
+function parseCookie(cookieString) {
+  return cookieString.split(";").reduce((acc, cookiePart) => {
+    const [key, value] = cookiePart.trim().split("=");
+    acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
+}
+
 module.exports = {
   createSessionAPI,
   createSession,
   getUsernameBySessionId,
   updateUsernameBySessionId,
-  checkCurrentSession,
+  checkAndUpdateCurrentSession,
 };

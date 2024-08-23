@@ -15,7 +15,8 @@ export async function fetchGameAvailability(gameId, orientation, sessionId) {
       }
 
       const data = await response.json();
-      console.log("DATA:", data);
+      console.log("Game on the frontend:", data);
+
       if (data.isAvailable) {
         return { isAvailable: data.isAvailable, game: data.game };
       }

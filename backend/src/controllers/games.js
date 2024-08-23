@@ -4,7 +4,7 @@ const {
   createCustomError,
   CustomAPIError,
 } = require("../middleware/customError");
-const { checkCurrentSession } = require("./session");
+const { checkAndUpdateCurrentSession } = require("./session");
 const sequelize = require("../db/models/index").sequelize;
 const { Op } = require("sequelize");
 
@@ -28,7 +28,6 @@ const newGame = asyncWrapper(async (req, res) => {
     playerWhiteTimeRemaining,
     playerBlackTimeRemaining,
     timeIncrement,
-    sessionId,
     username,
   } = req.body;
 
@@ -36,7 +35,7 @@ const newGame = asyncWrapper(async (req, res) => {
   let playerBlackSession = null;
 
   // Handle session creation or username update
-  let session = await checkCurrentSession(sessionId, username, res);
+  let session = await checkAndUpdateCurrentSession(username, req, res);
 
   if (playerColor === "white") {
     playerWhiteSession = session.id;
@@ -54,6 +53,7 @@ const newGame = asyncWrapper(async (req, res) => {
     timeIncrement,
   });
 
+  console.log("Game on the backend!", game);
   if (!game) {
     throw createCustomError("Game unable to be created", 500);
   }

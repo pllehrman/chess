@@ -3,13 +3,12 @@ import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
 import { checkForCookie } from "../formatting/checkForCookie";
+import { useChessPieces } from "./useChessPieces";
 
-export async function MainGame({
-  gameId,
-  orientation,
-  sessionId,
-  sessionUsername,
-}) {
+export async function MainGame({ gameId, orientation }) {
+  const { sessionId, sessionUsername } = await checkForCookie();
+  const customPieces = useChessPieces();
+
   let isAvailable = false;
   let game = null;
   let error = null;
@@ -23,6 +22,7 @@ export async function MainGame({
     isAvailable = response.isAvailable;
     game = response.game;
   } catch (err) {
+    console.log("This is the error:", err);
     error = err;
   }
 
@@ -40,18 +40,7 @@ export async function MainGame({
       orientation={orientation}
       sessionId={sessionId}
       sessionUsername={sessionUsername}
+      chessPieces={customPieces}
     />
   );
-}
-
-// Start working here. Gather all the server side information needed ahead of time...
-export async function getServerSideProps({ req, res }) {
-  const { sessionId, sessionUsername } = await checkForCookie(req, res);
-
-  return {
-    props: {
-      sessionId,
-      sessionUsername,
-    },
-  };
 }
