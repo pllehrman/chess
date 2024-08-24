@@ -13,6 +13,8 @@ import { Chat } from "./Chat";
 import { MoveHistory } from "./MoveHistory";
 import { TwoPeoplePresent } from "./TwoPeoplePresent";
 import { joinGame } from "./joinGame";
+import { useChessPieces } from "./useChessPieces";
+import { Loading } from "../formatting/Loading";
 
 export function MainGameClient({
   gameData,
@@ -21,6 +23,7 @@ export function MainGameClient({
   sessionUsername,
   chessPieces,
 }) {
+  const customPieces = useChessPieces();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

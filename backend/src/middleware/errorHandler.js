@@ -1,15 +1,16 @@
-const { CustomAPIError } = require('./customError')
+const { CustomAPIError } = require("./customError");
 
 const errorHandler = (err, req, res, next) => {
-  let statusCode = 500
-  let message = 'Something went wrong'
+  console.error(err.stack);
 
   if (err instanceof CustomAPIError) {
-    statusCode = err.statusCode
-    message = err.message
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+    });
   }
 
-  res.status(statusCode).json({ message })
-}
+  res.status(500).json({ success: false, message: "Internal Server Error" });
+};
 
-module.exports = errorHandler
+module.exports = errorHandler;

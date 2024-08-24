@@ -3,11 +3,9 @@ import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
 import { checkForCookie } from "../formatting/checkForCookie";
-import { useChessPieces } from "./useChessPieces";
 
 export async function MainGame({ gameId, orientation }) {
   const { sessionId, sessionUsername } = await checkForCookie();
-  const customPieces = useChessPieces();
 
   let isAvailable = false;
   let game = null;

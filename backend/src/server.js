@@ -7,7 +7,6 @@ const webSocketServer = require("./services/webSocket");
 // Middleware
 const dbConnect = require("./middleware/dbConnect");
 const errorHandler = require("./middleware/errorHandler");
-const generateNonce = require("./middleware/nonceGenerator");
 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(
@@ -18,19 +17,19 @@ app.use(
   })
 );
 
-// app.use(generateNonce);
-
 // Routes
 const games = require("./routes/games");
-const sessions = require("./routes/sessions");
 app.use("/games", games);
-app.use("/sessions", sessions);
 
 // Database connection
 dbConnect();
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the backend!");
+  res.status(200).json({
+    status: "Ok",
+    name: "chessGambit backend",
+    version: "1.0.0",
+  });
 });
 
 app.use(errorHandler);

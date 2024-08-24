@@ -8,15 +8,13 @@ const {
   getGame,
   deleteGame,
   getAllGamesBySessionId,
-  isGameAvailable,
+  joinGame,
   updateGameByID,
 } = require("../controllers/games");
 
-// IMPORTANTLY THIS ROUTE NEEDS TO BE PASSED FIRST
-router.route("/check-game-availability").get(isGameAvailable);
-
 router.route("/").get(getAllGames).post(newGame).delete(deleteAllGames);
 router.route("/:id").get(getGame).delete(deleteGame).patch(updateGameByID);
+router.route("/join").post(joinGame);
 router.route("/session/:sessionId").get(getAllGamesBySessionId);
 
 module.exports = router;

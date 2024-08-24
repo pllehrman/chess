@@ -4,13 +4,6 @@ const asyncWrapper = require("../middleware/asyncWrapper");
 const { createCustomError } = require("../middleware/customError");
 const defaultUsername = "Unnamed Grand Master";
 
-const createSessionAPI = asyncWrapper(async (req, res) => {
-  const session = await createSession(defaultUsername);
-  setSessionCookie(res, session);
-
-  res.status(200).json({ session });
-});
-
 async function createSession(username) {
   try {
     const currentUsername = username || defaultUsername;
@@ -25,7 +18,7 @@ async function createSession(username) {
 
     return session;
   } catch (error) {
-    throw createCustomError(`Error creating session: ${error.msg}`, 500);
+    throw createCustomError(`Error creating session: ${error.message}`, 500);
   }
 }
 
@@ -43,7 +36,7 @@ async function getUsernameBySessionId(sessionId) {
     return session.username;
   } catch (error) {
     throw createCustomError(
-      `Error in retrieving username from session ID: ${sessionId} and err: ${error.msg}`,
+      `Error in retrieving username from session ID: ${sessionId} and err: ${error.message}`,
       500
     );
   }
@@ -66,7 +59,7 @@ async function updateUsernameBySessionId(sessionId, newUsername) {
     return session;
   } catch (error) {
     throw createCustomError(
-      `Error in saving new username to session ID: ${sessionId} and err: ${error.msg}`,
+      `Error in saving new username to session ID: ${sessionId} and err: ${error.message}`,
       500
     );
   }
@@ -86,7 +79,7 @@ async function checkAndUpdateCurrentSession(username, req, res) {
     currentUsername = parsedCookie.username;
     sessionId = parsedCookie.id;
 
-    if (currentUsername !== username) {
+    if (username && currentUsername !== username) {
       const session = await updateUsernameBySessionId(sessionId, username);
       setSessionCookie(res, session);
       return session;
@@ -119,7 +112,6 @@ function parseCookie(cookieString) {
 }
 
 module.exports = {
-  createSessionAPI,
   createSession,
   getUsernameBySessionId,
   updateUsernameBySessionId,

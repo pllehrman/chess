@@ -3,8 +3,7 @@ export async function newChessGame(
   playerColor,
   timeRemaining,
   timeIncrement,
-  username,
-  sessionId
+  username
 ) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
@@ -23,11 +22,7 @@ export async function newChessGame(
       }),
     });
 
-    // Inspecting the Set-Cookie header
-    // const setCookieHeader = response.headers.get("Set-Cookie");
-    // console.log("Set-Cookie header:", setCookieHeader);
-
-    if (!response.ok) {
+    if (!response.success) {
       throw new Error(`Error starting new game: ${response.statusText}`);
     }
 

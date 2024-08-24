@@ -34,31 +34,75 @@ const newGame = asyncWrapper(async (req, res) => {
   let playerWhiteSession = null;
   let playerBlackSession = null;
 
-  // Handle session creation or username update
+  try {
+    let session = await checkAndUpdateCurrentSession(username, req, res);
+
+    if (playerColor === "white") {
+      playerWhiteSession = session.id;
+    } else if (playerColor === "black") {
+      playerBlackSession = session.id;
+    } else {
+      throw createCustomError(`that game color is not supported`, 404);
+    }
+
+    const game = await Game.create({
+      type,
+      playerWhiteSession,
+      playerWhiteTimeRemaining,
+      playerBlackSession,
+      playerBlackTimeRemaining,
+      timeIncrement,
+    });
+
+    if (!game) {
+      throw createCustomError(`error creating new game.`, 500);
+    }
+
+    res.status(200).json({ success: true, game });
+  } catch (error) {
+    throw createCustomError(
+      `error in checking session and creating new game: ${error.message}`,
+      500
+    );
+  }
+});
+
+const joinGame = asyncWrapper(async (req, res) => {
+  const { gameId, orientation, username } = req.body;
   let session = await checkAndUpdateCurrentSession(username, req, res);
+  const transaction = await sequelize.transaction();
+  try {
+    const game = await Game.findByPk(gameId, { transaction });
 
-  if (playerColor === "white") {
-    playerWhiteSession = session.id;
-  } else if (playerColor === "black") {
-    playerBlackSession = session.id;
+    if (!game) {
+      throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
+    }
+
+    if (
+      orientation === "white" &&
+      (!game.playerWhiteSession || game.playerWhiteSession === session.id)
+    ) {
+      game.playerWhiteSession = sessionId;
+    } else if (
+      orientation === "black" &&
+      (!game.playerBlackSession || game.playerBlackSession === session.id)
+    ) {
+      game.playerBlackSession = sessionId;
+    } else {
+      throw createCustomError(
+        `error in assigning a sessionId to an orientaiton color`,
+        404
+      );
+    }
+
+    await game.save({ transaction });
+    await transaction.commit();
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    await transaction.rollback();
+    throw createCustomError("error in joining game", 500);
   }
-
-  // Create a new game
-  const game = await Game.create({
-    type,
-    playerWhiteSession,
-    playerWhiteTimeRemaining,
-    playerBlackSession,
-    playerBlackTimeRemaining,
-    timeIncrement,
-  });
-
-  console.log("Game on the backend!", game);
-  if (!game) {
-    throw createCustomError("Game unable to be created", 500);
-  }
-
-  res.status(201).json({ game });
 });
 
 //DELETE
@@ -205,31 +249,6 @@ const gameCapacity = async (gameId) => {
   return game.numPlayers;
 };
 
-// INTERNAL METHOD
-const setGameSessionId = async (gameId, orientation, sessionId) => {
-  const transaction = await sequelize.transaction();
-  try {
-    const game = await Game.findByPk(gameId, { transaction });
-
-    if (!game) {
-      throw createCustomError("Game could not be found", 404);
-    }
-
-    // Game is available
-    if (orientation === "white" && !game.playerWhiteSession) {
-      game.playerWhiteSession = sessionId; // for now just set to mean an unidentified player
-    } else if (orientation === "black" && !game.playerBlackSession) {
-      game.playerBlackSession = sessionId;
-    }
-
-    await game.save({ transaction });
-    await transaction.commit();
-  } catch (error) {
-    await transaction.rollback();
-    throw createCustomError("Transaction failed");
-  }
-};
-
 const increaseNumPlayers = async (gameId) => {
   const transaction = await sequelize.transaction();
 
@@ -315,7 +334,7 @@ module.exports = {
   deleteGame,
   updateGameByID,
   updateGame,
-  setGameSessionId,
+  joinGame,
   increaseNumPlayers,
   decreaseNumPlayers,
   isGameAvailable,

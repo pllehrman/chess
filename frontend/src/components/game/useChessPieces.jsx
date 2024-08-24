@@ -1,29 +1,40 @@
-import { useMemo } from 'react';
+// Memoization on the server side?
+import { useMemo } from "react";
 
 const pieces = [
-    'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',
-    'bP', 'bN', 'bB', 'bR', 'bQ', 'bK',
-  ];
+  "wP",
+  "wN",
+  "wB",
+  "wR",
+  "wQ",
+  "wK",
+  "bP",
+  "bN",
+  "bB",
+  "bR",
+  "bQ",
+  "bK",
+];
 
 export const useChessPieces = () => {
-    const customPieces = useMemo(() => {
-        const pieceComponents = {};
+  const customPieces = useMemo(() => {
+    const pieceComponents = {};
 
-        pieces.forEach((piece) => {
-        pieceComponents[piece] = ({ squareWidth }) => (
-            <div
-            className="bg-no-repeat bg-center"
-            style={{
-                width: squareWidth,
-                height: squareWidth,
-                backgroundImage: `url(/${piece}.png)`,
-                backgroundSize: '100%',
-            }}
-            />
-        );
-        });
+    pieces.forEach((piece) => {
+      pieceComponents[piece] = ({ squareWidth }) => (
+        <div
+          className="bg-no-repeat bg-center"
+          style={{
+            width: squareWidth,
+            height: squareWidth,
+            backgroundImage: `url(/${piece}.png)`,
+            backgroundSize: "100%",
+          }}
+        />
+      );
+    });
 
-        return pieceComponents;
+    return pieceComponents;
   }, []);
 
   return customPieces;
