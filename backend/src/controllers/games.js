@@ -4,7 +4,7 @@ const {
   createCustomError,
   CustomAPIError,
 } = require("../middleware/customError");
-const { checkAndUpdateCurrentSession } = require("./session");
+const { checkAndUpdateCurrentSession, createSession } = require("./session");
 const sequelize = require("../db/models/index").sequelize;
 const { Op } = require("sequelize");
 
@@ -17,7 +17,7 @@ const getAllGames = asyncWrapper(async (req, res) => {
     throw createCustomError("Could not retrieve games.", 404);
   }
 
-  res.status(200).json(games);
+  res.status(200).json({ games });
 });
 
 // POST
@@ -28,14 +28,18 @@ const newGame = asyncWrapper(async (req, res) => {
     playerWhiteTimeRemaining,
     playerBlackTimeRemaining,
     timeIncrement,
-    username,
+    sessionUsername,
   } = req.body;
 
   let playerWhiteSession = null;
   let playerBlackSession = null;
 
   try {
-    let session = await checkAndUpdateCurrentSession(username, req, res);
+    const session = await checkAndUpdateCurrentSession(
+      req,
+      res,
+      sessionUsername
+    );
 
     if (playerColor === "white") {
       playerWhiteSession = session.id;
@@ -58,7 +62,7 @@ const newGame = asyncWrapper(async (req, res) => {
       throw createCustomError(`error creating new game.`, 500);
     }
 
-    res.status(200).json({ success: true, game });
+    res.status(200).json({ game });
   } catch (error) {
     throw createCustomError(
       `error in checking session and creating new game: ${error.message}`,
@@ -68,8 +72,21 @@ const newGame = asyncWrapper(async (req, res) => {
 });
 
 const joinGame = asyncWrapper(async (req, res) => {
-  const { gameId, orientation, username } = req.body;
-  let session = await checkAndUpdateCurrentSession(username, req, res);
+  const { gameId, orientation } = req.body;
+  let { sessionId } = req.body;
+  // console.log(
+  //   "GAME ID",
+  //   gameId,
+  //   "Orientation:",
+  //   orientation,
+  //   "sessionId",
+  //   sessionId
+  // );
+  if (!sessionId) {
+    const session = await createSession(res, null);
+    sessionId = session.id;
+  }
+
   const transaction = await sequelize.transaction();
   try {
     const game = await Game.findByPk(gameId, { transaction });
@@ -78,19 +95,26 @@ const joinGame = asyncWrapper(async (req, res) => {
       throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
     }
 
+    // console.log(game);
+    // console.log(
+    //   orientation === "white",
+    //   !game.playerWhiteSession,
+    //   game.playerWhiteSession === sessionId
+    // );
     if (
       orientation === "white" &&
-      (!game.playerWhiteSession || game.playerWhiteSession === session.id)
+      (!game.playerWhiteSession || game.playerWhiteSession === sessionId)
     ) {
+      console.log("Inside if!");
       game.playerWhiteSession = sessionId;
     } else if (
       orientation === "black" &&
-      (!game.playerBlackSession || game.playerBlackSession === session.id)
+      (!game.playerBlackSession || game.playerBlackSession === sessionId)
     ) {
       game.playerBlackSession = sessionId;
     } else {
       throw createCustomError(
-        `error in assigning a sessionId to an orientaiton color`,
+        `tried to join a game where the user didn't belong`,
         404
       );
     }
@@ -98,8 +122,9 @@ const joinGame = asyncWrapper(async (req, res) => {
     await game.save({ transaction });
     await transaction.commit();
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ game });
   } catch (error) {
+    console.log("there was an error!");
     await transaction.rollback();
     throw createCustomError("error in joining game", 500);
   }
@@ -110,7 +135,7 @@ const deleteAllGames = asyncWrapper(async (req, res) => {
   await Game.destroy({
     where: {},
   });
-  res.status(200).json({ message: "All games deleted successfully." });
+  res.status(200).json({ message: "all games deleted successfully." });
 });
 
 //ROUTES -> '/games/:id'
@@ -122,7 +147,7 @@ const getGame = asyncWrapper(async (req, res) => {
   if (!game) {
     throw createCustomError("Game could not be found", 404);
   }
-  res.status(200).json(game);
+  res.status(200).json({ game });
 });
 
 //DELETE

@@ -3,7 +3,7 @@ export async function newChessGame(
   playerColor,
   timeRemaining,
   timeIncrement,
-  username
+  sessionUsername
 ) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
@@ -18,18 +18,21 @@ export async function newChessGame(
         playerWhiteTimeRemaining: timeRemaining * 60, // convert to seconds
         playerBlackTimeRemaining: timeRemaining * 60, // convert to seconds
         timeIncrement,
-        username,
+        sessionUsername,
       }),
     });
 
-    if (!response.success) {
-      throw new Error(`Error starting new game: ${response.statusText}`);
+    console.log(response);
+    if (!response.ok) {
+      throw new Error(
+        `error fetching to start a new game: ${response.message}`
+      );
     }
 
     const data = await response.json();
+    console.log(data);
     return data.game;
   } catch (error) {
-    console.error("Error starting new game:", error);
-    throw error;
+    console.error("error starting new game:", error);
   }
 }

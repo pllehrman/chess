@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 export const retrieveSession = () => {
-  const cookie = cookies().get("session_token");
+  const cookie = cookies().get("session_cookie");
   let sessionId = null;
   let sessionUsername = null;
 
@@ -11,7 +11,7 @@ export const retrieveSession = () => {
       sessionId = sessionData.id;
       sessionUsername = sessionData.username;
     } catch (error) {
-      throw new Error("error in parsing cookie.");
+      console.error(`error in parsing cookie: ${error.message}`);
     }
   }
 

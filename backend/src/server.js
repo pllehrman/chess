@@ -7,6 +7,7 @@ const webSocketServer = require("./services/webSocket");
 // Middleware
 const dbConnect = require("./middleware/dbConnect");
 const errorHandler = require("./middleware/errorHandler");
+const cookieParser = require("cookie-parser");
 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(
@@ -16,6 +17,7 @@ app.use(
     credentials: true, // Enable sending cookies
   })
 );
+app.use(cookieParser());
 
 // Routes
 const games = require("./routes/games");

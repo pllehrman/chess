@@ -4,17 +4,17 @@ const asyncWrapper = require("../middleware/asyncWrapper");
 const { createCustomError } = require("../middleware/customError");
 const defaultUsername = "Unnamed Grand Master";
 
-async function createSession(username) {
+async function createSession(res, sessionUsername) {
   try {
-    const currentUsername = username || defaultUsername;
     const id = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
 
     const session = await Session.create({
       id,
-      username: defaultUsername,
+      username: sessionUsername || defaultUsername,
       expiresAt,
     });
+    setSessionCookie(res, session);
 
     return session;
   } catch (error) {
@@ -22,27 +22,7 @@ async function createSession(username) {
   }
 }
 
-async function getUsernameBySessionId(sessionId) {
-  try {
-    const session = await Session.findByPk(sessionId);
-
-    if (!session) {
-      throw createCustomError(
-        `Error retrieving session with ID: ${sessionId}`,
-        500
-      );
-    }
-
-    return session.username;
-  } catch (error) {
-    throw createCustomError(
-      `Error in retrieving username from session ID: ${sessionId} and err: ${error.message}`,
-      500
-    );
-  }
-}
-
-async function updateUsernameBySessionId(sessionId, newUsername) {
+async function updateUsernameBySessionId(res, sessionId, newUsername) {
   try {
     const session = await Session.findByPk(sessionId);
 
@@ -55,6 +35,7 @@ async function updateUsernameBySessionId(sessionId, newUsername) {
 
     session.username = newUsername;
     session.save();
+    setSessionCookie(res, session);
 
     return session;
   } catch (error) {
@@ -65,34 +46,27 @@ async function updateUsernameBySessionId(sessionId, newUsername) {
   }
 }
 
-async function checkAndUpdateCurrentSession(username, req, res) {
-  const cookie = req.headers.cookie;
-  let parsedCookie, currentUsername, sessionId;
+// Method only works when the incoming request actually contains cookies!
+async function checkAndUpdateCurrentSession(req, res, newUsername) {
+  let session = req.cookies.session_cookie;
 
-  if (!cookie) {
-    const session = await createSession(username);
-
-    setSessionCookie(res, session);
+  if (!session) {
+    session = await createSession(res, newUsername || defaultUsername);
     return session;
-  } else {
-    parsedCookie = parseCookie(cookie);
-    currentUsername = parsedCookie.username;
-    sessionId = parsedCookie.id;
-
-    if (username && currentUsername !== username) {
-      const session = await updateUsernameBySessionId(sessionId, username);
-      setSessionCookie(res, session);
-      return session;
-    }
-
-    return { id: sessionId, username: currentUsername };
   }
+
+  if (newUsername && session.username !== newUsername) {
+    session = await updateUsernameBySessionId(res, session.id, newUsername);
+    return session;
+  }
+
+  return session;
 }
 
 function setSessionCookie(res, session) {
   console.log("ISSUING A NEW COOKIE");
   res.cookie(
-    "session_token",
+    "session_cookie",
     JSON.stringify({ id: session.id, username: session.username }),
     {
       httpOnly: true,
@@ -103,17 +77,8 @@ function setSessionCookie(res, session) {
   );
 }
 
-function parseCookie(cookieString) {
-  return cookieString.split(";").reduce((acc, cookiePart) => {
-    const [key, value] = cookiePart.trim().split("=");
-    acc[key] = decodeURIComponent(value);
-    return acc;
-  }, {});
-}
-
 module.exports = {
   createSession,
-  getUsernameBySessionId,
   updateUsernameBySessionId,
   checkAndUpdateCurrentSession,
 };

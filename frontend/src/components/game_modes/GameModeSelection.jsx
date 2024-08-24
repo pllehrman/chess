@@ -15,33 +15,38 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
 
   const coinFlip = () => Math.random() < 0.5;
 
-  const handlePlayAgainstComputer = () => {
+  function handlePlayAgainstComputer() {
     setShowComputerOptions(true);
     setShowFriendOptions(false);
-  };
+  }
 
-  const handlePlayAgainstFriend = () => {
+  function handlePlayAgainstFriend() {
     setShowFriendOptions(true);
     setShowComputerOptions(false);
-  };
-  // THERE needs to be a way of storing the browser cookie. Currently 'undefined' on the client side.
+  }
+
   async function handleStartGame() {
     let playerColor =
       colorChoice === "random" ? (coinFlip() ? "white" : "black") : colorChoice;
     const type = showFriendOptions ? 1 : 0;
 
-    const gameData = await newChessGame(
-      type,
-      playerColor,
-      timeControl,
-      increment,
-      username,
-      sessionId
-    );
-    console.log(gameData);
-    const gameId = gameData.id;
+    try {
+      const game = await newChessGame(
+        type,
+        playerColor,
+        timeControl,
+        increment,
+        username
+      );
 
-    router.push(`/compete/${gameId}/${playerColor}`);
+      if (!game) {
+        throw new Error("error in starting a new chess game");
+      }
+
+      router.push(`/compete/${game.id}/${playerColor}`);
+    } catch (error) {
+      console.error(`error in starting a new chess game: ${error.message}`);
+    }
   }
 
   return (

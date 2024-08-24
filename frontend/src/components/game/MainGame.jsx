@@ -1,26 +1,22 @@
-import { fetchGameAvailability } from "./fetchGameAvailability";
 import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
-import { checkForCookie } from "../formatting/checkForCookie";
+import { joinGame } from "./joinGame";
+import { retrieveSession } from "../formatting/retrieveSession";
 
 export async function MainGame({ gameId, orientation }) {
-  const { sessionId, sessionUsername } = await checkForCookie();
+  const { sessionId, sessionUsername } = await retrieveSession();
 
   let isAvailable = false;
   let game = null;
   let error = null;
 
   try {
-    const response = await fetchGameAvailability(
-      gameId,
-      orientation,
-      sessionId
-    );
+    const response = await joinGame(gameId, orientation, sessionId);
     isAvailable = response.isAvailable;
     game = response.game;
   } catch (err) {
-    console.log("This is the error:", err);
+    console.error(`error in joining game: ${err.message}`);
     error = err;
   }
 
@@ -38,7 +34,6 @@ export async function MainGame({ gameId, orientation }) {
       orientation={orientation}
       sessionId={sessionId}
       sessionUsername={sessionUsername}
-      chessPieces={customPieces}
     />
   );
 }
