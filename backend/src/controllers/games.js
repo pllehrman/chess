@@ -21,7 +21,7 @@ const getAllGames = asyncWrapper(async (req, res) => {
 });
 
 // POST
-const newGame = asyncWrapper(async (req, res) => {
+const startNewGame = asyncWrapper(async (req, res) => {
   const {
     type,
     playerColor,
@@ -74,60 +74,46 @@ const newGame = asyncWrapper(async (req, res) => {
 const joinGame = asyncWrapper(async (req, res) => {
   const { gameId, orientation } = req.body;
   let { sessionId } = req.body;
-  // console.log(
-  //   "GAME ID",
-  //   gameId,
-  //   "Orientation:",
-  //   orientation,
-  //   "sessionId",
-  //   sessionId
-  // );
+  let session;
+  console.log(
+    "GAME ID",
+    gameId,
+    "Orientation:",
+    orientation,
+    "sessionId",
+    sessionId
+  );
   if (!sessionId) {
-    const session = await createSession(res, null);
+    session = await createSession(res, null);
+    console.log("session", session);
     sessionId = session.id;
   }
 
-  const transaction = await sequelize.transaction();
-  try {
-    const game = await Game.findByPk(gameId, { transaction });
-
-    if (!game) {
-      throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
-    }
-
-    // console.log(game);
-    // console.log(
-    //   orientation === "white",
-    //   !game.playerWhiteSession,
-    //   game.playerWhiteSession === sessionId
-    // );
-    if (
-      orientation === "white" &&
-      (!game.playerWhiteSession || game.playerWhiteSession === sessionId)
-    ) {
-      console.log("Inside if!");
-      game.playerWhiteSession = sessionId;
-    } else if (
-      orientation === "black" &&
-      (!game.playerBlackSession || game.playerBlackSession === sessionId)
-    ) {
-      game.playerBlackSession = sessionId;
-    } else {
-      throw createCustomError(
-        `tried to join a game where the user didn't belong`,
-        404
-      );
-    }
-
-    await game.save({ transaction });
-    await transaction.commit();
-
-    res.status(200).json({ game });
-  } catch (error) {
-    console.log("there was an error!");
-    await transaction.rollback();
-    throw createCustomError("error in joining game", 500);
+  const game = await Game.findByPk(gameId);
+  console.log(game.playerBlackSession);
+  if (!game) {
+    throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
   }
+  if (
+    orientation === "white" &&
+    (!game.playerWhiteSession || game.playerWhiteSession === sessionId)
+  ) {
+    game.playerWhiteSession = sessionId;
+    console.log("Inside white if");
+  } else if (
+    orientation === "black" &&
+    (!game.playerBlackSession || game.playerBlackSession === sessionId)
+  ) {
+    game.playerBlackSession = sessionId;
+  } else {
+    throw createCustomError(
+      `tried to join a game where the user didn't belong`,
+      400
+    );
+  }
+
+  await game.save();
+  res.status(200).json({ game, session });
 });
 
 //DELETE
@@ -149,7 +135,7 @@ const getGame = asyncWrapper(async (req, res) => {
   }
   res.status(200).json({ game });
 });
-
+//
 //DELETE
 const deleteGame = asyncWrapper(async (req, res) => {
   const gameId = req.params.id;
@@ -165,46 +151,6 @@ const deleteGame = asyncWrapper(async (req, res) => {
   res
     .status(200)
     .json({ message: `Game with ${gameId} ID successfully deleted` });
-});
-
-// GET
-const isGameAvailable = asyncWrapper(async (req, res) => {
-  console.log("hello from the backend!");
-  const gameId = req.query.id;
-  const orientation = req.query.orientation; //white or black
-  const sessionId = req.query.sessionId;
-
-  const game = await Game.findByPk(gameId);
-  if (!game) {
-    return res
-      .status(404)
-      .json({ message: `Game could not be found with id ${gameId}` });
-  }
-
-  let isAvailable = false;
-
-  // Does the game have less than two players and is the player color occupied?
-  if (orientation === "white") {
-    console.log(
-      "Num Players:",
-      game.numPlayers,
-      "Player White:",
-      game.playerWhiteSession,
-      "Session ID:",
-      sessionId
-    );
-
-    // is game available based on whether the correct session id is present ont he game table. Do this tomorrow...
-    if (!game.playerWhiteSession || game.playerWhiteSession === sessionId) {
-      isAvailable = true;
-    }
-  } else if (orientation === "black") {
-    if (!game.playerBlackSession || game.playerBlackSession === sessionId) {
-      isAvailable = true;
-    }
-  }
-  console.log(isAvailable, game);
-  res.status(200).json({ isAvailable, game });
 });
 
 // GET
@@ -227,7 +173,6 @@ const getAllGamesBySessionId = asyncWrapper(async (req, res) => {
 const updateGameByID = asyncWrapper(async (req, res) => {
   const gameId = req.params.id;
   const { fen, whiteTime, blackTime } = req.body;
-  const transaction = await sequelize.transaction();
   try {
     const game = await Game.findByPk(gameId); //find the game
 
@@ -275,10 +220,8 @@ const gameCapacity = async (gameId) => {
 };
 
 const increaseNumPlayers = async (gameId) => {
-  const transaction = await sequelize.transaction();
-
   try {
-    const game = await Game.findByPk(gameId, { transaction });
+    const game = await Game.findByPk(gameId);
 
     if (!game) {
       throw createCustomError("Game could not be found", 404);
@@ -286,21 +229,25 @@ const increaseNumPlayers = async (gameId) => {
 
     if (game.numPlayers < 2) {
       game.numPlayers += 1;
+    } else {
+      throw createCustomError(
+        "Error increasing numPlayers in game with too many people",
+        400
+      );
     }
 
-    await game.save({ transaction });
-    await transaction.commit();
-
+    await game.save();
     return game.numPlayers;
   } catch (error) {
-    await transaction.rollback();
-    throw createCustomError(`Transaction failed: ${error.message}`, 500);
+    throw createCustomError(
+      `error increasing numPlayers  ${error.message}`,
+      500
+    );
   }
 };
 
 // INTERNAL METHOD
 const decreaseNumPlayers = async (gameId) => {
-  const transaction = await sequelize.transaction();
   try {
     const game = await Game.findByPk(gameId);
 
@@ -313,22 +260,21 @@ const decreaseNumPlayers = async (gameId) => {
 
     if (game.numPlayers > 0) {
       game.numPlayers -= 1;
+    } else {
+      throw createCustomError(
+        `error decreasing numPlayers in game with too few players`
+      );
     }
 
-    await game.save({ transaction });
-    await transaction.commit();
-
+    await game.save();
     return game.numPlayers;
   } catch (error) {
-    await transaction.rollback();
-    throw createCustomError("Transaction failed");
+    throw createCustomError(`error decreasing numPlayers: ${error.message}`);
   }
 };
 
 // INTERNAL METHOD
 const updateGame = async (gameId, fen, whiteTime, blackTime) => {
-  console.log("here in the backend!");
-  const transaction = await sequelize.transaction();
   try {
     const game = await Game.findByPk(gameId); //find the game
 
@@ -344,16 +290,35 @@ const updateGame = async (gameId, fen, whiteTime, blackTime) => {
       playerWhiteTimeRemaining: whiteTime,
       playerBlackTimeRemaining: blackTime,
     });
-    transaction.commit();
   } catch (error) {
-    await transaction.rollback();
     throw createCustomError("Transaction failed.");
+  }
+};
+
+// INTERNAL METHOD
+const setGameSessionId = async (gameId, orientation, sessionId) => {
+  try {
+    const game = await Game.findByPk(gameId);
+
+    if (!game) {
+      throw createCustomError(
+        `Game with ${gameId} ID could not be found while trying to update.`,
+        404
+      );
+    }
+    if (orientation === "white") {
+      await game.update({ playerWhiteSession: sessionId });
+    } else if (orientation === "black") {
+      await game.update({ playerBlackSession: sessionId });
+    }
+  } catch (error) {
+    throw createCustomError("error in setting game sessionId", 500);
   }
 };
 
 module.exports = {
   getAllGames,
-  newGame,
+  startNewGame,
   deleteAllGames,
   getGame,
   deleteGame,
@@ -362,8 +327,8 @@ module.exports = {
   joinGame,
   increaseNumPlayers,
   decreaseNumPlayers,
-  isGameAvailable,
   gameCapacity,
   updateGame,
   getAllGamesBySessionId,
+  setGameSessionId,
 };

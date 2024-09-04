@@ -25,8 +25,17 @@ export async function joinGame(gameId, orientation, sessionId) {
           `error in joining game with status ${response.status} and message: ${response.message}`
         );
       }
-
       const data = await response.json();
+
+      if (!sessionId) {
+        return {
+          isAvailable: true,
+          game: data.game,
+          sessionId: data.session.id,
+          sessionUsername: data.session.username,
+        };
+      }
+
       return { isAvailable: true, game: data.game };
     } catch (error) {
       console.error(`error joining game on ${attempt}: ${error.message}`);
@@ -37,5 +46,8 @@ export async function joinGame(gameId, orientation, sessionId) {
     }
   }
 
-  return { isAvailable: false, game: null };
+  return {
+    isAvailable: false,
+    game: null,
+  };
 }

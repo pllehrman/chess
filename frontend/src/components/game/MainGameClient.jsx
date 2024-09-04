@@ -14,29 +14,16 @@ import { MoveHistory } from "./MoveHistory";
 import { TwoPeoplePresent } from "./TwoPeoplePresent";
 import { joinGame } from "./joinGame";
 import { useChessPieces } from "./useChessPieces";
-import { Loading } from "../formatting/Loading";
+import { requestCookie } from "../formatting/requestCookie";
 
 export function MainGameClient({
   gameData,
   orientation,
   sessionId,
   sessionUsername,
-  chessPieces,
 }) {
-  const customPieces = useChessPieces();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const asyncJoinGame = async () => {
-      await joinGame(gameData.id);
-      setIsLoading(false);
-    };
-    asyncJoinGame();
-  }, [gameData.id]);
-
-  if (isLoading) {
-    return <Loading />;
-  }
+  requestCookie(sessionId);
+  const chessPieces = useChessPieces();
 
   //  Need to add current move
   const {

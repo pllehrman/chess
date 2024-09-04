@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   getAllGames,
-  newGame,
+  startNewGame,
   deleteAllGames,
   getGame,
   deleteGame,
@@ -12,7 +12,7 @@ const {
   updateGameByID,
 } = require("../controllers/games");
 
-router.route("/").get(getAllGames).post(newGame).delete(deleteAllGames);
+router.route("/").get(getAllGames).post(startNewGame).delete(deleteAllGames);
 router.route("/:id").get(getGame).delete(deleteGame).patch(updateGameByID);
 router.route("/join").post(joinGame);
 router.route("/session/:sessionId").get(getAllGamesBySessionId);

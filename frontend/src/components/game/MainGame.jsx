@@ -5,7 +5,7 @@ import { joinGame } from "./joinGame";
 import { retrieveSession } from "../formatting/retrieveSession";
 
 export async function MainGame({ gameId, orientation }) {
-  const { sessionId, sessionUsername } = await retrieveSession();
+  let { sessionId, sessionUsername } = await retrieveSession();
 
   let isAvailable = false;
   let game = null;
@@ -15,14 +15,17 @@ export async function MainGame({ gameId, orientation }) {
     const response = await joinGame(gameId, orientation, sessionId);
     isAvailable = response.isAvailable;
     game = response.game;
+
+    if (!sessionId && isAvailable) {
+      sessionId = response.sessionId;
+      sessionUsername = response.sessionUsername;
+    }
   } catch (err) {
     console.error(`error in joining game: ${err.message}`);
     error = err;
   }
 
-  if (error) {
-    return <GameUnavailable />;
-  } else if (!isAvailable) {
+  if (error || !isAvailable) {
     return <GameUnavailable />;
   } else if (!game || game.fen === null) {
     return <Loading />;

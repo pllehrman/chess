@@ -14,12 +14,16 @@ export const useWebSocket = (
   const [currentMessage, setCurrentMessage] = useState("");
   const [moveHistory, setMoveHistory] = useState([]);
   const [twoPeoplePresent, setTwoPeoplePresent] = useState(
-    gameData.numPlayers === 1
+    gameData ? gameData.numPlayers === 1 : false
   );
-  const [whiteTime, setWhiteTime] = useState(gameData.playerWhiteTimeRemaining);
-  const [blackTime, setBlackTime] = useState(gameData.playerBlackTimeRemaining);
+  const [whiteTime, setWhiteTime] = useState(
+    gameData ? gameData.playerWhiteTimeRemaining : 0
+  );
+  const [blackTime, setBlackTime] = useState(
+    gameData ? gameData.playerBlackTimeRemaining : 0
+  );
   const [currentTurn, setCurrentTurn] = useState(
-    getCurrentTurnFromFEN(gameData.fen)
+    gameData ? getCurrentTurnFromFEN(gameData.fen) : "white"
   );
 
   const { sendMessage, readyState, lastMessage } = reconnectWebSocket(
@@ -31,6 +35,7 @@ export const useWebSocket = (
 
   // Determines the kind of incoming ws message and handles accordingly
   const handleMessage = useCallback((messageData) => {
+    console.log(messageData);
     switch (messageData.type) {
       case "chat":
         setMessageHistory((prev) => [...prev, messageData]);
@@ -39,6 +44,7 @@ export const useWebSocket = (
         incomingMove(messageData.message);
         break;
       case "capacityUpdate":
+        console.log("Message Data:", messageData.message.capacity);
         setTwoPeoplePresent(messageData.message.capacity === 2);
         updateTime(gameId, whiteTime, blackTime);
         break;

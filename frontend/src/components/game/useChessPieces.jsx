@@ -1,4 +1,3 @@
-// Memoization on the server side?
 import { useMemo } from "react";
 
 const pieces = [
@@ -17,11 +16,11 @@ const pieces = [
 ];
 
 export const useChessPieces = () => {
-  const customPieces = useMemo(() => {
-    const pieceComponents = {};
+  const chessPieces = useMemo(() => {
+    const piecesObj = {};
 
     pieces.forEach((piece) => {
-      pieceComponents[piece] = ({ squareWidth }) => (
+      piecesObj[piece] = ({ squareWidth }) => (
         <div
           className="bg-no-repeat bg-center"
           style={{
@@ -34,8 +33,8 @@ export const useChessPieces = () => {
       );
     });
 
-    return pieceComponents;
-  }, []);
+    return piecesObj;
+  }, [pieces]); // Dependencies
 
-  return customPieces;
+  return chessPieces;
 };

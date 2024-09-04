@@ -35,7 +35,7 @@ class WebSocketManager {
     }
 
     try {
-      await this.handleJoinGame(gameId, orientation, connection, sessionId);
+      await this.handleJoinGame(gameId, orientation, sessionId);
     } catch (error) {
       console.log(`Error joining game: ${error.message}`);
       connection.close();
@@ -60,9 +60,8 @@ class WebSocketManager {
     connection.on("close", this.onClose.bind(this, sessionId, gameId));
   }
 
-  async handleJoinGame(gameId, orientation, connection, sessionId) {
+  async handleJoinGame(gameId, orientation, sessionId) {
     // Join the game in the database
-    await setGameSessionId(gameId, orientation, sessionId);
     const entryCapacity = await increaseNumPlayers(gameId);
 
     // Notify the client of the join event
