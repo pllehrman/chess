@@ -7,7 +7,7 @@ const {
   deleteAllGames,
   getGame,
   deleteGame,
-  getAllGamesBySessionId,
+  getGameHistory,
   joinGame,
   updateGameByID,
 } = require("../controllers/games");
@@ -15,6 +15,6 @@ const {
 router.route("/").get(getAllGames).post(startNewGame).delete(deleteAllGames);
 router.route("/:id").get(getGame).delete(deleteGame).patch(updateGameByID);
 router.route("/join").post(joinGame);
-router.route("/session/:sessionId").get(getAllGamesBySessionId);
+router.route("/session/:sessionId").get(getGameHistory);
 
 module.exports = router;

@@ -10,6 +10,7 @@ export async function MainGame({ gameId, orientation }) {
   let isAvailable = false;
   let game = null;
   let error = null;
+  let needsCookie = false;
 
   try {
     const response = await joinGame(gameId, orientation, sessionId);
@@ -17,6 +18,7 @@ export async function MainGame({ gameId, orientation }) {
     game = response.game;
 
     if (!sessionId && isAvailable) {
+      needsCookie = true;
       sessionId = response.sessionId;
       sessionUsername = response.sessionUsername;
     }
@@ -37,6 +39,7 @@ export async function MainGame({ gameId, orientation }) {
       orientation={orientation}
       sessionId={sessionId}
       sessionUsername={sessionUsername}
+      needsCookie={needsCookie}
     />
   );
 }

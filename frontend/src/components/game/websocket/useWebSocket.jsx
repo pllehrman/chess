@@ -63,6 +63,7 @@ export const useWebSocket = (
 
   // Handle 'move' message
   const incomingMove = useCallback(({ move, whiteTime, blackTime }) => {
+    console.log(move);
     setMoveHistory((prev) => [...prev, move]);
     setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
     setWhiteTime(whiteTime);

@@ -1,4 +1,4 @@
-const { Game } = require("../db/models"); // Assuming your models' index.js is in ../db/models
+const { Game, Session } = require("../db/models"); // Assuming your models' index.js is in ../db/models
 const asyncWrapper = require("../middleware/asyncWrapper");
 const {
   createCustomError,
@@ -153,10 +153,10 @@ const deleteGame = asyncWrapper(async (req, res) => {
     .json({ message: `Game with ${gameId} ID successfully deleted` });
 });
 
-// GET
-const getAllGamesBySessionId = asyncWrapper(async (req, res) => {
+const getGameHistory = asyncWrapper(async (req, res) => {
   const sessionId = req.params.sessionId;
 
+  // Fetch games where the sessionId was either the white or black player
   const games = await Game.findAll({
     where: {
       [Op.or]: [
@@ -164,11 +164,74 @@ const getAllGamesBySessionId = asyncWrapper(async (req, res) => {
         { playerBlackSession: sessionId },
       ],
     },
+    include: [
+      // Join with session to get playerWhiteSession username
+      {
+        model: Session,
+        as: "whiteSession", // Use the alias defined in the model
+        required: false, // Left join, so if session doesn't exist, null will be returned
+        attributes: ["username"], // Select only the username
+      },
+      // Join with session to get playerBlackSession username
+      {
+        model: Session,
+        as: "blackSession", // Use the alias defined in the model
+        required: false,
+        attributes: ["username"],
+      },
+    ],
   });
 
-  res.status(200).json({ games });
+  // Separate games into in-progress and completed
+  const inProgressGames = [];
+  const completedGames = [];
+
+  // Add a field for the result (WIN, LOSS, TIE) based on sessionId
+  games.forEach((game) => {
+    let result;
+    if (!game.winner) {
+      result = "IN PROGRESS";
+    } else if (game.winner === "TIE") {
+      result = "TIE";
+    } else if (game.winner === sessionId) {
+      result = "WIN";
+    } else {
+      result = "LOSS";
+    }
+
+    // Determine opponent based on sessionId
+    let opponent, orientation;
+    if (game.playerWhiteSession === sessionId) {
+      orientation = "white";
+      opponent = game.blackSession ? game.blackSession.username : null;
+    } else if (game.playerBlackSession === sessionId) {
+      orientation = "black";
+      opponent = game.whiteSession ? game.whiteSession.username : null;
+    }
+
+    const gameWithResult = {
+      ...game.toJSON(),
+      result, // Add the result field
+      opponent,
+      orientation,
+    };
+
+    // Sort games into in-progress and completed based on the result
+    if (result === "IN PROGRESS") {
+      inProgressGames.push(gameWithResult);
+    } else {
+      completedGames.push(gameWithResult);
+    }
+  });
+
+  // Return the in-progress and completed games in separate arrays
+  res.status(200).json({
+    inProgressGames,
+    completedGames,
+  });
 });
 
+// GET
 // UPDATE
 const updateGameByID = asyncWrapper(async (req, res) => {
   const gameId = req.params.id;
@@ -329,6 +392,6 @@ module.exports = {
   decreaseNumPlayers,
   gameCapacity,
   updateGame,
-  getAllGamesBySessionId,
+  getGameHistory,
   setGameSessionId,
 };

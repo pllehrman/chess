@@ -21,8 +21,12 @@ export function MainGameClient({
   orientation,
   sessionId,
   sessionUsername,
+  needsCookie,
 }) {
-  requestCookie(sessionId);
+  if (needsCookie) {
+    requestCookie(sessionId);
+  }
+
   const chessPieces = useChessPieces();
 
   //  Need to add current move
@@ -60,7 +64,7 @@ export function MainGameClient({
     setGameOver,
     setResult,
     setWinner,
-  } = ChessGameLogic(gameData, moveHistory);
+  } = ChessGameLogic(gameData, currentTurn, orientation, moveHistory);
 
   const { resetGame, undoMove } = useControlsLogic(
     safeGameMutate,

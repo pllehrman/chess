@@ -112,6 +112,7 @@ class WebSocketManager {
   }
 
   async onClose(sessionId, gameId) {
+    console.log("SessionID in ws:", sessionId);
     const user = this.users[sessionId][gameId];
     if (!user) return;
 

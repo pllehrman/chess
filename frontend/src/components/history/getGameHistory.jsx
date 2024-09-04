@@ -1,4 +1,4 @@
-export async function getAllGamesByUserId(sessionId) {
+export async function getGameHistory(sessionId) {
   const response = await fetch(
     `${
       process.env.NEXT_PUBLIC_BACKEND_URL
@@ -11,5 +11,8 @@ export async function getAllGamesByUserId(sessionId) {
 
   const data = await response.json();
 
-  return data.games;
+  return {
+    inProgressGames: data.inProgressGames,
+    completedGames: data.completedGames,
+  };
 }

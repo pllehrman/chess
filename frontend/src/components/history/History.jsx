@@ -1,52 +1,24 @@
-import { getAllGamesByUserId } from "@/components/history/getAllGamesByUserId";
+import { retrieveSession } from "../formatting/retrieveSession";
+import { getGameHistory } from "./getGameHistory";
+import { CompletedGames } from "./CompletedGames";
+import { InProgressGames } from "./InProgressGames";
 
-export async function History({ sessionId }) {
-  const games = await getAllGamesByUserId(sessionId);
-  const totalGames = games.length;
+export async function History({}) {
+  // Retrieve the current session ID and username
+  const { sessionId, sessionUsername } = retrieveSession();
+  const { inProgressGames, completedGames } = await getGameHistory(sessionId);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-15">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen flex flex-col">
         <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-8">
           Chess Game History
         </h1>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Total Games Played: {totalGames}
-          </h2>
-          <div className="space-y-4">
-            {games.map((game, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-md shadow-sm"
-              >
-                <div>
-                  <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Result:{" "}
-                    <span
-                      className={`font-bold ${
-                        game.result === "WIN"
-                          ? "text-green-500"
-                          : game.result === "LOSS"
-                          ? "text-red-500"
-                          : "text-yellow-500"
-                      }`}
-                    >
-                      {game.result}
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Opponent: {game.opponent}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-300">
-                    Date: {game.date}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+
+        {/* Two Columns for In Progress and Completed Games */}
+        <div className="flex justify-between space-x-6 flex-grow min-h-0">
+          <InProgressGames inProgressGames={inProgressGames} />
+          <CompletedGames completedGames={completedGames} />
         </div>
       </div>
     </div>
