@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { newChessGame } from "./newChessGame";
 
@@ -11,6 +11,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   const [timeControl, setTimeControl] = useState(10);
   const [increment, setIncrement] = useState(0);
   const [colorChoice, setColorChoice] = useState("random");
+  const [difficulty, setDifficulty] = useState("medium"); // New state for difficulty
   const [username, setUsername] = useState(sessionUsername);
 
   const coinFlip = () => Math.random() < 0.5;
@@ -28,24 +29,29 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   async function handleStartGame() {
     let playerColor =
       colorChoice === "random" ? (coinFlip() ? "white" : "black") : colorChoice;
-    const type = showFriendOptions ? 1 : 0;
+    if (showFriendOptions) {
+      const type = showFriendOptions ? 1 : 0;
 
-    try {
-      const game = await newChessGame(
-        type,
-        playerColor,
-        timeControl,
-        increment,
-        username
-      );
+      try {
+        const game = await newChessGame(
+          type,
+          playerColor,
+          timeControl,
+          increment,
+          username,
+          difficulty // Pass the difficulty to the newChessGame function
+        );
 
-      if (!game) {
-        throw new Error("error in starting a new chess game");
+        if (!game) {
+          throw new Error("error in starting a new chess game");
+        }
+
+        window.location.href = `/compete/${game.id}/${playerColor}`;
+      } catch (error) {
+        console.error(`error in starting a new chess game: ${error.message}`);
       }
-
-      window.location.href = `/compete/${game.id}/${playerColor}`;
-    } catch (error) {
-      console.error(`error in starting a new chess game: ${error.message}`);
+    } else {
+      router.push(`/compete/cpu/${difficulty}/${playerColor}`);
     }
   }
 
@@ -134,6 +140,49 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
                 </label>
               </div>
             </div>
+
+            {/* Difficulty Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
+                Choose Difficulty
+              </label>
+              <div className="mt-2 flex space-x-4">
+                <label className="text-gray-900 dark:text-gray-300">
+                  <input
+                    type="radio"
+                    name="difficulty"
+                    value="easy"
+                    checked={difficulty === "easy"}
+                    onChange={() => setDifficulty("easy")}
+                    className="mr-2"
+                  />
+                  Easy
+                </label>
+                <label className="text-gray-900 dark:text-gray-300">
+                  <input
+                    type="radio"
+                    name="difficulty"
+                    value="medium"
+                    checked={difficulty === "medium"}
+                    onChange={() => setDifficulty("medium")}
+                    className="mr-2"
+                  />
+                  Medium
+                </label>
+                <label className="text-gray-900 dark:text-gray-300">
+                  <input
+                    type="radio"
+                    name="difficulty"
+                    value="hard"
+                    checked={difficulty === "hard"}
+                    onChange={() => setDifficulty("hard")}
+                    className="mr-2"
+                  />
+                  Hard
+                </label>
+              </div>
+            </div>
+
             <button
               onClick={handleStartGame}
               className="w-full bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
