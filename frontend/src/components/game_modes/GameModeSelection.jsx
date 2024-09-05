@@ -43,7 +43,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         throw new Error("error in starting a new chess game");
       }
 
-      router.push(`/compete/${game.id}/${playerColor}`);
+      window.location.href = `/compete/${game.id}/${playerColor}`;
     } catch (error) {
       console.error(`error in starting a new chess game: ${error.message}`);
     }

@@ -4,6 +4,8 @@ import Link from "next/link";
 import DarkModeToggle from "./DarkModeToggle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChessKnight } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 export default function Header({ sessionUsername }) {
   return (

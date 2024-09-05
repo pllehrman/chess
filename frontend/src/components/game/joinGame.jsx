@@ -1,53 +1,43 @@
 export async function joinGame(gameId, orientation, sessionId) {
-  const maxRetries = 3;
-  const retryDelay = 1500;
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/join`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameId,
+          orientation,
+          sessionId,
+        }),
+      }
+    );
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/join`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gameId,
-            orientation,
-            sessionId,
-          }),
-        }
+    if (!response.ok) {
+      throw new Error(
+        `error in joining game with status ${response.status} and message: ${response.message}`
       );
+    }
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          `error in joining game with status ${response.status} and message: ${response.message}`
-        );
-      }
-      const data = await response.json();
-
-      if (!sessionId) {
-        return {
-          isAvailable: true,
-          game: data.game,
-          sessionId: data.session.id,
-          sessionUsername: data.session.username,
-        };
-      }
-
-      return { isAvailable: true, game: data.game };
-    } catch (error) {
-      console.error(`error joining game on ${attempt}: ${error.message}`);
+    if (!sessionId) {
+      return {
+        isAvailable: true,
+        game: data.game,
+        sessionId: data.session.id,
+        sessionUsername: data.session.username,
+      };
     }
 
-    if (attempt < maxRetries) {
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-    }
+    return { isAvailable: true, game: data.game };
+  } catch (error) {
+    console.error(`error joining game on ${attempt}: ${error.message}`);
+    return {
+      isAvailable: false,
+      game: null,
+    };
   }
-
-  return {
-    isAvailable: false,
-    game: null,
-  };
 }

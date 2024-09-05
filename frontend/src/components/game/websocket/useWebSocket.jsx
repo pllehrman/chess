@@ -8,23 +8,17 @@ export const useWebSocket = (
   sessionUsername,
   gameId,
   orientation,
-  gameData
+  safeGameMutate,
+  whiteTime,
+  blackTime,
+  setWhiteTime,
+  setBlackTime,
+  setCurrentTurn,
+  setTwoPeoplePresent
 ) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const [moveHistory, setMoveHistory] = useState([]);
-  const [twoPeoplePresent, setTwoPeoplePresent] = useState(
-    gameData ? gameData.numPlayers === 1 : false
-  );
-  const [whiteTime, setWhiteTime] = useState(
-    gameData ? gameData.playerWhiteTimeRemaining : 0
-  );
-  const [blackTime, setBlackTime] = useState(
-    gameData ? gameData.playerBlackTimeRemaining : 0
-  );
-  const [currentTurn, setCurrentTurn] = useState(
-    gameData ? getCurrentTurnFromFEN(gameData.fen) : "white"
-  );
 
   const { sendMessage, readyState, lastMessage } = reconnectWebSocket(
     sessionId,
@@ -64,19 +58,42 @@ export const useWebSocket = (
   // Handle 'move' message
   const incomingMove = useCallback(({ move, whiteTime, blackTime }) => {
     console.log(move);
+
+    // Use safeGameMutate to update the game state safely
+    safeGameMutate((game) => {
+      const result = game.move({
+        from: move.from,
+        to: move.to,
+        promotion: move.promotion || "q", // Ensure promotion defaults to a queen
+      });
+
+      if (result === null) {
+        console.error("Invalid move received:", move);
+      } else {
+        console.log("Move applied successfully:", result);
+      }
+    });
+
     setMoveHistory((prev) => [...prev, move]);
+
     setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
     setWhiteTime(whiteTime);
     setBlackTime(blackTime);
   }, []);
 
-  // Send chat message
   const sendChat = useCallback(() => {
     if (currentMessage) {
-      sendMessage(JSON.stringify({ type: "chat", message: currentMessage }));
+      const chatMessage = {
+        type: "chat",
+        message: currentMessage,
+        fromMe: true,
+      };
+      setMessageHistory((prev) => [...prev, chatMessage]);
+      sendMessage(JSON.stringify(chatMessage));
+
       setCurrentMessage("");
     }
-  }, [sendMessage]);
+  }, [sendMessage, currentMessage, setMessageHistory]);
 
   // Send move message
   const sendMove = useCallback(
@@ -122,22 +139,8 @@ export const useWebSocket = (
     setCurrentMessage,
     sendChat,
     moveHistory,
-    twoPeoplePresent,
     sendMove,
     readyState,
-    whiteTime,
-    setWhiteTime,
-    blackTime,
-    setBlackTime,
-    currentTurn,
     setMoveHistory,
   };
-};
-
-const getCurrentTurnFromFEN = (fen) => {
-  const parts = fen.split(" ");
-  if (parts.length > 1) {
-    return parts[1] === "w" ? "white" : "black";
-  }
-  return "white";
 };

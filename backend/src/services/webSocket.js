@@ -84,7 +84,9 @@ class WebSocketManager {
   async onMessage(sessionId, gameId, message) {
     const messageString = message.toString("utf-8");
 
+    console.log("RECIEVED MESSAGE!");
     try {
+      console.log("sessionId:", sessionId);
       const parsedMessage = JSON.parse(messageString);
       const user = this.users[sessionId][gameId];
 
@@ -112,9 +114,14 @@ class WebSocketManager {
   }
 
   async onClose(sessionId, gameId) {
-    console.log("SessionID in ws:", sessionId);
+    if (!this.users[sessionId] || !this.users[sessionId][gameId]) {
+      console.warn(
+        `Session or game not found for sessionId: ${sessionId} and gameId: ${gameId}`
+      );
+      return;
+    }
+
     const user = this.users[sessionId][gameId];
-    if (!user) return;
 
     console.log(
       `${this.users[sessionId].sessionUsername} disconnected from game ${gameId}`
@@ -134,7 +141,7 @@ class WebSocketManager {
       capacity: exitCapacity,
     });
 
-    // Resend the message on a delay to ensure all clients are up to date and clean up
+    // Clean up after a short delay
     setTimeout(() => {
       this.broadcastMessage("capacityUpdate", sessionId, gameId, {
         gameId: user.gameId,

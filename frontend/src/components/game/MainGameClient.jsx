@@ -12,7 +12,6 @@ import { useWebSocket } from "./websocket/useWebSocket";
 import { Chat } from "./Chat";
 import { MoveHistory } from "./MoveHistory";
 import { TwoPeoplePresent } from "./TwoPeoplePresent";
-import { joinGame } from "./joinGame";
 import { useChessPieces } from "./useChessPieces";
 import { requestCookie } from "../formatting/requestCookie";
 
@@ -23,48 +22,54 @@ export function MainGameClient({
   sessionUsername,
   needsCookie,
 }) {
+  const [whiteTime, setWhiteTime] = useState(gameData.playerBlackTimeRemaining);
+  const [blackTime, setBlackTime] = useState(gameData.playerWhiteTimeRemaining);
+  const [twoPeoplePresent, setTwoPeoplePresent] = useState(
+    gameData.numPlayers === 1
+  );
+  const [currentTurn, setCurrentTurn] = useState(
+    getCurrentTurnFromFEN(gameData.fen)
+  );
+
   if (needsCookie) {
+    console.log("NEEDS COOKIE!");
     requestCookie(sessionId);
   }
-
   const chessPieces = useChessPieces();
 
-  //  Need to add current move
+  const {
+    game,
+    result,
+    winner,
+    safeGameMutate,
+    checkGameOver,
+    setGameOver,
+    setResult,
+    setWinner,
+  } = ChessGameLogic(gameData, orientation);
+
   const {
     messageHistory,
     currentMessage,
     setCurrentMessage,
     sendChat,
     moveHistory,
-    twoPeoplePresent,
     sendMove,
     readyState,
-    whiteTime,
-    setWhiteTime,
-    blackTime,
-    setBlackTime,
-    currentTurn,
     setMoveHistory,
   } = useWebSocket(
     sessionId,
     sessionUsername,
     gameData.id,
     orientation,
-    gameData
-  );
-
-  // CHESS GAME LOGIC
-  const {
-    game,
-    result,
-    winner,
-    setGame,
     safeGameMutate,
-    checkGameOver,
-    setGameOver,
-    setResult,
-    setWinner,
-  } = ChessGameLogic(gameData, currentTurn, orientation, moveHistory);
+    whiteTime,
+    blackTime,
+    setWhiteTime,
+    setBlackTime,
+    setCurrentTurn,
+    setTwoPeoplePresent
+  );
 
   const { resetGame, undoMove } = useControlsLogic(
     safeGameMutate,
@@ -73,7 +78,7 @@ export function MainGameClient({
     setWinner
   );
 
-  console.log("move history:", moveHistory);
+  // console.log("move history:", moveHistory);
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <TwoPeoplePresent twoPeoplePresent={twoPeoplePresent} />
@@ -113,14 +118,14 @@ export function MainGameClient({
               orientation={orientation}
               position={game.fen()}
               onDrop={onDropHandler(
-                game,
-                setGame,
+                safeGameMutate,
                 checkGameOver,
                 sendMove,
                 setMoveHistory,
                 orientation,
                 whiteTime,
-                blackTime
+                blackTime,
+                twoPeoplePresent
               )}
               customPieces={chessPieces}
             />
@@ -145,3 +150,11 @@ export function MainGameClient({
     </div>
   );
 }
+
+const getCurrentTurnFromFEN = (fen) => {
+  const parts = fen.split(" ");
+  if (parts.length > 1) {
+    return parts[1] === "w" ? "white" : "black";
+  }
+  return "white";
+};

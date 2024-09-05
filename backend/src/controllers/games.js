@@ -180,6 +180,7 @@ const getGameHistory = asyncWrapper(async (req, res) => {
         attributes: ["username"],
       },
     ],
+    order: [["createdAt", "DESC"]],
   });
 
   // Separate games into in-progress and completed
