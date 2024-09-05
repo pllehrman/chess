@@ -1,11 +1,11 @@
 // components/chess_game/MainGameClient.jsx
 "use client";
 import { useState, useEffect } from "react";
-import Board from "./Board";
+import { Board } from "./Board";
 import Controls from "./Controls";
 import ResultNotice from "./ResultNotice";
 import { Timers } from "./timers/Timers";
-import { ChessGameLogic } from "./chessGameLogic";
+import { chessGameLogic } from "./chessGameLogic";
 import { useControlsLogic } from "./useControlsLogic";
 import { onDropHandler } from "./onDropHandler";
 import { useWebSocket } from "./websocket/useWebSocket";
@@ -35,7 +35,6 @@ export function MainGameClient({
     console.log("NEEDS COOKIE!");
     requestCookie(sessionId);
   }
-  const chessPieces = useChessPieces();
 
   const {
     game,
@@ -46,7 +45,7 @@ export function MainGameClient({
     setGameOver,
     setResult,
     setWinner,
-  } = ChessGameLogic(gameData, orientation);
+  } = chessGameLogic(gameData, orientation, setCurrentTurn);
 
   const {
     messageHistory,
@@ -71,17 +70,22 @@ export function MainGameClient({
     setTwoPeoplePresent
   );
 
-  const { resetGame, undoMove } = useControlsLogic(
+  const stockfishWorker = computerLogic(
+    game,
     safeGameMutate,
-    setGameOver,
-    setResult,
-    setWinner
+    setCurrentTurn,
+    difficulty,
+    orientation,
+    sendMove,
+    setMoveHistory
   );
 
   // console.log("move history:", moveHistory);
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
-      <TwoPeoplePresent twoPeoplePresent={twoPeoplePresent} />
+      {!gameData.type === "pvc" && (
+        <TwoPeoplePresent twoPeoplePresent={twoPeoplePresent} />
+      )}
 
       <div className="flex w-full max-w-full justify-between items-start px-5 h-full">
         {/* MoveHistory Component */}
@@ -118,16 +122,17 @@ export function MainGameClient({
               orientation={orientation}
               position={game.fen()}
               onDrop={onDropHandler(
-                safeGameMutate,
+                safeGameMutate, // Pass safeGameMutate instead of setGame
                 checkGameOver,
                 sendMove,
                 setMoveHistory,
                 orientation,
                 whiteTime,
                 blackTime,
-                twoPeoplePresent
+                twoPeoplePresent,
+                stockfishWorker,
+                difficulty
               )}
-              customPieces={chessPieces}
             />
             <ResultNotice result={result} winner={winner} />
           </div>
@@ -136,15 +141,16 @@ export function MainGameClient({
         {/* Chat Component */}
         <div className="w-1/3 pr-2">
           {" "}
-          {/* Reduced width */}
-          <Chat
-            username={sessionUsername}
-            messageHistory={messageHistory}
-            currentMessage={currentMessage}
-            setCurrentMessage={setCurrentMessage}
-            sendChat={sendChat}
-            readyState={readyState}
-          />
+          {!gameData.type == "pvc" && (
+            <Chat
+              username={sessionUsername}
+              messageHistory={messageHistory}
+              currentMessage={currentMessage}
+              setCurrentMessage={setCurrentMessage}
+              sendChat={sendChat}
+              readyState={readyState}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Chess } from "chess.js";
 
-export function ChessGameLogic(gameData, orientation, moveHistory) {
+export function chessGameLogic(gameData, orientation, setCurrentTurn) {
   const [game, setGame] = useState(new Chess());
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
@@ -20,6 +20,8 @@ export function ChessGameLogic(gameData, orientation, moveHistory) {
       modify(update);
       return update;
     });
+
+    setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
   }, []);
 
   function checkGameOver() {

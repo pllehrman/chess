@@ -1,6 +1,3 @@
-import { Chess } from "chess.js";
-import { TwoPeoplePresent } from "./TwoPeoplePresent";
-
 export function onDropHandler(
   safeGameMutate, // Pass safeGameMutate instead of setGame
   checkGameOver,
@@ -9,12 +6,14 @@ export function onDropHandler(
   orientation,
   whiteTime,
   blackTime,
-  twoPeoplePresent
+  twoPeoplePresent,
+  worker, // Stockfish worker
+  difficulty // Difficulty level for Stockfish
 ) {
   return (sourceSquare, targetSquare) => {
     // Use safeGameMutate to safely update the game state
-    safeGameMutate((game) => {
-      const piece = game.get(sourceSquare);
+    safeGameMutate((updatedGame) => {
+      const piece = updatedGame.get(sourceSquare);
 
       if (!twoPeoplePresent) {
         return false;
@@ -29,10 +28,10 @@ export function onDropHandler(
         return false; // Illegal move
       }
 
-      const move = game.move({
+      const move = updatedGame.move({
         from: sourceSquare,
         to: targetSquare,
-        promotion: "q", // always promote to a queen for simplicity
+        promotion: "q", // Always promote to a queen for simplicity
       });
 
       if (move === null) {
@@ -53,6 +52,15 @@ export function onDropHandler(
 
       // Check if the game is over
       checkGameOver();
+
+      // If worker (Stockfish) is available, let Stockfish calculate its move
+      if (worker) {
+        const depth = Math.floor((difficulty / 20) * 10) + 1; // Scale depth from difficulty
+
+        // Let Stockfish calculate its move
+        worker.postMessage(`position fen ${game.fen()}`);
+        worker.postMessage(`go depth ${depth}`);
+      }
 
       return true; // Legal move
     });

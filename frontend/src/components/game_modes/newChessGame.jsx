@@ -3,7 +3,8 @@ export async function newChessGame(
   playerColor,
   timeRemaining,
   timeIncrement,
-  sessionUsername
+  sessionUsername,
+  difficulty
 ) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
@@ -19,6 +20,7 @@ export async function newChessGame(
         playerBlackTimeRemaining: timeRemaining * 60, // convert to seconds
         timeIncrement,
         sessionUsername,
+        difficulty,
       }),
     });
 

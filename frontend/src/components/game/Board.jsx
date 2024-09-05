@@ -1,13 +1,14 @@
 "use client";
 import { Chessboard } from "react-chessboard";
+import { useChessPieces } from "./useChessPieces";
 import React from "react";
 
-const Board = React.memo(function Board({
+export const Board = React.memo(function Board({
   orientation,
   position,
   onDrop,
-  customPieces,
 }) {
+  const chessPieces = useChessPieces();
   return (
     <Chessboard
       id="StyledBoard"
@@ -20,9 +21,7 @@ const Board = React.memo(function Board({
       }}
       customDarkSquareStyle={{ backgroundColor: "#779952" }}
       customLightSquareStyle={{ backgroundColor: "#edeed1" }}
-      customPieces={customPieces}
+      customPieces={chessPieces}
     />
   );
 });
-
-export default Board;

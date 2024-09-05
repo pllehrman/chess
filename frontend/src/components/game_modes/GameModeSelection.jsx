@@ -11,7 +11,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   const [timeControl, setTimeControl] = useState(10);
   const [increment, setIncrement] = useState(0);
   const [colorChoice, setColorChoice] = useState("random");
-  const [difficulty, setDifficulty] = useState("medium"); // New state for difficulty
+  const [difficulty, setDifficulty] = useState(10); // New state for difficulty
   const [username, setUsername] = useState(sessionUsername);
 
   const coinFlip = () => Math.random() < 0.5;
@@ -29,29 +29,34 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   async function handleStartGame() {
     let playerColor =
       colorChoice === "random" ? (coinFlip() ? "white" : "black") : colorChoice;
-    if (showFriendOptions) {
-      const type = showFriendOptions ? 1 : 0;
+    const type = showFriendOptions ? "pvp" : "pvc";
 
-      try {
-        const game = await newChessGame(
-          type,
-          playerColor,
-          timeControl,
-          increment,
-          username,
-          difficulty // Pass the difficulty to the newChessGame function
-        );
+    if (showComputerOptions) {
+      setTimeControl(null);
+      setIncrement(null);
+    }
 
-        if (!game) {
-          throw new Error("error in starting a new chess game");
-        }
+    try {
+      const game = await newChessGame(
+        type,
+        playerColor,
+        timeControl,
+        increment,
+        username,
+        difficulty // Pass the difficulty to the newChessGame function
+      );
 
-        window.location.href = `/compete/${game.id}/${playerColor}`;
-      } catch (error) {
-        console.error(`error in starting a new chess game: ${error.message}`);
+      if (!game) {
+        throw new Error("error in starting a new chess game");
       }
-    } else {
-      router.push(`/compete/cpu/${difficulty}/${playerColor}`);
+
+      if (showFriendOptions) {
+        window.location.href = `/compete/${game.id}/${playerColor}`;
+      } else {
+        window.location.href = `/compete/cpu/${difficulty}/${playerColor}`;
+      }
+    } catch (error) {
+      console.error(`error in starting a new chess game: ${error.message}`);
     }
   }
 
@@ -69,7 +74,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
           <input
             type="text"
             id="username"
-            value={username}
+            value={username || ""}
             onChange={(e) => setUsername(e.target.value)}
             placeholder={username || "Unnamed Grand Master"}
             className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
@@ -142,44 +147,26 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             </div>
 
             {/* Difficulty Selection */}
+            {/* Difficulty Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
-                Choose Difficulty
+                Choose Difficulty (ELO)
               </label>
-              <div className="mt-2 flex space-x-4">
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    value="easy"
-                    checked={difficulty === "easy"}
-                    onChange={() => setDifficulty("easy")}
-                    className="mr-2"
-                  />
-                  Easy
-                </label>
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    value="medium"
-                    checked={difficulty === "medium"}
-                    onChange={() => setDifficulty("medium")}
-                    className="mr-2"
-                  />
-                  Medium
-                </label>
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    value="hard"
-                    checked={difficulty === "hard"}
-                    onChange={() => setDifficulty("hard")}
-                    className="mr-2"
-                  />
-                  Hard
-                </label>
+              <div className="mt-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="20"
+                  step="1"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                />
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <span>0 (Easy)</span>
+                  <span>{difficulty} Difficulty</span>
+                  <span>20(Hard)</span>
+                </div>
               </div>
             </div>
 

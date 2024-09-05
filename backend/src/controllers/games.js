@@ -29,6 +29,7 @@ const startNewGame = asyncWrapper(async (req, res) => {
     playerBlackTimeRemaining,
     timeIncrement,
     sessionUsername,
+    difficulty,
   } = req.body;
 
   let playerWhiteSession = null;
@@ -204,10 +205,20 @@ const getGameHistory = asyncWrapper(async (req, res) => {
     let opponent, orientation;
     if (game.playerWhiteSession === sessionId) {
       orientation = "white";
-      opponent = game.blackSession ? game.blackSession.username : null;
+      opponent =
+        game.type === "pvc"
+          ? "Stockfish"
+          : game.blackSession
+          ? game.blackSession.username
+          : null;
     } else if (game.playerBlackSession === sessionId) {
       orientation = "black";
-      opponent = game.whiteSession ? game.whiteSession.username : null;
+      opponent =
+        game.type === "pvc"
+          ? "Stockfish"
+          : game.whiteSession
+          ? game.whiteSession.username
+          : null;
     }
 
     const gameWithResult = {

@@ -11,19 +11,22 @@ module.exports = {
         primaryKey: true,
       },
       type: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: 0,
+        defaultValue: "pvc",
+      },
+      difficulty: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
         validate: {
           isInt: {
-            msg: "Game type must be an integer value",
+            msg: "Game type must be an integer value.",
           },
         },
       },
       winner: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        defaultValue: null,
         validate: {
           isInt: {
             msg: "Winner must be an integer",

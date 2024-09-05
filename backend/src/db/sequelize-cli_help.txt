@@ -37,3 +37,7 @@ npx sequelize-cli db:migrate
 MUST BE AT SRC/DB SHELL IN ORDER TO EXECUTE SEQUELIZE COMMANDS
 
 npx sequelize-cli db:migrate:undo --name 20240319203517-create-games-table.js
+
+Dropping and recreating a database:
+npx sequelize-cli db:drop
+npx sequelize-cli db:create

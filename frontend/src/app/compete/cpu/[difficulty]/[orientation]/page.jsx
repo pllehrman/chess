@@ -1,11 +1,11 @@
 import { ComputerGame } from "@/components/game/ComputerGame";
 
 export default function Page({ params }) {
-  const { difficulty, orienation } = params;
+  const { difficulty, orientation } = params;
 
   return (
     <>
-      <ComputerGame difficulty={difficulty} orienation={orienation} />
+      <ComputerGame difficulty={difficulty} orientation={orientation} />
     </>
   );
 }

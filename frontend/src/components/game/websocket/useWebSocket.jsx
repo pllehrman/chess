@@ -60,14 +60,14 @@ export const useWebSocket = (
     console.log(move);
 
     // Use safeGameMutate to update the game state safely
-    safeGameMutate((game) => {
-      const result = game.move({
+    safeGameMutate((updatedGame) => {
+      const move = updatedGame.move({
         from: move.from,
         to: move.to,
         promotion: move.promotion || "q", // Ensure promotion defaults to a queen
       });
 
-      if (result === null) {
+      if (!move) {
         console.error("Invalid move received:", move);
       } else {
         console.log("Move applied successfully:", result);
@@ -76,7 +76,6 @@ export const useWebSocket = (
 
     setMoveHistory((prev) => [...prev, move]);
 
-    setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
     setWhiteTime(whiteTime);
     setBlackTime(blackTime);
   }, []);

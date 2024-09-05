@@ -10,19 +10,22 @@ module.exports = (sequelize, DataTypes) => {
       },
       type: {
         // This type refers to computer engine games vs. person-to-person games
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 0,
+        defaultValue: "pvc",
+      },
+      difficulty: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
         validate: {
           isInt: {
-            msg: "Game type must be an integer value",
+            msg: "Game type must be an integer value.",
           },
         },
       },
       winner: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        defaultValue: null,
         validate: {
           isInt: {
             msg: "Winner must be an integer",
