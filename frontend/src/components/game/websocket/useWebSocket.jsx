@@ -8,11 +8,8 @@ export const useWebSocket = (
   sessionUsername,
   gameId,
   orientation,
-  safeGameMutate,
   whiteTime,
   blackTime,
-  setWhiteTime,
-  setBlackTime,
   setCurrentTurn,
   setTwoPeoplePresent
 ) => {
@@ -56,29 +53,29 @@ export const useWebSocket = (
   }, [lastMessage]);
 
   // Handle 'move' message
-  const incomingMove = useCallback(({ move, whiteTime, blackTime }) => {
-    console.log(move);
+  // const incomingMove = useCallback(({ move, whiteTime, blackTime }) => {
+  //   console.log(move);
 
-    // Use safeGameMutate to update the game state safely
-    safeGameMutate((updatedGame) => {
-      const move = updatedGame.move({
-        from: move.from,
-        to: move.to,
-        promotion: move.promotion || "q", // Ensure promotion defaults to a queen
-      });
+  //   // Use safeGameMutate to update the game state safely
+  //   safeGameMutate((updatedGame) => {
+  //     const move = updatedGame.move({
+  //       from: move.from,
+  //       to: move.to,
+  //       promotion: move.promotion || "q", // Ensure promotion defaults to a queen
+  //     });
 
-      if (!move) {
-        console.error("Invalid move received:", move);
-      } else {
-        console.log("Move applied successfully:", result);
-      }
-    });
+  //     if (!move) {
+  //       console.error("Invalid move received:", move);
+  //     } else {
+  //       console.log("Move applied successfully:", result);
+  //     }
+  //   });
 
-    setMoveHistory((prev) => [...prev, move]);
+  //   setMoveHistory((prev) => [...prev, move]);
 
-    setWhiteTime(whiteTime);
-    setBlackTime(blackTime);
-  }, []);
+  //   setWhiteTime(whiteTime);
+  //   setBlackTime(blackTime);
+  // }, []);
 
   const sendChat = useCallback(() => {
     if (currentMessage) {
@@ -105,32 +102,32 @@ export const useWebSocket = (
     [sendMessage]
   );
 
-  const updateTime = useCallback(async (gameId, whiteTime, blackTime) => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/${gameId}`,
-        {
-          method: "PATCH", // Use PATCH to update partial fields
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            whiteTime,
-            blackTime,
-          }),
-        }
-      );
+  // const updateTime = useCallback(async (gameId, whiteTime, blackTime) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/${gameId}`,
+  //       {
+  //         method: "PATCH", // Use PATCH to update partial fields
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           whiteTime,
+  //           blackTime,
+  //         }),
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to update game times");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to update game times");
+  //     }
 
-      const data = await response.json();
-      console.log("Game updated successfully:", data);
-    } catch (error) {
-      console.error("Error updating game times:", error.message);
-    }
-  }, []);
+  //     const data = await response.json();
+  //     console.log("Game updated successfully:", data);
+  //   } catch (error) {
+  //     console.error("Error updating game times:", error.message);
+  //   }
+  // }, []);
 
   return {
     messageHistory,

@@ -1,11 +1,33 @@
 import { useState, useEffect, useCallback } from "react";
 import { Chess } from "chess.js";
 
-export function chessGameLogic(gameData) {
+export function chessGameLogic(
+  gameData,
+  whiteTime,
+  blackTime,
+  sendMove,
+  setMoveHistory
+) {
   const [game, setGame] = useState(new Chess(gameData.fen));
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
+
+  const safeGameMutate = (modify) => {
+    setGame((currentGame) => {
+      const gameCopy = new Chess(currentGame.fen());
+      const move = modify(gameCopy);
+      if (move) {
+        sendMove(move, gameCopy.fen(), whiteTime, blackTime);
+        setMoveHistory((prev) => [...prev, move]);
+        checkGameOver();
+      } else {
+        console.error("Invalid move:", move);
+      }
+
+      return gameCopy;
+    });
+  };
 
   function checkGameOver() {
     let gameResult = null;
@@ -42,5 +64,6 @@ export function chessGameLogic(gameData) {
     setGameOver,
     setResult,
     setWinner,
+    safeGameMutate,
   };
 }

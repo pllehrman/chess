@@ -1,19 +1,13 @@
 import { useRef } from "react";
 
 export function onDropHandler(
-  setGame, // Pass safeGameMutate instead of setGame
-  checkGameOver,
-  sendMove,
-  setMoveHistory,
   orientation,
-  whiteTime,
-  blackTime,
   twoPeoplePresent,
-  stockfishWorker, // Stockfish worker
-  difficulty
+  gameType,
+  safeGameMutate
 ) {
   return (sourceSquare, targetSquare) => {
-    if (!difficulty && !twoPeoplePresent) {
+    if (gameType !== "pvc" && !twoPeoplePresent) {
       return false;
     }
 
@@ -28,30 +22,20 @@ export function onDropHandler(
       return false; // Illegal move
     }
 
-    const move = updatedGame.move({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: "q", // Always promote to a queen for simplicity
+    safeGameMutate((currentGame) => {
+      const move = currentGame.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: "q",
+      });
+
+      if (move === null) {
+        console.error("Invalid move");
+        return false;
+      }
+
+      return move;
     });
-
-    if (move === null) {
-      console.error(
-        `Invalid move: ${JSON.stringify({
-          from: sourceSquare,
-          to: targetSquare,
-        })}`
-      );
-      return false; // Illegal move
-    }
-
-    // Send the move over the WebSocket
-    sendMove(move, updatedGame.fen(), whiteTime, blackTime);
-
-    // Add the move to the move history
-    setMoveHistory((prev) => [...prev, move]);
-
-    // Check if the game is over
-    checkGameOver();
 
     return true; // Legal move
   };

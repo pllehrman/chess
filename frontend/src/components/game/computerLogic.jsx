@@ -1,11 +1,20 @@
 "use client";
 
 import { Chess } from "chess.js";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 
-export function computerLogic(game, setGame, orientation, difficulty) {
+export function computerLogic(
+  game,
+  setGame,
+  orientation,
+  difficulty,
+  safeGameMutate
+) {
   const [worker, setWorker] = useState(null);
-  const [isFirstMove, setIsFirstMove] = useState(true);
+  const [isFirstMove, setIsFirstMove] = useState(
+    game.fen() === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  );
+  const firstRender = useRef(true);
 
   useEffect(() => {
     // Check if we are in the browser environment
@@ -16,7 +25,7 @@ export function computerLogic(game, setGame, orientation, difficulty) {
 
       stockfishWorker.onmessage = (e) => {
         const message = e.data;
-        console.log("Stockfish says:", message);
+        // console.log("Stockfish says:", message);
 
         if (message.startsWith("bestmove")) {
           const bestMove = message.split(" ")[1];
@@ -24,10 +33,10 @@ export function computerLogic(game, setGame, orientation, difficulty) {
           const to = bestMove.substring(2, 4);
 
           setTimeout(() => {
-            setGame((currentGame) => {
-              const newGame = new Chess(currentGame.fen()); // Clone the current game state
-              newGame.move({ from, to, promotion: "q" });
-              return newGame;
+            safeGameMutate((currentGame) => {
+              const move = currentGame.move({ from, to, promotion: "q" });
+
+              return move;
             });
           }, 1000);
         }
@@ -50,7 +59,7 @@ export function computerLogic(game, setGame, orientation, difficulty) {
 
   // When the game updates, Stockfish makes a move.
   useEffect(() => {
-    if (worker && game && game.turn() != orientation[0]) {
+    if (worker && game && game.turn() !== orientation[0]) {
       const depth = Math.floor((10 / 20) * 10) + 1; // Scale depth from 1 to 10 based on difficulty
       worker.postMessage(`position fen ${game.fen()}`);
       worker.postMessage(`go depth ${depth}`);
@@ -59,8 +68,7 @@ export function computerLogic(game, setGame, orientation, difficulty) {
 
   // Random move should be made when stockfish is first to go
   useEffect(() => {
-    console.log(difficulty);
-    if (isFirstMove && game.turn() != orientation[0]) {
+    if (isFirstMove && firstRender.current && game.turn() != orientation[0]) {
       if (worker) {
         const possibleMoves = game.moves(); // Get all possible moves for the current turn
 
@@ -70,31 +78,30 @@ export function computerLogic(game, setGame, orientation, difficulty) {
             possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
           // Apply the random move
-          setGame((currentGame) => {
-            const newGame = new Chess(currentGame.fen());
-            newGame.move(randomMove);
-            return newGame;
+          safeGameMutate((currentGame) => {
+            const move = currentGame.move(randomMove);
+
+            return move;
           });
         }
+        firstRender.current = false;
       }
     }
   }, [worker]);
 
   const handleMove = (sourceSquare, targetSquare) => {
-    setGame((currentGame) => {
-      const newGame = new Chess(currentGame.fen()); // Clone the current game state
-      const move = newGame.move({
+    safeGameMutate((currentGame) => {
+      const move = currentGame.move({
         from: sourceSquare,
         to: targetSquare,
         promotion: "q",
       });
 
       if (move === null) {
-        console.log("invalid move");
-        return currentGame;
+        console.error("invalid move");
       }
 
-      return newGame; // Return the updated game state
+      return move;
     });
   };
 

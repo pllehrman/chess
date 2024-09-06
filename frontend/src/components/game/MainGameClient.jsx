@@ -21,7 +21,6 @@ export function MainGameClient({
   sessionId,
   sessionUsername,
   needsCookie,
-  difficulty,
 }) {
   const [whiteTime, setWhiteTime] = useState(gameData.playerBlackTimeRemaining);
   const [blackTime, setBlackTime] = useState(gameData.playerWhiteTimeRemaining);
@@ -35,6 +34,25 @@ export function MainGameClient({
   }
 
   const {
+    messageHistory,
+    currentMessage,
+    setCurrentMessage,
+    sendChat,
+    moveHistory,
+    sendMove,
+    readyState,
+    setMoveHistory,
+  } = useWebSocket(
+    sessionId,
+    sessionUsername,
+    gameData.id,
+    orientation,
+    whiteTime,
+    blackTime,
+    setTwoPeoplePresent
+  );
+
+  const {
     game,
     setGame,
     result,
@@ -43,36 +61,15 @@ export function MainGameClient({
     setGameOver,
     setResult,
     setWinner,
-  } = chessGameLogic(gameData);
-
-  // const {
-  //   messageHistory,
-  //   currentMessage,
-  //   setCurrentMessage,
-  //   sendChat,
-  //   moveHistory,
-  //   sendMove,
-  //   readyState,
-  //   setMoveHistory,
-  // } = useWebSocket(
-  //   sessionId,
-  //   sessionUsername,
-  //   gameData.id,
-  //   orientation,
-  //   safeGameMutate,
-  //   whiteTime,
-  //   blackTime,
-  //   setWhiteTime,
-  //   setBlackTime,
-  //   setCurrentTurn,
-  //   setTwoPeoplePresent
-  // );
+    safeGameMutate,
+  } = chessGameLogic(gameData, whiteTime, blackTime, sendMove, setMoveHistory);
 
   const { handleMove } = computerLogic(
     game,
     setGame,
     orientation,
-    gameData.difficulty
+    gameData.difficulty,
+    safeGameMutate
   );
 
   return (
@@ -86,7 +83,7 @@ export function MainGameClient({
         <div className="w-1/3 pl-2 h-full flex flex-col">
           {" "}
           {/* Reduced width */}
-          <MoveHistory moveHistory={[]} />
+          <MoveHistory moveHistory={moveHistory} />
         </div>
 
         {/* Main Game Component */}
