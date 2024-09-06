@@ -12,9 +12,10 @@ export const Timers = React.memo(
     increment,
     currentTurn,
     twoPeoplePresent,
+    isFirstMove,
   }) => {
     useEffect(() => {
-      if (!twoPeoplePresent) return;
+      if (!twoPeoplePresent || isFirstMove) return;
 
       // Start the timer
       const timer = setInterval(() => {

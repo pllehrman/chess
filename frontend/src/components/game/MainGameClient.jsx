@@ -27,6 +27,9 @@ export function MainGameClient({
   const [twoPeoplePresent, setTwoPeoplePresent] = useState(
     gameData.type === "pvc" ? true : gameData.numPlayers === 1
   );
+  const [isFirstMove, setIsFirstMove] = useState(
+    gameData.fen === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+  );
 
   if (needsCookie) {
     requestCookie(sessionId);
@@ -68,10 +71,12 @@ export function MainGameClient({
     orientation,
     gameData.difficulty,
     safeGameMutate,
-    gameData.type
+    gameData.type,
+    isFirstMove,
+    setIsFirstMove
   );
 
-  console.log("Board Renders!");
+  // console.log("Board Renders!");
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <GameBanner
@@ -111,6 +116,7 @@ export function MainGameClient({
               increment={gameData.timeIncrement}
               currentTurn={game.turn()}
               twoPeoplePresent={twoPeoplePresent}
+              isFirstMove
             />
           )}
           <Board

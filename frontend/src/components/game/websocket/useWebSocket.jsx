@@ -38,10 +38,17 @@ export const useWebSocket = (
         // setBlackTime(messageData.message.blackTime);
         break;
       case "capacityUpdate":
-        setTwoPeoplePresent(messageData.message.capacity === 2);
+        if (gameData.type === "pvp") {
+          console.log("Current ws capacity:", messageData.message.capacity);
+          setTwoPeoplePresent(messageData.message.capacity === 2);
+        }
         // updateTime(gameId, whiteTime, blackTime);
         break;
       default:
+        console.log(
+          messageData.type === "capacityUpdate",
+          gameData.type === "pvp"
+        );
         console.warn(`Unhandled message type: ${messageData.type}`);
     }
   }, []);

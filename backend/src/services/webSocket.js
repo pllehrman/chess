@@ -2,7 +2,6 @@ const { WebSocketServer } = require("ws");
 const url = require("url");
 const {
   setGameSessionId,
-  validateMove,
   updateGame,
   increaseNumPlayers,
   decreaseNumPlayers,
@@ -11,6 +10,7 @@ const {
 function setupWebSocket(server) {
   const wsServer = new WebSocketServer({ server });
   const connections = {}; // Map to track user connections by sessionId
+  const games = {};
 
   wsServer.on("connection", async (connection, request) => {
     const { sessionId, sessionUsername, gameId, gameType, orientation } =
@@ -24,15 +24,22 @@ function setupWebSocket(server) {
       return;
     }
 
-    // Handle game join logic
-    try {
-      if (gameType === "pvp") {
-        await increaseNumPlayers(gameId);
-      }
-    } catch (error) {
-      console.error(`Error joining game: ${error.message}`);
+    if (!games[gameId]) {
+      games[gameId] = { white: null, black: null };
+    }
+
+    if (games[gameId][orientation]) {
+      console.error("error joining a game: tried to join a full game");
       connection.close();
       return;
+    }
+    games[gameId][orientation] = sessionId;
+
+    const numPlayers = Object.values(games[gameId]).filter(Boolean).length;
+    for (let i = 0; i < 3; i++) {
+      broadcastMessage("capacityUpdate", sessionId, gameId, {
+        capacity: numPlayers,
+      });
     }
 
     console.log(
@@ -49,11 +56,22 @@ function setupWebSocket(server) {
 
     // Handle connection close
     connection.on("close", async () => {
-      console.log(`${sessionUsername} disconnected from game ${gameId}`);
-      if (gameType === "pvp") {
-        await decreaseNumPlayers(gameId);
+      if (games[gameId] && games[gameId][orientation] === sessionId) {
+        games[gameId][orientation] = null;
+        console.log(`${sessionUsername} disconnected from game ${gameId}`);
+
+        const updatedNumPlayers = Object.values(games[gameId]).filter(
+          Boolean
+        ).length;
+        // const numPlayers = await decreaseNumPlayers(gameId, orientation);
+        for (let i = 0; i < 3; i++) {
+          broadcastMessage("capacityUpdate", sessionId, gameId, {
+            capacity: updatedNumPlayers,
+          });
+        }
+
+        delete connections[sessionId]; // Remove user connection
       }
-      delete connections[sessionId]; // Remove user connection
     });
   });
 
@@ -89,7 +107,13 @@ function setupWebSocket(server) {
 
     // Broadcast the message to all players except the sender
     Object.keys(connections).forEach((sessionId) => {
+      // Even send to senderSessionId when type === "capacityUpdate"
       if (
+        type === "capacityUpdate" &&
+        connections[sessionId].gameId === gameId
+      ) {
+        connections[sessionId].connection.send(messageString);
+      } else if (
         connections[sessionId].gameId === gameId &&
         sessionId !== senderSessionId
       ) {

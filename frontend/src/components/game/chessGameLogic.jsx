@@ -1,10 +1,6 @@
+"use client";
 import { useState, useEffect, useCallback } from "react";
 import { Chess } from "chess.js";
-const invalidMoveSound = new Audio("/sounds/invalid-move.mp3");
-invalidMoveSound.preload = "auto"; // Preload the audio
-invalidMoveSound.onerror = () => {
-  console.error("Error loading the invalid move sound.");
-};
 
 export function chessGameLogic(
   gameData,
@@ -19,6 +15,18 @@ export function chessGameLogic(
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
   const [invalidMove, setInvalidMove] = useState(false);
+  const [invalidMoveSound, setInvalidMoveSound] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const audio = new Audio("/sounds/invalid-move.mp3");
+      audio.preload = "auto"; // Preload the audio
+      audio.onerror = () => {
+        console.error("Error loading the invalid move sound.");
+      };
+      setInvalidMoveSound(audio); // Set the audio to state
+    }
+  }, []);
 
   // add move validation here
   const safeGameMutate = (modify) => {

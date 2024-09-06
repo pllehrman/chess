@@ -312,7 +312,7 @@ const increaseNumPlayers = async (gameId) => {
 };
 
 // INTERNAL METHOD
-const decreaseNumPlayers = async (gameId) => {
+const decreaseNumPlayers = async (gameId, orientation) => {
   try {
     const game = await Game.findByPk(gameId);
 

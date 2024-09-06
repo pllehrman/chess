@@ -8,12 +8,11 @@ export function computerLogic(
   orientation,
   difficulty,
   safeGameMutate,
-  type
+  type,
+  isFirstMove,
+  setIsFirstMove
 ) {
   const [worker, setWorker] = useState(null);
-  const [isFirstMove, setIsFirstMove] = useState(
-    game.fen() === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-  );
   const firstRender = useRef(true);
 
   useEffect(() => {
