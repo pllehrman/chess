@@ -24,7 +24,6 @@ export async function newChessGame(
       }),
     });
 
-    console.log(response);
     if (!response.ok) {
       throw new Error(
         `error fetching to start a new game: ${response.message}`
@@ -32,7 +31,6 @@ export async function newChessGame(
     }
 
     const data = await response.json();
-    console.log(data);
     return data.game;
   } catch (error) {
     console.error("error starting new game:", error);

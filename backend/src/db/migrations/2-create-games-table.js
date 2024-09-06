@@ -89,7 +89,7 @@ module.exports = {
       },
       timeIncrement: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         validate: {
           isInt: {
             msg: "TimeIncrement must be an integer.",

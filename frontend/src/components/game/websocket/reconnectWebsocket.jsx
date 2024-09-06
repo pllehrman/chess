@@ -5,6 +5,7 @@ export const reconnectWebSocket = (
   sessionId,
   sessionUsername,
   gameId,
+  gameType,
   orientation,
   maxRetries = 3
 ) => {
@@ -12,7 +13,13 @@ export const reconnectWebSocket = (
   const { sendMessage, readyState, lastMessage, getWebSocket } = useWebSocket(
     process.env.NEXT_PUBLIC_WS_URL,
     {
-      queryParams: { sessionId, sessionUsername, gameId, orientation },
+      queryParams: {
+        sessionId,
+        sessionUsername,
+        gameId,
+        gameType,
+        orientation,
+      },
       shouldReconnect: (closeEvent) => retryCount.current < maxRetries,
       onClose: () => {
         if (readyState === ReadyState.CLOSED && retryCount < maxRetries) {

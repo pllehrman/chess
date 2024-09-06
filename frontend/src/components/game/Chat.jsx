@@ -20,8 +20,6 @@ export const Chat = React.memo(
       [ReadyState.UNINSTANTIATED]: "Uninstantiated",
     }[readyState];
 
-    console.log(messageHistory);
-
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-gray-900 dark:text-gray-100">
         <h1 className="text-xl font-semibold">{username}</h1>

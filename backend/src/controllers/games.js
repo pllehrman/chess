@@ -77,22 +77,12 @@ const joinGame = asyncWrapper(async (req, res) => {
   const { gameId, orientation } = req.body;
   let { sessionId } = req.body;
   let session;
-  console.log(
-    "GAME ID",
-    gameId,
-    "Orientation:",
-    orientation,
-    "sessionId",
-    sessionId
-  );
   if (!sessionId) {
     session = await createSession(res, null);
-    console.log("session", session);
     sessionId = session.id;
   }
 
   const game = await Game.findByPk(gameId);
-  console.log(game.playerBlackSession);
   if (!game) {
     throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
   }
@@ -101,7 +91,6 @@ const joinGame = asyncWrapper(async (req, res) => {
     (!game.playerWhiteSession || game.playerWhiteSession === sessionId)
   ) {
     game.playerWhiteSession = sessionId;
-    console.log("Inside white if");
   } else if (
     orientation === "black" &&
     (!game.playerBlackSession || game.playerBlackSession === sessionId)

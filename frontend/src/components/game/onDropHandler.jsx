@@ -2,16 +2,16 @@ import { useRef } from "react";
 
 export function onDropHandler(
   orientation,
+  game,
   twoPeoplePresent,
-  gameType,
   safeGameMutate
 ) {
   return (sourceSquare, targetSquare) => {
-    if (gameType !== "pvc" && !twoPeoplePresent) {
-      return false;
-    }
+    // if (!twoPeoplePresent) {
+    //   return false;
+    // }
 
-    const piece = updatedGame.get(sourceSquare);
+    const piece = game.get(sourceSquare);
 
     if (!piece || piece.color !== orientation[0]) {
       console.error(
@@ -28,11 +28,6 @@ export function onDropHandler(
         to: targetSquare,
         promotion: "q",
       });
-
-      if (move === null) {
-        console.error("Invalid move");
-        return false;
-      }
 
       return move;
     });

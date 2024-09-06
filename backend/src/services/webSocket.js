@@ -13,10 +13,8 @@ function setupWebSocket(server) {
   const connections = {}; // Map to track user connections by sessionId
 
   wsServer.on("connection", async (connection, request) => {
-    const { sessionId, sessionUsername, gameId, orientation } = url.parse(
-      request.url,
-      true
-    ).query;
+    const { sessionId, sessionUsername, gameId, gameType, orientation } =
+      url.parse(request.url, true).query;
 
     if (!sessionId || !gameId || !orientation) {
       console.log(
@@ -28,7 +26,9 @@ function setupWebSocket(server) {
 
     // Handle game join logic
     try {
-      await increaseNumPlayers(gameId);
+      if (gameType === "pvp") {
+        await increaseNumPlayers(gameId);
+      }
     } catch (error) {
       console.error(`Error joining game: ${error.message}`);
       connection.close();
@@ -40,25 +40,27 @@ function setupWebSocket(server) {
     );
 
     // Store user connection by sessionId
-    connections[sessionId] = { connection, gameId, orientation };
+    connections[sessionId] = { connection, gameId, gameType, orientation };
 
     // Handle incoming messages
     connection.on("message", (message) =>
-      handleMessage(sessionId, gameId, orientation, message)
+      handleMessage(sessionId, gameId, message)
     );
 
     // Handle connection close
     connection.on("close", async () => {
       console.log(`${sessionUsername} disconnected from game ${gameId}`);
-      await decreaseNumPlayers(gameId);
+      if (gameType === "pvp") {
+        await decreaseNumPlayers(gameId);
+      }
       delete connections[sessionId]; // Remove user connection
     });
   });
 
-  async function handleMessage(sessionId, gameId, orientation, message) {
+  async function handleMessage(sessionId, gameId, message) {
     try {
       const parsedMessage = JSON.parse(message);
-      console.log("Received message:", parsedMessage);
+      // console.log("Received message:", parsedMessage);
 
       if (parsedMessage.type === "move") {
         broadcastMessage("move", sessionId, gameId, parsedMessage);

@@ -6,11 +6,12 @@ import { reconnectWebSocket } from "./reconnectWebsocket";
 export const useWebSocket = (
   sessionId,
   sessionUsername,
-  gameId,
+  gameData,
   orientation,
   whiteTime,
   blackTime,
-  setCurrentTurn,
+  setWhiteTime,
+  setBlackTime,
   setTwoPeoplePresent
 ) => {
   const [messageHistory, setMessageHistory] = useState([]);
@@ -20,24 +21,25 @@ export const useWebSocket = (
   const { sendMessage, readyState, lastMessage } = reconnectWebSocket(
     sessionId,
     sessionUsername,
-    gameId,
+    gameData.id,
+    gameData.type,
     orientation
   );
 
   // Determines the kind of incoming ws message and handles accordingly
   const handleMessage = useCallback((messageData) => {
-    console.log(messageData);
     switch (messageData.type) {
       case "chat":
         setMessageHistory((prev) => [...prev, messageData]);
         break;
       case "move":
-        incomingMove(messageData.message);
+        setMoveHistory((prev) => [...prev, messageData.message.move]);
+        // setWhiteTime(messageData.message.whiteTime);
+        // setBlackTime(messageData.message.blackTime);
         break;
       case "capacityUpdate":
-        console.log("Message Data:", messageData.message.capacity);
         setTwoPeoplePresent(messageData.message.capacity === 2);
-        updateTime(gameId, whiteTime, blackTime);
+        // updateTime(gameId, whiteTime, blackTime);
         break;
       default:
         console.warn(`Unhandled message type: ${messageData.type}`);
@@ -97,7 +99,7 @@ export const useWebSocket = (
       sendMessage(
         JSON.stringify({ type: "move", move, fen, whiteTime, blackTime })
       );
-      setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
+      // setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
     },
     [sendMessage]
   );

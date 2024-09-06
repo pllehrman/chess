@@ -1,6 +1,6 @@
 export function CompletedGames({ completedGames }) {
   return (
-    <div className="w-1/2 h-5/6 flex flex-col h-full min-h-0 border-2 border-green-500 rounded-lg shadow-lg p-4 hover:shadow-2xl transition-shadow duration-300">
+    <div className="w-1/2 h-3/4 flex flex-col h-full min-h-0 border-2 border-green-500 rounded-lg shadow-lg p-4 hover:shadow-2xl transition-shadow duration-300">
       <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
         Completed Games
       </h2>

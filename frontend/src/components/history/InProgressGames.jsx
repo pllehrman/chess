@@ -4,7 +4,7 @@ import { faForward } from "@fortawesome/free-solid-svg-icons";
 
 export function InProgressGames({ inProgressGames }) {
   return (
-    <div className="w-1/2 h-5/6 flex flex-col h-full min-h-0 border-2 border-blue-500 rounded-lg shadow-lg p-4 hover:shadow-2xl transition-shadow duration-300">
+    <div className="w-1/2 h-3/4 flex flex-col h-full min-h-0 border-2 border-blue-500 rounded-lg shadow-lg p-4 hover:shadow-2xl transition-shadow duration-300">
       <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
         In Progress Games
       </h2>
@@ -33,10 +33,12 @@ export function InProgressGames({ inProgressGames }) {
                     Opponent:{" "}
                     {game.opponent ? game.opponent : "No Opponent Yet"}
                   </p>
-                  <p className="text-sm text-gray-200">
-                    White Time: {formatTime(game.playerWhiteTimeRemaining)} |
-                    Black Time: {formatTime(game.playerBlackTimeRemaining)}
-                  </p>
+                  {game.type === "pvp" && (
+                    <p className="text-sm text-gray-200">
+                      White Time: {formatTime(game.playerWhiteTimeRemaining)} |
+                      Black Time: {formatTime(game.playerBlackTimeRemaining)}
+                    </p>
+                  )}
                 </div>
 
                 <Link href={`/compete/${game.id}/${game.orientation}`} passHref>

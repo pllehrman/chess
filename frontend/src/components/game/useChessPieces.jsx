@@ -26,7 +26,7 @@ export const useChessPieces = () => {
           style={{
             width: squareWidth,
             height: squareWidth,
-            backgroundImage: `url(/${piece}.png)`,
+            backgroundImage: `url(/chess_pieces/${piece}.png)`,
             backgroundSize: "100%",
           }}
         />

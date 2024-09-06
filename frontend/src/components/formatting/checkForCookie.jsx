@@ -17,7 +17,6 @@ export const checkForCookie = async () => {
       sessionUsername = session.sessionUsername;
     }
   } else {
-    console.log("Cookie is not present!");
     const session = await requestNewSession(res);
     sessionId = session.sessionId;
     sessionUsername = session.sessionUsername;

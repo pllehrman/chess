@@ -1,14 +1,14 @@
 "use client";
 
 import { Chess } from "chess.js";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 export function computerLogic(
   game,
-  setGame,
   orientation,
   difficulty,
-  safeGameMutate
+  safeGameMutate,
+  type
 ) {
   const [worker, setWorker] = useState(null);
   const [isFirstMove, setIsFirstMove] = useState(
@@ -18,7 +18,7 @@ export function computerLogic(
 
   useEffect(() => {
     // Check if we are in the browser environment
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && type !== "pvp") {
       // Dynamically load the Stockfish Web Worker from the public folder
       const stockfishWorker = new Worker("/stockfish/stockfish-16.1-lite.js");
       setWorker(stockfishWorker);
@@ -59,7 +59,7 @@ export function computerLogic(
 
   // When the game updates, Stockfish makes a move.
   useEffect(() => {
-    if (worker && game && game.turn() !== orientation[0]) {
+    if (worker && game && game.turn() !== orientation[0] && type !== "pvp") {
       const depth = Math.floor((10 / 20) * 10) + 1; // Scale depth from 1 to 10 based on difficulty
       worker.postMessage(`position fen ${game.fen()}`);
       worker.postMessage(`go depth ${depth}`);
@@ -68,7 +68,12 @@ export function computerLogic(
 
   // Random move should be made when stockfish is first to go
   useEffect(() => {
-    if (isFirstMove && firstRender.current && game.turn() != orientation[0]) {
+    if (
+      isFirstMove &&
+      firstRender.current &&
+      game.turn() != orientation[0] &&
+      type !== "pvp"
+    ) {
       if (worker) {
         const possibleMoves = game.moves(); // Get all possible moves for the current turn
 
@@ -85,25 +90,8 @@ export function computerLogic(
           });
         }
         firstRender.current = false;
+        setIsFirstMove(false);
       }
     }
   }, [worker]);
-
-  const handleMove = (sourceSquare, targetSquare) => {
-    safeGameMutate((currentGame) => {
-      const move = currentGame.move({
-        from: sourceSquare,
-        to: targetSquare,
-        promotion: "q",
-      });
-
-      if (move === null) {
-        console.error("invalid move");
-      }
-
-      return move;
-    });
-  };
-
-  return { game, handleMove };
 }

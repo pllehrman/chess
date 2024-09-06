@@ -70,7 +70,6 @@ async function checkAndUpdateCurrentSession(req, res, newUsername) {
   }
 
   if (newUsername && session.username !== newUsername) {
-    console.log("SESSION", session.id);
     session = await updateUsernameBySessionId(res, session.id, newUsername);
     return session;
   }

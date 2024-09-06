@@ -33,7 +33,7 @@ export function ComputerGame({ difficulty, orientation }) {
           const bestMove = message.split(" ")[1];
           const from = bestMove.substring(0, 2);
           const to = bestMove.substring(2, 4);
-          console.log(game.fen); // this wasn't up to date
+          // console.log(game.fen); // this wasn't up to date
           game.move({ from, to, promotion: "q" });
           setFen(game.fen());
         }
@@ -70,7 +70,7 @@ export function ComputerGame({ difficulty, orientation }) {
       const depth = Math.floor((difficulty / 20) * 10) + 1; // Scale depth from 1 to 10 based on difficulty
 
       // Let Stockfish calculate its move with the specified depth
-      console.log(game.fen());
+      // console.log(game.fen());
       worker.postMessage(`position fen ${game.fen()}`);
       worker.postMessage(`go depth ${depth}`); // Specify depth to limit the computation
     }

@@ -6,29 +6,30 @@ export function GameBanner({
   inCheck,
   result,
   winner,
+  orientation,
 }) {
   // If the game result is available, show the result message
   if (result) {
     let message;
-
+    console.log(winner, orientation);
     if (winner === "draw") {
       message = `Draw by ${result}`;
-    } else if (winner === "white") {
-      message = "You won!";
-    } else if (winner === "black") {
-      message = "You lost!";
+    } else if (winner === orientation) {
+      message = "You Won: Great Work!";
     } else {
-      message = `The game ended by ${result}`;
+      message = "You Lost: There's Always Next Time!";
     }
 
     return (
-      <div className="animate-flash text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-200 p-4 rounded-lg shadow-lg">
-        <h2>{message}</h2>
+      <div className="animate-flash max-w-lg mx-auto text-center bg-gray-100 dark:bg-gray-800 p-4 mb-2 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          {message}
+        </h2>
 
         {/* Play Again Button */}
         <button
-          onClick={onPlayAgain}
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          // onClick={onPlayAgain}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
         >
           Play Again
         </button>
