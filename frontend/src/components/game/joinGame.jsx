@@ -22,7 +22,7 @@ export async function joinGame(gameId, orientation, sessionId) {
       );
     }
     const data = await response.json();
-
+    console.log("Game Data", data);
     if (!sessionId) {
       return {
         isAvailable: true,

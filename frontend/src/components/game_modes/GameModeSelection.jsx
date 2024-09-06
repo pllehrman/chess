@@ -50,11 +50,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         throw new Error("error in starting a new chess game");
       }
 
-      if (showFriendOptions) {
-        window.location.href = `/compete/${game.id}/${playerColor}`;
-      } else {
-        window.location.href = `/compete/cpu/${difficulty}/${playerColor}`;
-      }
+      window.location.href = `/compete/${game.id}/${playerColor}`;
     } catch (error) {
       console.error(`error in starting a new chess game: ${error.message}`);
     }

@@ -12,8 +12,8 @@ import { useWebSocket } from "./websocket/useWebSocket";
 import { Chat } from "./Chat";
 import { MoveHistory } from "./MoveHistory";
 import { TwoPeoplePresent } from "./TwoPeoplePresent";
-import { useChessPieces } from "./useChessPieces";
 import { requestCookie } from "../formatting/requestCookie";
+import { computerLogic } from "./computerLogic";
 
 export function MainGameClient({
   gameData,
@@ -21,14 +21,12 @@ export function MainGameClient({
   sessionId,
   sessionUsername,
   needsCookie,
+  difficulty,
 }) {
   const [whiteTime, setWhiteTime] = useState(gameData.playerBlackTimeRemaining);
   const [blackTime, setBlackTime] = useState(gameData.playerWhiteTimeRemaining);
   const [twoPeoplePresent, setTwoPeoplePresent] = useState(
     gameData.numPlayers === 1
-  );
-  const [currentTurn, setCurrentTurn] = useState(
-    getCurrentTurnFromFEN(gameData.fen)
   );
 
   if (needsCookie) {
@@ -38,49 +36,45 @@ export function MainGameClient({
 
   const {
     game,
+    setGame,
     result,
     winner,
-    safeGameMutate,
     checkGameOver,
     setGameOver,
     setResult,
     setWinner,
-  } = chessGameLogic(gameData, orientation, setCurrentTurn);
+  } = chessGameLogic(gameData);
 
-  const {
-    messageHistory,
-    currentMessage,
-    setCurrentMessage,
-    sendChat,
-    moveHistory,
-    sendMove,
-    readyState,
-    setMoveHistory,
-  } = useWebSocket(
-    sessionId,
-    sessionUsername,
-    gameData.id,
-    orientation,
-    safeGameMutate,
-    whiteTime,
-    blackTime,
-    setWhiteTime,
-    setBlackTime,
-    setCurrentTurn,
-    setTwoPeoplePresent
-  );
+  // const {
+  //   messageHistory,
+  //   currentMessage,
+  //   setCurrentMessage,
+  //   sendChat,
+  //   moveHistory,
+  //   sendMove,
+  //   readyState,
+  //   setMoveHistory,
+  // } = useWebSocket(
+  //   sessionId,
+  //   sessionUsername,
+  //   gameData.id,
+  //   orientation,
+  //   safeGameMutate,
+  //   whiteTime,
+  //   blackTime,
+  //   setWhiteTime,
+  //   setBlackTime,
+  //   setCurrentTurn,
+  //   setTwoPeoplePresent
+  // );
 
-  const stockfishWorker = computerLogic(
+  const { handleMove } = computerLogic(
     game,
-    safeGameMutate,
-    setCurrentTurn,
-    difficulty,
+    setGame,
     orientation,
-    sendMove,
-    setMoveHistory
+    gameData.difficulty
   );
 
-  // console.log("move history:", moveHistory);
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       {!gameData.type === "pvc" && (
@@ -102,46 +96,51 @@ export function MainGameClient({
           <div className="flex flex-col items-center">
             <h2
               className={`text-2xl font-bold mb-4 ${
-                currentTurn === "white"
+                game.turn() === "w"
                   ? "text-gray-900 dark:text-gray-100"
                   : "text-gray-400 dark:text-gray-500"
               }`}
             >
-              {currentTurn === "white" ? "White to Move" : "Black to Move"}
+              {game.turn() === "w" ? "White to Move" : "Black to Move"}
             </h2>
-            <Timers
-              whiteTime={whiteTime}
-              blackTime={blackTime}
-              setWhiteTime={setWhiteTime}
-              setBlackTime={setBlackTime}
-              increment={gameData.timeIncrement}
-              currentTurn={currentTurn}
-              twoPeoplePresent={twoPeoplePresent}
-            />
+            {gameData.type != "pvc" && (
+              <Timers
+                whiteTime={whiteTime}
+                blackTime={blackTime}
+                setWhiteTime={setWhiteTime}
+                setBlackTime={setBlackTime}
+                increment={gameData.timeIncrement}
+                currentTurn={game.turn()}
+                twoPeoplePresent={twoPeoplePresent}
+              />
+            )}
             <Board
               orientation={orientation}
               position={game.fen()}
-              onDrop={onDropHandler(
-                safeGameMutate, // Pass safeGameMutate instead of setGame
-                checkGameOver,
-                sendMove,
-                setMoveHistory,
-                orientation,
-                whiteTime,
-                blackTime,
-                twoPeoplePresent,
-                stockfishWorker,
-                difficulty
-              )}
+              onDrop={
+                handleMove
+
+                // onDropHandler(
+                // safeGameMutate, // Pass safeGameMutate instead of setGame
+                // checkGameOver,
+                // sendMove,
+                // setMoveHistory,
+                // orientation,
+                // whiteTime,
+                // blackTime,
+                // twoPeoplePresent,
+                // stockfishWorker,
+                // gameData.difficulty
+              }
             />
-            <ResultNotice result={result} winner={winner} />
+            {/* <ResultNotice result={result} winner={winner} /> */}
           </div>
         </div>
 
         {/* Chat Component */}
         <div className="w-1/3 pr-2">
           {" "}
-          {!gameData.type == "pvc" && (
+          {gameData.type != "pvc" && (
             <Chat
               username={sessionUsername}
               messageHistory={messageHistory}
@@ -156,11 +155,3 @@ export function MainGameClient({
     </div>
   );
 }
-
-const getCurrentTurnFromFEN = (fen) => {
-  const parts = fen.split(" ");
-  if (parts.length > 1) {
-    return parts[1] === "w" ? "white" : "black";
-  }
-  return "white";
-};

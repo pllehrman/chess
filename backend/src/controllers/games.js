@@ -57,6 +57,7 @@ const startNewGame = asyncWrapper(async (req, res) => {
       playerBlackSession,
       playerBlackTimeRemaining,
       timeIncrement,
+      difficulty,
     });
 
     if (!game) {

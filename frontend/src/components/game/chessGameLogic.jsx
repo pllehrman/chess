@@ -1,28 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Chess } from "chess.js";
 
-export function chessGameLogic(gameData, orientation, setCurrentTurn) {
-  const [game, setGame] = useState(new Chess());
+export function chessGameLogic(gameData) {
+  const [game, setGame] = useState(new Chess(gameData.fen));
   const [gameOver, setGameOver] = useState(false);
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
-
-  useEffect(() => {
-    if (gameData) {
-      setGame(new Chess(gameData.fen));
-    }
-  }, [gameData]);
-
-  // useCallback ensures safeGameMutate maintains the same reference across re-renders
-  const safeGameMutate = useCallback((modify) => {
-    setGame((g) => {
-      const update = new Chess(g.fen());
-      modify(update);
-      return update;
-    });
-
-    setCurrentTurn((prev) => (prev === "white" ? "black" : "white"));
-  }, []);
 
   function checkGameOver() {
     let gameResult = null;
@@ -55,7 +38,6 @@ export function chessGameLogic(gameData, orientation, setCurrentTurn) {
     gameOver,
     result,
     winner,
-    safeGameMutate,
     checkGameOver,
     setGameOver,
     setResult,
