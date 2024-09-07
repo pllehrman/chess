@@ -21,15 +21,15 @@ export function GameBanner({
     }
 
     return (
-      <div className="animate-flash max-w-lg mx-auto text-center bg-gray-100 dark:bg-gray-800 p-4 mb-2 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+      <div className="animate-flash max-w-md mx-auto text-center bg-gray-100 dark:bg-gray-800 p-2 mb-2 rounded-lg shadow-md">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">
           {message}
         </h2>
 
         {/* Play Again Button */}
         <button
           // onClick={onPlayAgain}
-          className="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
+          className="bg-blue-600 hover:bg-blue-500 text-white font-medium py-1 px-4 rounded-full transition-colors duration-300"
         >
           Play Again
         </button>
@@ -39,7 +39,7 @@ export function GameBanner({
 
   if (invalidMove) {
     return (
-      <div className="animate-flash text-2xl font-bold text-red-500 dark:text-red-300 mb-4">
+      <div className="animate-flash text-lg font-bold text-red-500 dark:text-red-300 mb-2">
         {inCheck ? "Invalid Move: You're in Check!" : "Invalid Move!"}
       </div>
     );
@@ -47,7 +47,7 @@ export function GameBanner({
 
   if (!twoPeoplePresent) {
     return (
-      <div className="animate-flash text-2xl font-bold text-red-500 dark:text-red-300 mb-4">
+      <div className="animate-flash text-lg font-bold text-red-500 dark:text-red-300 mb-2">
         Waiting for opponent to connect...
       </div>
     );

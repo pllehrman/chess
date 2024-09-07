@@ -4,12 +4,13 @@ export function onDropHandler(
   orientation,
   game,
   twoPeoplePresent,
-  safeGameMutate
+  safeGameMutate,
+  winner
 ) {
   return (sourceSquare, targetSquare) => {
-    // if (!twoPeoplePresent) {
-    //   return false;
-    // }
+    if (!twoPeoplePresent || winner) {
+      return false;
+    }
 
     const piece = game.get(sourceSquare);
 

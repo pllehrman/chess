@@ -22,8 +22,8 @@ export function MainGameClient({
   sessionUsername,
   needsCookie,
 }) {
-  const [whiteTime, setWhiteTime] = useState(gameData.playerBlackTimeRemaining);
-  const [blackTime, setBlackTime] = useState(gameData.playerWhiteTimeRemaining);
+  const [whiteTime, setWhiteTime] = useState(gameData.playerWhiteTimeRemaining);
+  const [blackTime, setBlackTime] = useState(gameData.playerBlackTimeRemaining);
   const [twoPeoplePresent, setTwoPeoplePresent] = useState(
     gameData.type === "pvc" ? true : false
   );
@@ -53,19 +53,26 @@ export function MainGameClient({
     blackTime,
     setWhiteTime,
     setBlackTime,
-    twoPeoplePresent,
     setTwoPeoplePresent
-    // setOpponentUsername
   );
 
-  const { game, result, winner, safeGameMutate, invalidMove } = chessGameLogic(
+  const {
+    game,
+    result,
+    winner,
+    safeGameMutate,
+    invalidMove,
+    setResult,
+    setWinner,
+  } = chessGameLogic(
     gameData,
     whiteTime,
     blackTime,
     sendMove,
     setMoveHistory,
     moveHistory,
-    orientation
+    orientation,
+    setIsFirstMove
   );
 
   computerLogic(
@@ -78,7 +85,7 @@ export function MainGameClient({
     setIsFirstMove
   );
 
-  console.log("Board Renders!");
+  // console.log("Board Renders!");
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <GameBanner
@@ -105,7 +112,7 @@ export function MainGameClient({
           }}
         >
           <h2
-            className={`text-2xl font-bold mb-4 ${
+            className={`text-2xl font-bold mb-2 ${
               game.turn() === "w"
                 ? "text-gray-900 dark:text-gray-100"
                 : "text-gray-400 dark:text-gray-500"
@@ -123,7 +130,10 @@ export function MainGameClient({
               increment={gameData.timeIncrement}
               currentTurn={game.turn()}
               twoPeoplePresent={twoPeoplePresent}
-              isFirstMove
+              isFirstMove={isFirstMove}
+              winner={winner}
+              setResult={setResult}
+              setWinner={setWinner}
             />
           )}
 
@@ -136,7 +146,8 @@ export function MainGameClient({
                 orientation,
                 game,
                 twoPeoplePresent,
-                safeGameMutate
+                safeGameMutate,
+                winner
               )}
               boardStyle={{
                 width: "100%", // Fill the outer square

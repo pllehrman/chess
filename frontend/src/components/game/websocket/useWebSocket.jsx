@@ -12,9 +12,7 @@ export const useWebSocket = (
   blackTime,
   setWhiteTime,
   setBlackTime,
-  twoPeoplePresent,
   setTwoPeoplePresent
-  // setOpponentUsername
 ) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -28,8 +26,7 @@ export const useWebSocket = (
     orientation
   );
 
-  // Determines the kind of incoming ws message and handles accordingly
-  const handleMessage = useCallback((messageData) => {
+  const handleMessage = (messageData) => {
     switch (messageData.type) {
       case "chat":
         setMessageHistory((prev) => [...prev, messageData]);
@@ -41,19 +38,23 @@ export const useWebSocket = (
         break;
       case "capacityUpdate":
         if (gameData.type === "pvp") {
-          const newTwoPeoplePresent = messageData.message.capacity === 2;
-
-          // Only update if the value changes
-          if (twoPeoplePresent !== newTwoPeoplePresent) {
-            console.log("changing two people present");
-            setTwoPeoplePresent((prev) => newTwoPeoplePresent);
-          }
+          setTwoPeoplePresent((prev) => {
+            if (prev && messageData.message.capacity == 1) {
+              console.log(
+                "updating time on the frontend!",
+                whiteTime,
+                blackTime
+              );
+              sendTimeUpdate(whiteTime, blackTime);
+            }
+            return messageData.message.capacity == 2;
+          });
         }
         break;
       default:
         console.warn(`Unhandled message type: ${messageData.type}`);
     }
-  }, []);
+  };
 
   // Process the new incoming ws message
   useEffect(() => {
@@ -62,31 +63,6 @@ export const useWebSocket = (
       handleMessage(messageData);
     }
   }, [lastMessage]);
-
-  // Handle 'move' message
-  // const incomingMove = useCallback(({ move, whiteTime, blackTime }) => {
-  //   console.log(move);
-
-  //   // Use safeGameMutate to update the game state safely
-  //   safeGameMutate((updatedGame) => {
-  //     const move = updatedGame.move({
-  //       from: move.from,
-  //       to: move.to,
-  //       promotion: move.promotion || "q", // Ensure promotion defaults to a queen
-  //     });
-
-  //     if (!move) {
-  //       console.error("Invalid move received:", move);
-  //     } else {
-  //       console.log("Move applied successfully:", result);
-  //     }
-  //   });
-
-  //   setMoveHistory((prev) => [...prev, move]);
-
-  //   setWhiteTime(whiteTime);
-  //   setBlackTime(blackTime);
-  // }, []);
 
   const sendChat = useCallback(() => {
     if (currentMessage) {
@@ -113,32 +89,12 @@ export const useWebSocket = (
     [sendMessage]
   );
 
-  // const updateTime = useCallback(async (gameId, whiteTime, blackTime) => {
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/${gameId}`,
-  //       {
-  //         method: "PATCH", // Use PATCH to update partial fields
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           whiteTime,
-  //           blackTime,
-  //         }),
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to update game times");
-  //     }
-
-  //     const data = await response.json();
-  //     console.log("Game updated successfully:", data);
-  //   } catch (error) {
-  //     console.error("Error updating game times:", error.message);
-  //   }
-  // }, []);
+  const sendTimeUpdate = useCallback(
+    (whiteTime, blackTime) => {
+      sendMessage(JSON.stringify({ type: "timeUpdate", whiteTime, blackTime }));
+    },
+    [sendMessage]
+  );
 
   return {
     messageHistory,

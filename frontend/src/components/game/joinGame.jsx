@@ -33,7 +33,7 @@ export async function joinGame(gameId, orientation, sessionId) {
 
     return { isAvailable: true, game: data.game };
   } catch (error) {
-    console.error(`error joining game on ${attempt}: ${error.message}`);
+    console.error(`error joining game`);
     return {
       isAvailable: false,
       game: null,

@@ -77,6 +77,10 @@ export const Chat = React.memo(
                         ? "text-right bg-blue-100 dark:bg-blue-800"
                         : "text-left bg-gray-100 dark:bg-gray-700"
                     } p-2 rounded-md`}
+                    style={{
+                      wordBreak: "break-word", // Ensure long words break onto the next line
+                      overflowWrap: "break-word", // Additional rule to ensure proper wrapping
+                    }}
                   >
                     <strong>
                       {message.fromMe

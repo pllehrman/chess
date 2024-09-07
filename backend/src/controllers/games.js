@@ -102,12 +102,14 @@ const joinGame = asyncWrapper(async (req, res) => {
   }
   if (
     orientation === "white" &&
-    (!game.playerWhiteSession || game.playerWhiteSession === sessionId)
+    (!game.playerWhiteSession || game.playerWhiteSession === sessionId) &&
+    sessionId != game.playerBlackSession
   ) {
     game.playerWhiteSession = sessionId;
   } else if (
     orientation === "black" &&
-    (!game.playerBlackSession || game.playerBlackSession === sessionId)
+    (!game.playerBlackSession || game.playerBlackSession === sessionId) &&
+    sessionId != game.playerWhiteSession
   ) {
     game.playerBlackSession = sessionId;
   } else {
@@ -363,12 +365,20 @@ const updateGame = async (gameId, fen, whiteTime, blackTime) => {
         404
       );
     }
-
-    await game.update({
-      fen,
+    console.log(fen, whiteTime, blackTime);
+    // Create an update object with the values that are provided
+    const updateData = {
       playerWhiteTimeRemaining: whiteTime,
       playerBlackTimeRemaining: blackTime,
-    });
+    };
+
+    // Only add 'fen' to the update if it's provided (not null or undefined)
+    if (fen) {
+      updateData.fen = fen;
+    }
+
+    // Update the game with the provided values
+    await game.update(updateData);
   } catch (error) {
     throw createCustomError("Transaction failed.");
   }

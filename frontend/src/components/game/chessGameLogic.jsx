@@ -9,7 +9,8 @@ export function chessGameLogic(
   sendMove,
   setMoveHistory,
   moveHistory,
-  orientation
+  orientation,
+  setIsFirstMove
 ) {
   const [game, setGame] = useState(new Chess(gameData.fen));
   const [result, setResult] = useState(null);
@@ -37,7 +38,7 @@ export function chessGameLogic(
 
         sendMove(move, gameCopy.fen(), whiteTime, blackTime);
         setMoveHistory((prev) => [...prev, move]);
-
+        setIsFirstMove(false);
         return gameCopy;
       } catch (error) {
         console.error("error in mutating game.");
@@ -69,6 +70,7 @@ export function chessGameLogic(
 
           // Apply the move to the cloned game state
           gameCopy.move(lastMove);
+          setIsFirstMove(false);
 
           // Return the updated game state
           return gameCopy;
@@ -103,5 +105,7 @@ export function chessGameLogic(
     winner,
     safeGameMutate,
     invalidMove,
+    setResult,
+    setWinner,
   };
 }

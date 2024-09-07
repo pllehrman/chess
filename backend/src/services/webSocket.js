@@ -6,6 +6,7 @@ const {
   increaseNumPlayers,
   decreaseNumPlayers,
 } = require("../controllers/games");
+const { parse } = require("path");
 
 function setupWebSocket(server) {
   const wsServer = new WebSocketServer({ server });
@@ -33,7 +34,7 @@ function setupWebSocket(server) {
       connection.close();
       return;
     }
-    games[gameId][orientation] = { sessionId, sessionUsername };
+    games[gameId][orientation] = sessionId;
 
     for (let i = 0; i < 2; i++) {
       setTimeout(() => {
@@ -56,13 +57,14 @@ function setupWebSocket(server) {
     // Store user connection by sessionId
     connections[sessionId] = { connection, gameId, gameType, orientation };
 
+    // console.log(sessionUsername, "is connnected");
     connection.on("message", (message) =>
       handleMessage(sessionId, sessionUsername, gameId, message)
     );
 
     // Handle connection close
     connection.on("close", async () => {
-      if (games[gameId] && games[gameId][orientation].sessionId === sessionId) {
+      if (games[gameId]) {
         games[gameId][orientation] = null;
 
         for (let i = 0; i < 2; i++) {
@@ -82,6 +84,7 @@ function setupWebSocket(server) {
             }
           }, i * 2000);
 
+          // console.log(sessionUsername, "is disconnected");
           // Cleanup
           delete connections[sessionId];
           if (games[gameId] && !games[gameId].white && !games[gameId].black) {
@@ -118,6 +121,14 @@ function setupWebSocket(server) {
           gameId,
           parsedMessage.message
         );
+      } else if (parsedMessage.type === "timeUpdate") {
+        console.log("TIME UPDATE");
+        await updateGame(
+          gameId,
+          null,
+          parsedMessage.whiteTime,
+          parsedMessage.blackTime
+        );
       }
     } catch (error) {
       console.error(`Error handling message: ${error.message}`);
@@ -131,20 +142,10 @@ function setupWebSocket(server) {
     gameId,
     message
   ) {
-    let opponentUsername = null;
-    if (games[gameId]["white"] && games[gameId]["black"]) {
-      if (games[gameId]["white"].sessionId === senderSessionId) {
-        opponentUsername = games[gameId]["black"]?.sessionUsername || "Unknown";
-      } else if (games[gameId]["black"].sessionId === senderSessionId) {
-        opponentUsername = games[gameId]["white"]?.sessionUsername || "Unknown";
-      }
-    }
-
     const messageData = {
       type,
       sessionId: senderSessionId,
       sessionUsername: senderSessionUsername,
-      opponentUsername,
       message,
     };
 
