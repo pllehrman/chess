@@ -2,7 +2,14 @@ const { Session } = require("../db/models");
 const crypto = require("crypto");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const { createCustomError } = require("../middleware/customError");
-const defaultUsername = "Unnamed Grand Master";
+
+async function getRandomUsername() {
+  const fetch = (await import("node-fetch")).default;
+
+  const response = await fetch("https://randomuser.me/api/");
+  const data = await response.json();
+  return data.results[0].login.username;
+}
 
 const sendSessionCookie = asyncWrapper(async (req, res) => {
   sessionId = req.params.id;
@@ -19,6 +26,8 @@ async function createSession(res, sessionUsername) {
   try {
     const id = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const randomUsername = await getRandomUsername();
+    const defaultUsername = randomUsername || "Unnamed Grand Master";
 
     const session = await Session.create({
       id,
@@ -65,7 +74,7 @@ async function checkAndUpdateCurrentSession(req, res, newUsername) {
   }
 
   if (!session) {
-    session = await createSession(res, newUsername || defaultUsername);
+    session = await createSession(res, newUsername);
     return session;
   }
 

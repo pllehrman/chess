@@ -33,55 +33,77 @@ function setupWebSocket(server) {
       connection.close();
       return;
     }
-    games[gameId][orientation] = sessionId;
+    games[gameId][orientation] = { sessionId, sessionUsername };
 
-    const numPlayers = Object.values(games[gameId]).filter(Boolean).length;
-    for (let i = 0; i < 3; i++) {
-      broadcastMessage("capacityUpdate", sessionId, gameId, {
-        capacity: numPlayers,
-      });
+    for (let i = 0; i < 2; i++) {
+      setTimeout(() => {
+        if (games[gameId]) {
+          broadcastMessage(
+            "capacityUpdate",
+            sessionId,
+            sessionUsername,
+            gameId,
+            {
+              capacity: Object.values(games[gameId]).filter(Boolean).length,
+            }
+          );
+        } else {
+          console.error(`Game with ID ${gameId} no longer exists.`);
+        }
+      }, i * 2000);
     }
-
-    console.log(
-      `${sessionUsername} connected to game ${gameId} with sessionId: ${sessionId}`
-    );
 
     // Store user connection by sessionId
     connections[sessionId] = { connection, gameId, gameType, orientation };
 
-    // Handle incoming messages
     connection.on("message", (message) =>
-      handleMessage(sessionId, gameId, message)
+      handleMessage(sessionId, sessionUsername, gameId, message)
     );
 
     // Handle connection close
     connection.on("close", async () => {
-      if (games[gameId] && games[gameId][orientation] === sessionId) {
+      if (games[gameId] && games[gameId][orientation].sessionId === sessionId) {
         games[gameId][orientation] = null;
-        console.log(`${sessionUsername} disconnected from game ${gameId}`);
 
-        const updatedNumPlayers = Object.values(games[gameId]).filter(
-          Boolean
-        ).length;
-        // const numPlayers = await decreaseNumPlayers(gameId, orientation);
-        for (let i = 0; i < 3; i++) {
-          broadcastMessage("capacityUpdate", sessionId, gameId, {
-            capacity: updatedNumPlayers,
-          });
+        for (let i = 0; i < 2; i++) {
+          setTimeout(() => {
+            if (games[gameId]) {
+              broadcastMessage(
+                "capacityUpdate",
+                sessionId,
+                sessionUsername,
+                gameId,
+                {
+                  capacity: Object.values(games[gameId]).filter(Boolean).length,
+                }
+              );
+            } else {
+              console.error(`Game with ID ${gameId} no longer exists.`);
+            }
+          }, i * 2000);
+
+          // Cleanup
+          delete connections[sessionId];
+          if (games[gameId] && !games[gameId].white && !games[gameId].black) {
+            delete games[gameId];
+          }
         }
-
-        delete connections[sessionId]; // Remove user connection
       }
     });
   });
 
-  async function handleMessage(sessionId, gameId, message) {
+  async function handleMessage(sessionId, sessionUsername, gameId, message) {
     try {
       const parsedMessage = JSON.parse(message);
-      // console.log("Received message:", parsedMessage);
 
       if (parsedMessage.type === "move") {
-        broadcastMessage("move", sessionId, gameId, parsedMessage);
+        broadcastMessage(
+          "move",
+          sessionId,
+          sessionUsername,
+          gameId,
+          parsedMessage
+        );
         await updateGame(
           gameId,
           parsedMessage.fen,
@@ -89,31 +111,55 @@ function setupWebSocket(server) {
           parsedMessage.blackTime
         );
       } else if (parsedMessage.type === "chat") {
-        broadcastMessage("chat", sessionId, gameId, parsedMessage.message);
+        broadcastMessage(
+          "chat",
+          sessionId,
+          sessionUsername,
+          gameId,
+          parsedMessage.message
+        );
       }
     } catch (error) {
       console.error(`Error handling message: ${error.message}`);
     }
   }
 
-  function broadcastMessage(type, senderSessionId, gameId, message) {
+  function broadcastMessage(
+    type,
+    senderSessionId,
+    senderSessionUsername,
+    gameId,
+    message
+  ) {
+    let opponentUsername = null;
+    if (games[gameId]["white"] && games[gameId]["black"]) {
+      if (games[gameId]["white"].sessionId === senderSessionId) {
+        opponentUsername = games[gameId]["black"]?.sessionUsername || "Unknown";
+      } else if (games[gameId]["black"].sessionId === senderSessionId) {
+        opponentUsername = games[gameId]["white"]?.sessionUsername || "Unknown";
+      }
+    }
+
     const messageData = {
       type,
       sessionId: senderSessionId,
+      sessionUsername: senderSessionUsername,
+      opponentUsername,
       message,
     };
 
     const messageString = JSON.stringify(messageData);
 
-    // Broadcast the message to all players except the sender
     Object.keys(connections).forEach((sessionId) => {
-      // Even send to senderSessionId when type === "capacityUpdate"
+      // Send to all players if type is "capacityUpdate"
       if (
         type === "capacityUpdate" &&
         connections[sessionId].gameId === gameId
       ) {
         connections[sessionId].connection.send(messageString);
-      } else if (
+      }
+      // Send to all players except the sender for other message types
+      else if (
         connections[sessionId].gameId === gameId &&
         sessionId !== senderSessionId
       ) {
@@ -121,8 +167,6 @@ function setupWebSocket(server) {
       }
     });
   }
-
-  console.log("WebSocket server initialized.");
 }
 
 module.exports = setupWebSocket;

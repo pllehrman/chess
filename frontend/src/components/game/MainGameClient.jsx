@@ -25,7 +25,7 @@ export function MainGameClient({
   const [whiteTime, setWhiteTime] = useState(gameData.playerBlackTimeRemaining);
   const [blackTime, setBlackTime] = useState(gameData.playerWhiteTimeRemaining);
   const [twoPeoplePresent, setTwoPeoplePresent] = useState(
-    gameData.type === "pvc" ? true : gameData.numPlayers === 1
+    gameData.type === "pvc" ? true : false
   );
   const [isFirstMove, setIsFirstMove] = useState(
     gameData.fen === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -53,7 +53,9 @@ export function MainGameClient({
     blackTime,
     setWhiteTime,
     setBlackTime,
+    twoPeoplePresent,
     setTwoPeoplePresent
+    // setOpponentUsername
   );
 
   const { game, result, winner, safeGameMutate, invalidMove } = chessGameLogic(
@@ -76,7 +78,7 @@ export function MainGameClient({
     setIsFirstMove
   );
 
-  // console.log("Board Renders!");
+  console.log("Board Renders!");
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <GameBanner
@@ -95,9 +97,13 @@ export function MainGameClient({
         </div>
 
         {/* Main Game Component */}
-        <div className="w-[90vh] flex flex-col items-center max-w-lg bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-          {" "}
-          {/* Increased width */}
+        <div
+          className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-md p-8"
+          style={{
+            width: "min(65vh, 40vw)", // Ensure the outer div is a square, constrained by the viewport
+            height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
+          }}
+        >
           <h2
             className={`text-2xl font-bold mb-4 ${
               game.turn() === "w"
@@ -107,7 +113,8 @@ export function MainGameClient({
           >
             {game.turn() === "w" ? "White to Move" : "Black to Move"}
           </h2>
-          {gameData.type != "pvc" && (
+
+          {gameData.type !== "pvc" && (
             <Timers
               whiteTime={whiteTime}
               blackTime={blackTime}
@@ -119,29 +126,37 @@ export function MainGameClient({
               isFirstMove
             />
           )}
-          <Board
-            orientation={orientation}
-            position={game.fen()}
-            onDrop={onDropHandler(
-              orientation,
-              game,
-              twoPeoplePresent,
-              safeGameMutate
-            )}
-          />
+
+          {/* Chessboard should also resize according to the outer square */}
+          <div className="flex-1 w-full h-full">
+            <Board
+              orientation={orientation}
+              position={game.fen()}
+              onDrop={onDropHandler(
+                orientation,
+                game,
+                twoPeoplePresent,
+                safeGameMutate
+              )}
+              boardStyle={{
+                width: "100%", // Fill the outer square
+                height: "100%", // Keep the chessboard square
+              }}
+            />
+          </div>
         </div>
 
         {/* Chat Component */}
-        <div className="w-1/4 pr-2">
+        <div className="w-1/4 pr-2 h-full flex flex-col">
           {" "}
           {gameData.type != "pvc" && (
             <Chat
-              username={sessionUsername}
               messageHistory={messageHistory}
               currentMessage={currentMessage}
               setCurrentMessage={setCurrentMessage}
               sendChat={sendChat}
               readyState={readyState}
+              twoPeoplePresent={twoPeoplePresent}
             />
           )}
         </div>

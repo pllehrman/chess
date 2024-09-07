@@ -6,7 +6,7 @@ const {
 } = require("../middleware/customError");
 const { checkAndUpdateCurrentSession, createSession } = require("./session");
 const sequelize = require("../db/models/index").sequelize;
-const { Op } = require("sequelize");
+const { Op, or } = require("sequelize");
 
 //ROUTES -> '/games'
 // GET
@@ -82,7 +82,21 @@ const joinGame = asyncWrapper(async (req, res) => {
     sessionId = session.id;
   }
 
-  const game = await Game.findByPk(gameId);
+  const game = await Game.findByPk(gameId, {
+    include: [
+      {
+        model: Session,
+        as: "whiteSession",
+        attributes: ["username"],
+      },
+      {
+        model: Session,
+        as: "blackSession",
+        attributes: ["username"],
+      },
+    ],
+  });
+
   if (!game) {
     throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
   }

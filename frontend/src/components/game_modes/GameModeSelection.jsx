@@ -72,7 +72,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             id="username"
             value={username || ""}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder={username || "Unnamed Grand Master"}
+            placeholder={username || "Enter a Username"}
             className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
           />
         </div>

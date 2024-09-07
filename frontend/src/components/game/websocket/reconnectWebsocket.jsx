@@ -7,7 +7,7 @@ export const reconnectWebSocket = (
   gameId,
   gameType,
   orientation,
-  maxRetries = 3
+  maxRetries = 2
 ) => {
   const retryCount = useRef(0);
   const { sendMessage, readyState, lastMessage, getWebSocket } = useWebSocket(

@@ -12,7 +12,9 @@ export const useWebSocket = (
   blackTime,
   setWhiteTime,
   setBlackTime,
+  twoPeoplePresent,
   setTwoPeoplePresent
+  // setOpponentUsername
 ) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -34,21 +36,21 @@ export const useWebSocket = (
         break;
       case "move":
         setMoveHistory((prev) => [...prev, messageData.message.move]);
-        // setWhiteTime(messageData.message.whiteTime);
-        // setBlackTime(messageData.message.blackTime);
+        setWhiteTime(messageData.message.whiteTime);
+        setBlackTime(messageData.message.blackTime);
         break;
       case "capacityUpdate":
         if (gameData.type === "pvp") {
-          console.log("Current ws capacity:", messageData.message.capacity);
-          setTwoPeoplePresent(messageData.message.capacity === 2);
+          const newTwoPeoplePresent = messageData.message.capacity === 2;
+
+          // Only update if the value changes
+          if (twoPeoplePresent !== newTwoPeoplePresent) {
+            console.log("changing two people present");
+            setTwoPeoplePresent((prev) => newTwoPeoplePresent);
+          }
         }
-        // updateTime(gameId, whiteTime, blackTime);
         break;
       default:
-        console.log(
-          messageData.type === "capacityUpdate",
-          gameData.type === "pvp"
-        );
         console.warn(`Unhandled message type: ${messageData.type}`);
     }
   }, []);
