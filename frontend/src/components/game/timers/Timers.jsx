@@ -14,8 +14,6 @@ export const Timers = React.memo(
     twoPeoplePresent,
     isFirstMove,
     winner,
-    setResult,
-    setWinner,
   }) => {
     useEffect(() => {
       if (!twoPeoplePresent || isFirstMove || winner) return;
@@ -44,21 +42,6 @@ export const Timers = React.memo(
         };
       }
     }, [currentTurn]);
-
-    useEffect(() => {
-      // If there are two people present and no winner yet
-      if (twoPeoplePresent && !winner) {
-        if (whiteTime === 0) {
-          // If White runs out of time
-          setResult("lost on time");
-          setWinner("black");
-        } else if (blackTime === 0) {
-          // If Black runs out of time
-          setResult("lost on time");
-          setWinner("white");
-        }
-      }
-    }, [whiteTime, blackTime]);
 
     return (
       <div className="flex justify-between w-full mb-2">

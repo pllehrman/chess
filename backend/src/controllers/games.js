@@ -199,9 +199,12 @@ const getGameHistory = asyncWrapper(async (req, res) => {
     let result;
     if (!game.winner) {
       result = "IN PROGRESS";
-    } else if (game.winner === "TIE") {
-      result = "TIE";
-    } else if (game.winner === sessionId) {
+    } else if (game.winner === "draw") {
+      result = "DRAW";
+    } else if (
+      (game.playerWhiteSession === sessionId && game.winner === "white") ||
+      (game.playwerBlackSession === sessionId && game.winner === "black")
+    ) {
       result = "WIN";
     } else {
       result = "LOSS";
@@ -355,9 +358,10 @@ const decreaseNumPlayers = async (gameId, orientation) => {
 };
 
 // INTERNAL METHOD
-const updateGame = async (gameId, fen, whiteTime, blackTime) => {
+const updateGame = async (gameId, fen, whiteTime, blackTime, winner) => {
   try {
-    const game = await Game.findByPk(gameId); //find the game
+    // Find the game by its primary key (gameId)
+    const game = await Game.findByPk(gameId);
 
     if (!game) {
       throw createCustomError(
@@ -365,21 +369,35 @@ const updateGame = async (gameId, fen, whiteTime, blackTime) => {
         404
       );
     }
-    console.log(fen, whiteTime, blackTime);
-    // Create an update object with the values that are provided
-    const updateData = {
-      playerWhiteTimeRemaining: whiteTime,
-      playerBlackTimeRemaining: blackTime,
-    };
 
-    // Only add 'fen' to the update if it's provided (not null or undefined)
+    // Initialize an empty update object
+    const updateData = {};
+
+    // Add FEN to updateData if provided
     if (fen) {
       updateData.fen = fen;
     }
 
-    // Update the game with the provided values
-    await game.update(updateData);
+    // Add time fields if both are provided and not null/undefined
+    if (whiteTime != null && blackTime != null) {
+      updateData.playerWhiteTimeRemaining = whiteTime; // Correct field name if needed
+      updateData.playerBlackTimeRemaining = blackTime;
+    }
+
+    // Add winner if provided
+    if (winner) {
+      updateData.winner = winner;
+    }
+
+    // Debugging: Log the updateData to ensure it has correct values
+    console.log("updateData:", updateData);
+
+    // Only update if there is at least one key in updateData
+    if (Object.keys(updateData).length > 0) {
+      await game.update(updateData);
+    }
   } catch (error) {
+    console.error("Error updating the game:", error.message);
     throw createCustomError("Transaction failed.");
   }
 };

@@ -5,9 +5,9 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("Sessions", {
       id: {
-        type: Sequelize.STRING, // Using STRING instead of INTEGER for session ID
+        type: Sequelize.STRING,
         allowNull: false,
-        primaryKey: true, // Session ID should be the primary key
+        primaryKey: true,
       },
       username: {
         type: Sequelize.STRING,

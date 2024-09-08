@@ -33,7 +33,7 @@ export default function Header({ sessionUsername }) {
         </Link>
         <Link
           href="/compete"
-          className="text-lg px-4 py-2 rounded-md bg-white text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-colors duration-300"
+          className="text-lg px-2 py-2 rounded-md bg-white text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 transition-colors duration-300"
         >
           Play Chess
         </Link>

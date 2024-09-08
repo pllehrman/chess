@@ -14,6 +14,7 @@ import { MoveHistory } from "../history/MoveHistory";
 import { GameBanner } from "./GameBanner";
 import { requestCookie } from "../formatting/requestCookie";
 import { computerLogic } from "./computerLogic";
+import { MoveTurn } from "./MoveTurn";
 
 export function MainGameClient({
   gameData,
@@ -30,6 +31,7 @@ export function MainGameClient({
   const [isFirstMove, setIsFirstMove] = useState(
     gameData.fen === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   );
+  // BRIGN isGameOVer up to this level and spread it to useWEbsocket. Just have to iron out some of the kinks between history and should be ready to deploy tmrw/monday
 
   if (needsCookie) {
     requestCookie(sessionId);
@@ -44,6 +46,7 @@ export function MainGameClient({
     sendMove,
     readyState,
     setMoveHistory,
+    sendGameOver,
   } = useWebSocket(
     sessionId,
     sessionUsername,
@@ -56,15 +59,7 @@ export function MainGameClient({
     setTwoPeoplePresent
   );
 
-  const {
-    game,
-    result,
-    winner,
-    safeGameMutate,
-    invalidMove,
-    setResult,
-    setWinner,
-  } = chessGameLogic(
+  const { game, result, winner, safeGameMutate, invalidMove } = chessGameLogic(
     gameData,
     whiteTime,
     blackTime,
@@ -72,7 +67,8 @@ export function MainGameClient({
     setMoveHistory,
     moveHistory,
     orientation,
-    setIsFirstMove
+    setIsFirstMove,
+    sendGameOver
   );
 
   computerLogic(
@@ -105,21 +101,18 @@ export function MainGameClient({
 
         {/* Main Game Component */}
         <div
-          className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-md p-8"
+          className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-md pt-4 pr-8 pb-8 pl-8"
           style={{
             width: "min(65vh, 40vw)", // Ensure the outer div is a square, constrained by the viewport
             height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
           }}
         >
-          <h2
-            className={`text-2xl font-bold mb-2 ${
-              game.turn() === "w"
-                ? "text-gray-900 dark:text-gray-100"
-                : "text-gray-400 dark:text-gray-500"
-            }`}
-          >
-            {game.turn() === "w" ? "White to Move" : "Black to Move"}
-          </h2>
+          <MoveTurn
+            currentTurn={game.turn()}
+            winner={winner}
+            result={result}
+            orientation={orientation}
+          />
 
           {gameData.type !== "pvc" && (
             <Timers
@@ -132,8 +125,6 @@ export function MainGameClient({
               twoPeoplePresent={twoPeoplePresent}
               isFirstMove={isFirstMove}
               winner={winner}
-              setResult={setResult}
-              setWinner={setWinner}
             />
           )}
 

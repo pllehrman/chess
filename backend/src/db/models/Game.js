@@ -3,9 +3,9 @@ module.exports = (sequelize, DataTypes) => {
     "Game",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
       },
       type: {
@@ -24,13 +24,8 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       winner: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
-        validate: {
-          isInt: {
-            msg: "Winner must be an integer",
-          },
-        },
       },
       fen: {
         type: DataTypes.STRING,
@@ -93,16 +88,6 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           isInt: {
             msg: "TimeIncrement must be an integer.",
-          },
-        },
-      },
-      numPlayers: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-        validate: {
-          isInt: {
-            msg: "num_players must be an integer.",
           },
         },
       },

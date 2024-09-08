@@ -78,7 +78,6 @@ export const useWebSocket = (
     }
   }, [sendMessage, currentMessage, setMessageHistory]);
 
-  // Send move message
   const sendMove = useCallback(
     (move, fen, whiteTime, blackTime) => {
       sendMessage(
@@ -96,6 +95,16 @@ export const useWebSocket = (
     [sendMessage]
   );
 
+  const sendGameOver = useCallback(
+    (winner, whiteTime, blackTime) => {
+      console.log("At callback!");
+      sendMessage(
+        JSON.stringify({ type: "gameOver", winner, whiteTime, blackTime })
+      );
+    },
+    [sendMessage]
+  );
+
   return {
     messageHistory,
     currentMessage,
@@ -105,5 +114,6 @@ export const useWebSocket = (
     sendMove,
     readyState,
     setMoveHistory,
+    sendGameOver,
   };
 };

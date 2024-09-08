@@ -10,22 +10,61 @@ export function chessGameLogic(
   setMoveHistory,
   moveHistory,
   orientation,
-  setIsFirstMove
+  setIsFirstMove,
+  sendGameOver
 ) {
   const [game, setGame] = useState(new Chess(gameData.fen));
   const [result, setResult] = useState(null);
   const [winner, setWinner] = useState(null);
   const [invalidMove, setInvalidMove] = useState(false);
   const [invalidMoveSound, setInvalidMoveSound] = useState(null);
+  const [validMoveSound, setValidMoveSound] = useState(null);
+  const [winSound, setWinSound] = useState(null);
+  const [lossSound, setLossSound] = useState(null);
+  const [drawSound, setDrawSound] = useState(null);
+  const gameOver = gameData.winner ? true : false;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const audio = new Audio("/sounds/invalid-move.mp3");
-      audio.preload = "auto"; // Preload the audio
-      audio.onerror = () => {
+      const audioInvalid = new Audio("/sounds/invalid-move.mp3");
+      audioInvalid.preload = "auto"; // Preload the audio
+      audioInvalid.onerror = () => {
         console.error("Error loading the invalid move sound.");
       };
-      setInvalidMoveSound(audio); // Set the audio to state
+
+      setInvalidMoveSound(audioInvalid); // Set the audio to state
+
+      const audioValid = new Audio("/sounds/valid-move.wav");
+      audioValid.preload = "auto";
+      audioValid.onerror = () => {
+        console.error("Error loading the valid move sound.");
+      };
+
+      setValidMoveSound(audioValid);
+
+      const audioWin = new Audio("/sounds/win.wav");
+      audioWin.preload = "auto";
+      audioWin.onerror = () => {
+        console.error("Error loading the valid move sound.");
+      };
+
+      setWinSound(audioWin);
+
+      const audioLoss = new Audio("/sounds/loss.mp3");
+      audioLoss.preload = "auto";
+      audioLoss.onerror = () => {
+        console.error("Error loading the valid move sound.");
+      };
+
+      setLossSound(audioLoss);
+
+      const audioDraw = new Audio("/sounds/draw.mp3");
+      audioDraw.preload = "auto";
+      audioDraw.onerror = () => {
+        console.error("Error loading the valid move sound.");
+      };
+
+      setDrawSound(audioDraw);
     }
   }, []);
 
@@ -39,6 +78,10 @@ export function chessGameLogic(
         sendMove(move, gameCopy.fen(), whiteTime, blackTime);
         setMoveHistory((prev) => [...prev, move]);
         setIsFirstMove(false);
+        // NEed to ensure this doesn't throw an error
+
+        // validMoveSound.play();
+
         return gameCopy;
       } catch (error) {
         console.error("error in mutating game.");
@@ -50,7 +93,7 @@ export function chessGameLogic(
 
   const handleInvalidMove = () => {
     setInvalidMove(true);
-    invalidMoveSound.play();
+    // invalidMoveSound.play();
 
     setTimeout(() => {
       setInvalidMove(false);
@@ -99,13 +142,51 @@ export function chessGameLogic(
     setWinner(gameWinner);
   }, [game]);
 
+  useEffect(() => {
+    // If there are two people present and no winner yet
+    if (!winner) {
+      if (whiteTime === 0) {
+        // If White runs out of time
+        setResult("lost on time");
+        setWinner("black");
+      } else if (blackTime === 0) {
+        // If Black runs out of time
+        setResult("lost on time");
+        setWinner("white");
+      }
+    }
+  }, [whiteTime, blackTime]);
+
+  useEffect(() => {
+    console.log("Winner", winner && result && !gameOver);
+    if (winner && result && !gameOver) {
+      console.log("IF evalutates to true!");
+      sendGameOver(winner, whiteTime, blackTime);
+    }
+  }, [winner, result]);
+
+  // Sound effect play
+  useEffect(() => {
+    if (winner) {
+      if (
+        (winner === "white" && orientation === "white") ||
+        (winner === "black" && orientation === "black")
+      ) {
+        winSound.play();
+      } else if (winner === "draw") {
+        console.log("attempting to play!");
+        drawSound.play();
+      } else {
+        lossSound.play();
+      }
+    }
+  }, [winner]);
+
   return {
     game,
     result,
     winner,
     safeGameMutate,
     invalidMove,
-    setResult,
-    setWinner,
   };
 }

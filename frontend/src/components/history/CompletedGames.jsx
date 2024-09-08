@@ -1,11 +1,16 @@
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faForward } from "@fortawesome/free-solid-svg-icons";
+
 export function CompletedGames({ completedGames }) {
+  console.log(completedGames);
   return (
-    <div className="w-1/2 h-3/4 flex flex-col h-full min-h-0 border-2 border-green-500 rounded-lg shadow-lg p-4 hover:shadow-2xl transition-shadow duration-300">
+    <div className="w-1/2 h-3/4 flex flex-col border-2 border-green-500 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800">
       <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
         Completed Games
       </h2>
       {completedGames.length > 0 ? (
-        <div className="flex-grow overflow-y-auto space-y-4">
+        <div className="flex-grow overflow-y-auto px-4 py-4 space-y-6">
           {completedGames.map((game, index) => {
             const opponent = game.opponent ? game.opponent : "Unknown";
 
@@ -20,10 +25,10 @@ export function CompletedGames({ completedGames }) {
             return (
               <div
                 key={index}
-                className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-md border-2 border-gray-400 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                className="p-5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg border border-gray-300 dark:border-gray-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer flex justify-between items-center"
               >
-                <div>
-                  <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-lg font-semibold">
                     Result:{" "}
                     <span className={`font-bold ${resultClass}`}>
                       {game.result}
@@ -33,11 +38,19 @@ export function CompletedGames({ completedGames }) {
                     Opponent: {opponent}
                   </p>
                 </div>
-                <div>
+
+                <div className="text-center w-1/3">
                   <p className="text-sm text-gray-500 dark:text-gray-300">
                     Date: {new Date(game.createdAt).toLocaleDateString()}
                   </p>
                 </div>
+
+                <Link href={`/compete/${game.id}/${game.orientation}`} passHref>
+                  <FontAwesomeIcon
+                    icon={faForward}
+                    className="text-gray-500 hover:text-green-500 transition-colors duration-300 text-3xl"
+                  />
+                </Link>
               </div>
             );
           })}

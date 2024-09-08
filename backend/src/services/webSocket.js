@@ -122,12 +122,20 @@ function setupWebSocket(server) {
           parsedMessage.message
         );
       } else if (parsedMessage.type === "timeUpdate") {
-        console.log("TIME UPDATE");
         await updateGame(
           gameId,
           null,
           parsedMessage.whiteTime,
           parsedMessage.blackTime
+        );
+      } else if (parsedMessage.type === "gameOver") {
+        console.log("INSIDE gameOver");
+        await updateGame(
+          gameId,
+          null,
+          parsedMessage.whiteTime,
+          parsedMessage.blackTime,
+          parsedMessage.winner
         );
       }
     } catch (error) {

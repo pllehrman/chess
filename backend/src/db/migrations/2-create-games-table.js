@@ -5,9 +5,9 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("Games", {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
       },
       type: {
@@ -25,13 +25,8 @@ module.exports = {
         },
       },
       winner: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: true,
-        validate: {
-          isInt: {
-            msg: "Winner must be an integer",
-          },
-        },
       },
       fen: {
         type: Sequelize.STRING,
@@ -93,16 +88,6 @@ module.exports = {
         validate: {
           isInt: {
             msg: "TimeIncrement must be an integer.",
-          },
-        },
-      },
-      numPlayers: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-        validate: {
-          isInt: {
-            msg: "num_players must be an integer.",
           },
         },
       },
