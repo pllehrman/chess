@@ -1,17 +1,11 @@
 const { WebSocketServer } = require("ws");
 const url = require("url");
-const {
-  setGameSessionId,
-  updateGame,
-  increaseNumPlayers,
-  decreaseNumPlayers,
-} = require("../controllers/games");
-const { parse } = require("path");
+const { updateGame } = require("../controllers/games");
 
 function setupWebSocket(server) {
   const wsServer = new WebSocketServer({ server });
   const connections = {}; // Map to track user connections by sessionId
-  const games = {};
+  const games = {}; // To store the current game participants
 
   wsServer.on("connection", async (connection, request) => {
     const { sessionId, sessionUsername, gameId, gameType, orientation } =
@@ -19,81 +13,84 @@ function setupWebSocket(server) {
 
     if (!sessionId || !gameId || !orientation) {
       console.log(
-        "Missing sessionId or gameId or orientation. Connection closed."
+        "Missing sessionId, gameId, or orientation. Connection closed."
       );
       connection.close();
       return;
     }
 
+    // Ensure game is initialized in the games object
     if (!games[gameId]) {
       games[gameId] = { white: null, black: null };
     }
 
-    if (games[gameId][orientation]) {
-      console.error("error joining a game: tried to join a full game");
+    // If the game is full (both white and black are assigned), close the connection
+    if (
+      games[gameId][orientation] &&
+      games[gameId][orientation] !== sessionId
+    ) {
+      // If the slot (white or black) is taken by another player (not the current sessionId)
+      console.error("Error joining a game: tried to join a full game.");
       connection.close();
       return;
     }
+
     games[gameId][orientation] = sessionId;
 
-    for (let i = 0; i < 2; i++) {
-      setTimeout(() => {
-        if (games[gameId]) {
-          broadcastMessage(
-            "capacityUpdate",
-            sessionId,
-            sessionUsername,
-            gameId,
-            {
-              capacity: Object.values(games[gameId]).filter(Boolean).length,
-            }
-          );
-        } else {
-          console.error(`Game with ID ${gameId} no longer exists.`);
-        }
-      }, i * 2000);
+    // Broadcast the updated capacity to all players
+    broadcastCapacityUpdate(sessionId, sessionUsername, gameId);
+
+    if (!connections[sessionId]) {
+      connections[sessionId] = {}; // Initialize connections[sessionId] if it doesn't exist
     }
 
-    // Store user connection by sessionId
-    connections[sessionId] = { connection, gameId, gameType, orientation };
+    // Store user connection by sessionId and gameId
+    connections[sessionId][gameId] = {
+      connection,
+      gameId,
+      gameType,
+      orientation,
+    };
 
-    // console.log(sessionUsername, "is connnected");
     connection.on("message", (message) =>
       handleMessage(sessionId, sessionUsername, gameId, message)
     );
 
     // Handle connection close
     connection.on("close", async () => {
+      // Remove the player from the game
       if (games[gameId]) {
         games[gameId][orientation] = null;
+        broadcastCapacityUpdate(sessionId, sessionUsername, gameId);
 
-        for (let i = 0; i < 2; i++) {
-          setTimeout(() => {
-            if (games[gameId]) {
-              broadcastMessage(
-                "capacityUpdate",
-                sessionId,
-                sessionUsername,
-                gameId,
-                {
-                  capacity: Object.values(games[gameId]).filter(Boolean).length,
-                }
-              );
-            } else {
-              console.error(`Game with ID ${gameId} no longer exists.`);
-            }
-          }, i * 2000);
-
-          // console.log(sessionUsername, "is disconnected");
-          // Cleanup
-          delete connections[sessionId];
-          if (games[gameId] && !games[gameId].white && !games[gameId].black) {
-            delete games[gameId];
+        // Cleanup the user's connection to this game
+        if (connections[sessionId]) {
+          delete connections[sessionId][gameId];
+          if (Object.keys(connections[sessionId]).length === 0) {
+            delete connections[sessionId]; // Remove the session entirely if no games are left
           }
+        }
+
+        // If no players remain in the game, remove the game
+        if (!games[gameId].white && !games[gameId].black) {
+          delete games[gameId];
         }
       }
     });
   });
+
+  function broadcastCapacityUpdate(sessionId, sessionUsername, gameId) {
+    const gameCapacity = Object.values(games[gameId]).filter(Boolean).length;
+
+    // Broadcast capacity update twice with a 2-second delay between broadcasts
+    for (let i = 0; i < 2; i++) {
+      setTimeout(() => {
+        broadcastMessage("capacityUpdate", sessionId, sessionUsername, gameId, {
+          capacity: gameCapacity,
+        });
+      }, i * 2000); // Delay by 2 seconds (2000 milliseconds)
+    }
+  }
 
   async function handleMessage(sessionId, sessionUsername, gameId, message) {
     try {
@@ -129,7 +126,13 @@ function setupWebSocket(server) {
           parsedMessage.blackTime
         );
       } else if (parsedMessage.type === "gameOver") {
-        console.log("INSIDE gameOver");
+        broadcastMessage(
+          "gameOver",
+          sessionId,
+          sessionUsername,
+          gameId,
+          parsedMessage.message
+        );
         await updateGame(
           gameId,
           null,
@@ -137,6 +140,16 @@ function setupWebSocket(server) {
           parsedMessage.blackTime,
           parsedMessage.winner
         );
+      } else if (parsedMessage.type === "drawOffer") {
+        broadcastMessage(
+          "drawOffer",
+          sessionId,
+          sessionUsername,
+          gameId,
+          parsedMessage.message
+        );
+      } else {
+        console.error(`Unknown message type: ${parsedMessage.type}`);
       }
     } catch (error) {
       console.error(`Error handling message: ${error.message}`);
@@ -156,23 +169,15 @@ function setupWebSocket(server) {
       sessionUsername: senderSessionUsername,
       message,
     };
-
+    console.log("Message data on the backend", messageData);
     const messageString = JSON.stringify(messageData);
 
     Object.keys(connections).forEach((sessionId) => {
-      // Send to all players if type is "capacityUpdate"
-      if (
-        type === "capacityUpdate" &&
-        connections[sessionId].gameId === gameId
-      ) {
-        connections[sessionId].connection.send(messageString);
-      }
-      // Send to all players except the sender for other message types
-      else if (
-        connections[sessionId].gameId === gameId &&
-        sessionId !== senderSessionId
-      ) {
-        connections[sessionId].connection.send(messageString);
+      if (connections[sessionId][gameId]) {
+        // Send to all players if type is "capacityUpdate"
+        if (type === "capacityUpdate" || sessionId !== senderSessionId) {
+          connections[sessionId][gameId].connection.send(messageString);
+        }
       }
     });
   }

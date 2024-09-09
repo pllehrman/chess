@@ -1,11 +1,13 @@
 export async function newChessGame(
   type,
-  playerColor,
+  orientation,
   timeRemaining,
   timeIncrement,
   sessionUsername,
   difficulty
 ) {
+  let updatedDifficulty = type === "pvp" ? null : difficulty;
+
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
       method: "POST",
@@ -15,12 +17,12 @@ export async function newChessGame(
       },
       body: JSON.stringify({
         type,
-        playerColor,
+        orientation,
         playerWhiteTimeRemaining: timeRemaining * 60, // convert to seconds
         playerBlackTimeRemaining: timeRemaining * 60, // convert to seconds
         timeIncrement,
         sessionUsername,
-        difficulty,
+        difficulty: updatedDifficulty,
       }),
     });
 

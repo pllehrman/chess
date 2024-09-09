@@ -1,6 +1,6 @@
 "use client";
 import { Chessboard } from "react-chessboard";
-import { useChessPieces } from "./useChessPieces";
+import { useChessPieces } from "./utilities/useChessPieces";
 import React from "react";
 
 export const Board = React.memo(function Board({

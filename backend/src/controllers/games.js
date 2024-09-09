@@ -24,7 +24,7 @@ const getAllGames = asyncWrapper(async (req, res) => {
 const startNewGame = asyncWrapper(async (req, res) => {
   const {
     type,
-    playerColor,
+    orientation,
     playerWhiteTimeRemaining,
     playerBlackTimeRemaining,
     timeIncrement,
@@ -42,9 +42,9 @@ const startNewGame = asyncWrapper(async (req, res) => {
       sessionUsername
     );
 
-    if (playerColor === "white") {
+    if (orientation === "white") {
       playerWhiteSession = session.id;
-    } else if (playerColor === "black") {
+    } else if (orientation === "black") {
       playerBlackSession = session.id;
     } else {
       throw createCustomError(`that game color is not supported`, 404);
@@ -53,6 +53,7 @@ const startNewGame = asyncWrapper(async (req, res) => {
     const game = await Game.create({
       type,
       playerWhiteSession,
+      initialTime: playerWhiteTimeRemaining,
       playerWhiteTimeRemaining,
       playerBlackSession,
       playerBlackTimeRemaining,

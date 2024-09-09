@@ -35,7 +35,9 @@ export function CompletedGames({ completedGames }) {
                     </span>
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Opponent: {opponent}
+                    {game.type === "pvc" &&
+                      `Opponent: ${opponent} (${game.difficulty})`}
+                    {game.type === "pvp" && `Opponent: ${opponent}`}
                   </p>
                 </div>
 

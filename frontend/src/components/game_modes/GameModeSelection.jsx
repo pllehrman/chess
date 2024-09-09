@@ -27,7 +27,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   }
 
   async function handleStartGame() {
-    let playerColor =
+    let orientation =
       colorChoice === "random" ? (coinFlip() ? "white" : "black") : colorChoice;
     const type = showFriendOptions ? "pvp" : "pvc";
 
@@ -39,7 +39,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
     try {
       const game = await newChessGame(
         type,
-        playerColor,
+        orientation,
         timeControl,
         increment,
         username,
@@ -50,7 +50,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         throw new Error("error in starting a new chess game");
       }
 
-      window.location.href = `/compete/${game.id}/${playerColor}`;
+      window.location.href = `/compete/${game.id}/${orientation}`;
     } catch (error) {
       console.error(`error in starting a new chess game: ${error.message}`);
     }

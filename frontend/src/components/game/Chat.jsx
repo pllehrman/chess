@@ -17,7 +17,7 @@ export const Chat = React.memo(
     return (
       <div className="h-[75vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
         {twoPeoplePresent ? (
-          <h1 className="text-xl">
+          <h1 className="text-xl text-gray-900 dark:text-gray-100">
             Chat With Opponent
             <span className="font-semibold"></span>{" "}
             <span
@@ -27,7 +27,7 @@ export const Chat = React.memo(
             />
           </h1>
         ) : (
-          <h1 className="text-xl">
+          <h1 className="text-xl text-gray-900 dark:text-gray-100">
             Waiting for Opponent{" "}
             <span
               className={`inline-block w-3 h-3 rounded-full ${
@@ -45,7 +45,7 @@ export const Chat = React.memo(
               isChatAvailable ? "Enter your message" : "Chat is unavailable"
             }
             disabled={!isChatAvailable}
-            className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
           />
           <button
             onClick={sendChat}
@@ -59,7 +59,9 @@ export const Chat = React.memo(
         </div>
         <hr className="my-4 border-gray-300 dark:border-gray-600" />
         <div className="mt-6">
-          <h2 className="text-lg font-bold">Messages:</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            Messages:
+          </h2>
           <div className="mt-4 space-y-2">
             {messageHistory.length === 0 ? (
               <p className="text-gray-500 dark:text-gray-400">
@@ -76,7 +78,7 @@ export const Chat = React.memo(
                       message.fromMe
                         ? "text-right bg-blue-100 dark:bg-blue-800"
                         : "text-left bg-gray-100 dark:bg-gray-700"
-                    } p-2 rounded-md`}
+                    } p-2 rounded-md text-gray-900 dark:text-gray-100`}
                     style={{
                       wordBreak: "break-word", // Ensure long words break onto the next line
                       overflowWrap: "break-word", // Additional rule to ensure proper wrapping

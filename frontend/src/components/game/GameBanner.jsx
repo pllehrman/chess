@@ -6,8 +6,9 @@ export function GameBanner({
   inCheck,
   winner,
   orientation,
+  outgoingDrawOffer,
 }) {
-  if (winner) return;
+  if (winner) return null;
 
   if (invalidMove) {
     return (
@@ -21,6 +22,14 @@ export function GameBanner({
     return (
       <div className="animate-flash text-lg font-bold text-red-500 dark:text-red-300 mb-2">
         Waiting for opponent to connect...
+      </div>
+    );
+  }
+
+  if (outgoingDrawOffer) {
+    return (
+      <div className="animate-flash text-lg font-bold text-yellow-500 dark:text-yellow-300 mb-2">
+        You have a draw offer pending.
       </div>
     );
   }

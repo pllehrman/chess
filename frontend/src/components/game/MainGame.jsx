@@ -1,7 +1,7 @@
 import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
-import { joinGame } from "./joinGame";
+import { joinGame } from "./utilities/joinGame";
 import { retrieveSession } from "../formatting/retrieveSession";
 
 export async function MainGame({ gameId, orientation }) {

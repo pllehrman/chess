@@ -12,7 +12,11 @@ export const useWebSocket = (
   blackTime,
   setWhiteTime,
   setBlackTime,
-  setTwoPeoplePresent
+  setTwoPeoplePresent,
+  setError,
+  setResult,
+  setWinner,
+  setIncomingDrawOffer
 ) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -51,6 +55,20 @@ export const useWebSocket = (
           });
         }
         break;
+      case "gameOver":
+        setWinner(messageData.messsage.winner);
+      case "drawOffer":
+        if (messageData.message != null) {
+          if (messageData.message.answer) {
+            setWinner("draw");
+          }
+          setOutgoingDrawOffer(false);
+        } else {
+          setIncomingDrawOffer(true);
+        }
+
+      // case "error":
+      //   setError(messageData.message.error);
       default:
         console.warn(`Unhandled message type: ${messageData.type}`);
     }
@@ -97,13 +115,17 @@ export const useWebSocket = (
 
   const sendGameOver = useCallback(
     (winner, whiteTime, blackTime) => {
-      console.log("At callback!");
       sendMessage(
         JSON.stringify({ type: "gameOver", winner, whiteTime, blackTime })
       );
     },
     [sendMessage]
   );
+
+  const sendDrawOffer = useCallback((answer) => {
+    // action is either a "request" or "response" answer is either true or false in accepting the offer
+    sendMessage(JSON.stringify({ type: "drawOffer", answer: answer }));
+  });
 
   return {
     messageHistory,
@@ -115,5 +137,6 @@ export const useWebSocket = (
     readyState,
     setMoveHistory,
     sendGameOver,
+    sendDrawOffer,
   };
 };

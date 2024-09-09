@@ -49,6 +49,10 @@ module.exports = {
           },
         },
       },
+      initialTime: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       playerWhiteTimeRemaining: {
         type: Sequelize.INTEGER,
         allowNull: true,

@@ -27,6 +27,7 @@ export function InProgressGames({ inProgressGames }) {
                   <p className="text-lg font-semibold">
                     <span className="text-blue-500">Opponent: </span>
                     {game.opponent ? game.opponent : "No Opponent Yet"}
+                    {game.type === "pvc" ? ` (${game.difficulty})` : ""}
                   </p>
                   {game.type === "pvp" && (
                     <p className="text-sm">

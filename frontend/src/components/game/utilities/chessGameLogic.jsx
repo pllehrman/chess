@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Chess } from "chess.js";
 
 export function chessGameLogic(
@@ -11,60 +11,31 @@ export function chessGameLogic(
   moveHistory,
   orientation,
   setIsFirstMove,
-  sendGameOver
+  sendGameOver,
+  result,
+  winner,
+  setResult,
+  setWinner
 ) {
   const [game, setGame] = useState(new Chess(gameData.fen));
-  const [result, setResult] = useState(null);
-  const [winner, setWinner] = useState(null);
   const [invalidMove, setInvalidMove] = useState(false);
-  const [invalidMoveSound, setInvalidMoveSound] = useState(null);
-  const [validMoveSound, setValidMoveSound] = useState(null);
-  const [winSound, setWinSound] = useState(null);
-  const [lossSound, setLossSound] = useState(null);
-  const [drawSound, setDrawSound] = useState(null);
+
+  // Sounds
+  const invalidMoveSound = useRef(null);
+  const validMoveSound = useRef(null);
+  const winSound = useRef(null);
+  const lossSound = useRef(null);
+  const drawSound = useRef(null);
+
   const gameOver = gameData.winner ? true : false;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const audioInvalid = new Audio("/sounds/invalid-move.mp3");
-      audioInvalid.preload = "auto"; // Preload the audio
-      audioInvalid.onerror = () => {
-        console.error("Error loading the invalid move sound.");
-      };
-
-      setInvalidMoveSound(audioInvalid); // Set the audio to state
-
-      const audioValid = new Audio("/sounds/valid-move.wav");
-      audioValid.preload = "auto";
-      audioValid.onerror = () => {
-        console.error("Error loading the valid move sound.");
-      };
-
-      setValidMoveSound(audioValid);
-
-      const audioWin = new Audio("/sounds/win.wav");
-      audioWin.preload = "auto";
-      audioWin.onerror = () => {
-        console.error("Error loading the valid move sound.");
-      };
-
-      setWinSound(audioWin);
-
-      const audioLoss = new Audio("/sounds/loss.mp3");
-      audioLoss.preload = "auto";
-      audioLoss.onerror = () => {
-        console.error("Error loading the valid move sound.");
-      };
-
-      setLossSound(audioLoss);
-
-      const audioDraw = new Audio("/sounds/draw.mp3");
-      audioDraw.preload = "auto";
-      audioDraw.onerror = () => {
-        console.error("Error loading the valid move sound.");
-      };
-
-      setDrawSound(audioDraw);
+      invalidMoveSound.current = new Audio("/sounds/invalid-move.mp3");
+      validMoveSound.current = new Audio("/sounds/valid-move.wav");
+      winSound.current = new Audio("/sounds/win.wav");
+      lossSound.current = new Audio("/sounds/loss.mp3");
+      drawSound.current = new Audio("/sounds/draw.mp3");
     }
   }, []);
 
@@ -79,8 +50,11 @@ export function chessGameLogic(
         setMoveHistory((prev) => [...prev, move]);
         setIsFirstMove(false);
         // NEed to ensure this doesn't throw an error
-
-        // validMoveSound.play();
+        try {
+          validMoveSound.current.play();
+        } catch (error) {
+          console.error("error playing valid move sound:", error);
+        }
 
         return gameCopy;
       } catch (error) {
@@ -93,7 +67,12 @@ export function chessGameLogic(
 
   const handleInvalidMove = () => {
     setInvalidMove(true);
-    // invalidMoveSound.play();
+
+    try {
+      invalidMoveSound.current.play();
+    } catch (error) {
+      console.error("error playing valid move sound:", error);
+    }
 
     setTimeout(() => {
       setInvalidMove(false);
@@ -158,12 +137,16 @@ export function chessGameLogic(
   }, [whiteTime, blackTime]);
 
   useEffect(() => {
-    console.log("Winner", winner && result && !gameOver);
     if (winner && result && !gameOver) {
-      console.log("IF evalutates to true!");
       sendGameOver(winner, whiteTime, blackTime);
     }
   }, [winner, result]);
+
+  useEffect(() => {
+    if (gameOver) {
+      setWinner(gameData.winner);
+    }
+  }, []);
 
   // Sound effect play
   useEffect(() => {
@@ -172,20 +155,17 @@ export function chessGameLogic(
         (winner === "white" && orientation === "white") ||
         (winner === "black" && orientation === "black")
       ) {
-        winSound.play();
+        winSound.current.play();
       } else if (winner === "draw") {
-        console.log("attempting to play!");
-        drawSound.play();
+        drawSound.current.play();
       } else {
-        lossSound.play();
+        lossSound.current.play();
       }
     }
   }, [winner]);
 
   return {
     game,
-    result,
-    winner,
     safeGameMutate,
     invalidMove,
   };

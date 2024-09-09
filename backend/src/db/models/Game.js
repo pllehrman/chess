@@ -48,6 +48,10 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      initialTime: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       playerWhiteTimeRemaining: {
         type: DataTypes.INTEGER,
         allowNull: true,

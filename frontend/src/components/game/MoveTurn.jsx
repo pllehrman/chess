@@ -5,19 +5,44 @@ import {
   faHandshake,
   faFlag,
 } from "@fortawesome/free-solid-svg-icons";
+import { gameControls } from "./utilities/gameControls";
 
 export const MoveTurn = ({
   currentTurn,
   winner,
   result,
   orientation,
-  onNewGame,
-  onOfferDraw,
-  onResign,
+  gameData,
+  incomingDrawOffer,
+  sessionUsername,
+  setResult,
+  setWinner,
+  whiteTime,
+  blackTime,
+  sendDrawOffer,
+  sendGameOver,
+  setOutgoingDrawOffer,
 }) => {
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [showDrawModal, setShowDrawModal] = useState(false);
   const [showResignModal, setShowResignModal] = useState(false);
+
+  const { refreshGame, resignGame, offerDraw, acceptDraw, declineDraw } =
+    gameControls(
+      gameData.type,
+      orientation,
+      gameData.initialTime,
+      gameData.timeIncrement,
+      sessionUsername,
+      gameData.difficulty,
+      setWinner,
+      setResult,
+      whiteTime,
+      blackTime,
+      sendDrawOffer,
+      sendGameOver,
+      setOutgoingDrawOffer
+    );
 
   const closeModal = () => {
     setShowNewGameModal(false);
@@ -36,15 +61,19 @@ export const MoveTurn = ({
     }
   }
 
+  console.log("INcoming draw offer", incomingDrawOffer);
+
   return (
     <div className="relative w-full bg-white dark:bg-gray-800 rounded-lg pb-2">
       {/* Handshake and Flag icons on the left */}
       <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex space-x-4">
         <button onClick={() => setShowDrawModal(true)}>
-          <FontAwesomeIcon
-            icon={faHandshake}
-            className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-2xl"
-          />
+          {gameData.type === "pvp" && (
+            <FontAwesomeIcon
+              icon={faHandshake}
+              className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-2xl"
+            />
+          )}
         </button>
         <button onClick={() => setShowResignModal(true)}>
           <FontAwesomeIcon
@@ -91,7 +120,10 @@ export const MoveTurn = ({
             </p>
             <div className="mt-4 flex justify-between">
               <button
-                onClick={onNewGame}
+                onClick={() => {
+                  closeModal();
+                  refreshGame();
+                }}
                 className="bg-blue-500 text-white px-4 py-2 rounded w-24"
               >
                 Yes
@@ -115,7 +147,10 @@ export const MoveTurn = ({
             </p>
             <div className="mt-4 flex justify-between">
               <button
-                onClick={onOfferDraw}
+                onClick={() => {
+                  closeModal();
+                  offerDraw();
+                }}
                 className="bg-green-500 text-white px-4 py-2 rounded w-24"
               >
                 Yes
@@ -137,7 +172,10 @@ export const MoveTurn = ({
             <p className="text-xl font-semibold">Do you want to resign?</p>
             <div className="mt-4 flex justify-between">
               <button
-                onClick={onResign}
+                onClick={() => {
+                  closeModal();
+                  resignGame();
+                }}
                 className="bg-red-500 text-white px-4 py-2 rounded w-24"
               >
                 Yes
@@ -147,6 +185,34 @@ export const MoveTurn = ({
                 className="bg-gray-300 px-4 py-2 rounded w-24"
               >
                 No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {incomingDrawOffer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
+            <p className="text-xl font-semibold">
+              You have been offered a draw!
+            </p>
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => {
+                  acceptDraw();
+                }}
+                className="bg-green-500 text-white px-4 py-2 rounded w-24"
+              >
+                Accept
+              </button>
+              <button
+                onClick={() => {
+                  declinDraw();
+                }}
+                className="bg-red-500 text-white px-4 py-2 rounded w-24"
+              >
+                Decline
               </button>
             </div>
           </div>

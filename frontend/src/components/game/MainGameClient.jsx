@@ -2,18 +2,16 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Board } from "./Board";
-import Controls from "./Controls";
-import ResultNotice from "./ResultNotice";
-import { Timers } from "./timers/Timers";
-import { chessGameLogic } from "./chessGameLogic";
-import { useControlsLogic } from "./useControlsLogic";
-import { onDropHandler } from "./onDropHandler";
+import { Timers } from "./Timers";
+import { chessGameLogic } from "./utilities/chessGameLogic";
+// import { useControlsLogic } from "./utilities/refreshGame";
+import { onDropHandler } from "./utilities/onDropHandler";
 import { useWebSocket } from "./websocket/useWebSocket";
 import { Chat } from "./Chat";
 import { MoveHistory } from "../history/MoveHistory";
 import { GameBanner } from "./GameBanner";
 import { requestCookie } from "../formatting/requestCookie";
-import { computerLogic } from "./computerLogic";
+import { computerLogic } from "./utilities/computerLogic";
 import { MoveTurn } from "./MoveTurn";
 
 export function MainGameClient({
@@ -31,6 +29,11 @@ export function MainGameClient({
   const [isFirstMove, setIsFirstMove] = useState(
     gameData.fen === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   );
+  const [result, setResult] = useState(null);
+  const [winner, setWinner] = useState(null);
+  const [error, setError] = useState(null);
+  const [incomingDrawOffer, setIncomingDrawOffer] = useState(null);
+  const [outgoingDrawOffer, setOutgoingDrawOffer] = useState(null);
   // BRIGN isGameOVer up to this level and spread it to useWEbsocket. Just have to iron out some of the kinks between history and should be ready to deploy tmrw/monday
 
   if (needsCookie) {
@@ -47,6 +50,7 @@ export function MainGameClient({
     readyState,
     setMoveHistory,
     sendGameOver,
+    sendDrawOffer,
   } = useWebSocket(
     sessionId,
     sessionUsername,
@@ -56,10 +60,14 @@ export function MainGameClient({
     blackTime,
     setWhiteTime,
     setBlackTime,
-    setTwoPeoplePresent
+    setTwoPeoplePresent,
+    setError,
+    setResult,
+    setWinner,
+    setIncomingDrawOffer
   );
 
-  const { game, result, winner, safeGameMutate, invalidMove } = chessGameLogic(
+  const { game, safeGameMutate, invalidMove } = chessGameLogic(
     gameData,
     whiteTime,
     blackTime,
@@ -68,7 +76,11 @@ export function MainGameClient({
     moveHistory,
     orientation,
     setIsFirstMove,
-    sendGameOver
+    sendGameOver,
+    result,
+    winner,
+    setResult,
+    setWinner
   );
 
   computerLogic(
@@ -81,7 +93,7 @@ export function MainGameClient({
     setIsFirstMove
   );
 
-  // console.log("Board Renders!");
+  if (error) return <GameUnavailable />;
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <GameBanner
@@ -91,6 +103,7 @@ export function MainGameClient({
         result={result}
         winner={winner}
         orientation={orientation}
+        outgoingDrawOffer={outgoingDrawOffer}
       />
 
       <div className="flex w-full max-w-full justify-between items-start px-5 h-full">
@@ -108,10 +121,20 @@ export function MainGameClient({
           }}
         >
           <MoveTurn
+            gameData={gameData}
             currentTurn={game.turn()}
             winner={winner}
             result={result}
             orientation={orientation}
+            incomingDrawOffer={incomingDrawOffer}
+            sessionUsername={sessionUsername}
+            setResult={setResult}
+            setWinner={setWinner}
+            whiteTime={whiteTime}
+            blackTime={blackTime}
+            sendGameOver={sendGameOver}
+            sendDrawOffer={sendDrawOffer}
+            setOutgoingDrawOffer={setOutgoingDrawOffer}
           />
 
           {gameData.type !== "pvc" && (
