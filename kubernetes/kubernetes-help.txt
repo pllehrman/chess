@@ -1,0 +1,39 @@
+CREATING SECRETS
+kubectl create secret generic db-secrets \
+  --from-literal=db-user='postgres' \
+  --from-literal=db-password='<DB_PASSWORD>'
+
+LOGGING INTO A GIVEN CLUSTER
+gcloud container clusters get-credentials <cluster_name> --zone <zone> --project <project_id>
+
+AUTHENTICATING DOCKER:
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+ENABLING IAM BINDING BETWEEN KSA and GSA PAIR
+gcloud iam service-accounts add-iam-policy-binding \
+--role="roles/iam.workloadIdentityUser" \
+--member="serviceAccount:.svc.id.goog[YOUR-K8S-NAMESPACE/YOUR-KSA-NAME]" \
+YOUR-GSA-NAME@YOUR-GOOGLE-CLOUD-PROJECT.iam.gserviceaccount.com
+
+  necessary annotation:
+  
+  kubectl annotate serviceaccount \
+  chessgambit \
+  iam.gke.io/gcp-service-account=chessgambit-backend@chessgambit.iam.gserviceaccount.com
+
+CREATING A GSA:
+gcloud iam service-accounts create chessgambit-backend \
+  --description="GSA on chessgambit-backend" \
+  --display-name="chessgambit-backend"
+
+VIEWING ROLES:
+gcloud projects get-iam-policy chessgambit \
+--flatten="bindings[].members" \
+--filter="bindings.members:chessgambit-backend@chessgambit.iam.gserviceaccount.com" \
+--format="table(bindings.role)"
+
+CREATING AND LISTING DATABASES FOR A GIVEN INSTANCE:
+- gcloud sql databases create chessgambit-db --instance=chessgambit-db
+- gcloud sql databases list --instance=chessgambit-db
+
+

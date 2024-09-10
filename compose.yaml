@@ -2,6 +2,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     env_file:
       - frontend/.env
     ports:
@@ -16,6 +17,7 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile.dev
     env_file:
       - backend/.env
     ports:
@@ -33,7 +35,6 @@ services:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
-      TS: 'America/Los_Angeles'
     ports:
       - "5432:5432"
     volumes:

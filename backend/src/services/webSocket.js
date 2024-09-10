@@ -25,12 +25,10 @@ function setupWebSocket(server) {
     }
 
     // If the game is full (both white and black are assigned), close the connection
-    if (
-      games[gameId][orientation] &&
-      games[gameId][orientation] !== sessionId
-    ) {
+    if (games[gameId][orientation]) {
       // If the slot (white or black) is taken by another player (not the current sessionId)
       console.error("Error joining a game: tried to join a full game.");
+      broadcastError(connection, "tried to join a full game");
       connection.close();
       return;
     }
@@ -95,7 +93,7 @@ function setupWebSocket(server) {
   async function handleMessage(sessionId, sessionUsername, gameId, message) {
     try {
       const parsedMessage = JSON.parse(message);
-
+      console.log("Message data on the backend", parsedMessage);
       if (parsedMessage.type === "move") {
         broadcastMessage(
           "move",
@@ -116,7 +114,7 @@ function setupWebSocket(server) {
           sessionId,
           sessionUsername,
           gameId,
-          parsedMessage.message
+          parsedMessage
         );
       } else if (parsedMessage.type === "timeUpdate") {
         await updateGame(
@@ -131,14 +129,15 @@ function setupWebSocket(server) {
           sessionId,
           sessionUsername,
           gameId,
-          parsedMessage.message
+          parsedMessage
         );
         await updateGame(
           gameId,
           null,
           parsedMessage.whiteTime,
           parsedMessage.blackTime,
-          parsedMessage.winner
+          parsedMessage.winner,
+          parsedMessage.result
         );
       } else if (parsedMessage.type === "drawOffer") {
         broadcastMessage(
@@ -146,7 +145,7 @@ function setupWebSocket(server) {
           sessionId,
           sessionUsername,
           gameId,
-          parsedMessage.message
+          parsedMessage
         );
       } else {
         console.error(`Unknown message type: ${parsedMessage.type}`);
@@ -169,7 +168,7 @@ function setupWebSocket(server) {
       sessionUsername: senderSessionUsername,
       message,
     };
-    console.log("Message data on the backend", messageData);
+
     const messageString = JSON.stringify(messageData);
 
     Object.keys(connections).forEach((sessionId) => {
@@ -180,6 +179,15 @@ function setupWebSocket(server) {
         }
       }
     });
+  }
+  function broadcastError(connection, details) {
+    const errorMessage = {
+      type: "error",
+      message: details, // Details about the error
+    };
+
+    // Send the error message to the individual who triggered the error
+    connection.send(JSON.stringify(errorMessage));
   }
 }
 

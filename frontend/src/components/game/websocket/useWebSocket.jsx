@@ -16,7 +16,8 @@ export const useWebSocket = (
   setError,
   setResult,
   setWinner,
-  setIncomingDrawOffer
+  setIncomingDrawOffer,
+  setOutgoingDrawOffer
 ) => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -31,6 +32,7 @@ export const useWebSocket = (
   );
 
   const handleMessage = (messageData) => {
+    console.log(messageData);
     switch (messageData.type) {
       case "chat":
         setMessageHistory((prev) => [...prev, messageData]);
@@ -44,11 +46,6 @@ export const useWebSocket = (
         if (gameData.type === "pvp") {
           setTwoPeoplePresent((prev) => {
             if (prev && messageData.message.capacity == 1) {
-              console.log(
-                "updating time on the frontend!",
-                whiteTime,
-                blackTime
-              );
               sendTimeUpdate(whiteTime, blackTime);
             }
             return messageData.message.capacity == 2;
@@ -56,19 +53,21 @@ export const useWebSocket = (
         }
         break;
       case "gameOver":
-        setWinner(messageData.messsage.winner);
+        console.log(messageData.message.winner);
+        setResult(messageData.message.result);
+        setWinner(messageData.message.winner);
+
+        break;
       case "drawOffer":
-        if (messageData.message != null) {
-          if (messageData.message.answer) {
-            setWinner("draw");
-          }
+        if (messageData.message.answer != null) {
           setOutgoingDrawOffer(false);
         } else {
           setIncomingDrawOffer(true);
         }
-
-      // case "error":
-      //   setError(messageData.message.error);
+        break;
+      case "error":
+        setError(messageData.message);
+        break;
       default:
         console.warn(`Unhandled message type: ${messageData.type}`);
     }
@@ -83,17 +82,24 @@ export const useWebSocket = (
   }, [lastMessage]);
 
   const sendChat = useCallback(() => {
-    if (currentMessage) {
-      const chatMessage = {
-        type: "chat",
-        message: currentMessage,
-        fromMe: true,
-      };
-      setMessageHistory((prev) => [...prev, chatMessage]);
-      sendMessage(JSON.stringify(chatMessage));
+    if (!currentMessage) return;
 
-      setCurrentMessage("");
-    }
+    const baseMessage = {
+      type: "chat",
+      message: currentMessage,
+    };
+
+    // Add the message to your own message history
+    setMessageHistory((prev) => [
+      ...prev,
+      { message: { ...baseMessage, fromMe: true } },
+    ]);
+
+    // Send the message to the opponent
+    sendMessage(JSON.stringify({ ...baseMessage, fromMe: false }));
+
+    // Clear the current message
+    setCurrentMessage("");
   }, [sendMessage, currentMessage, setMessageHistory]);
 
   const sendMove = useCallback(
@@ -114,9 +120,15 @@ export const useWebSocket = (
   );
 
   const sendGameOver = useCallback(
-    (winner, whiteTime, blackTime) => {
+    (winner, result, whiteTime, blackTime) => {
       sendMessage(
-        JSON.stringify({ type: "gameOver", winner, whiteTime, blackTime })
+        JSON.stringify({
+          type: "gameOver",
+          winner,
+          result,
+          whiteTime,
+          blackTime,
+        })
       );
     },
     [sendMessage]

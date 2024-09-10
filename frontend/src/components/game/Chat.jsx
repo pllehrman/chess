@@ -71,11 +71,11 @@ export const Chat = React.memo(
               messageHistory
                 .slice() // Create a shallow copy of the array to avoid mutating original data
                 .reverse() // Reverse the array to show most recent messages at the top
-                .map((message, index) => (
+                .map((messageObject, index) => (
                   <div
                     key={index}
                     className={`${
-                      message.fromMe
+                      messageObject.message.fromMe
                         ? "text-right bg-blue-100 dark:bg-blue-800"
                         : "text-left bg-gray-100 dark:bg-gray-700"
                     } p-2 rounded-md text-gray-900 dark:text-gray-100`}
@@ -85,12 +85,13 @@ export const Chat = React.memo(
                     }}
                   >
                     <strong>
-                      {message.fromMe
+                      {messageObject.message.fromMe
                         ? "You"
-                        : `${message.sessionUsername} (Opponent)`}
+                        : `${messageObject.sessionUsername} (Opponent)`}
                       :
                     </strong>{" "}
-                    {message.message}
+                    {messageObject.message.message}{" "}
+                    {/* Accessing the actual message content */}
                   </div>
                 ))
             )}

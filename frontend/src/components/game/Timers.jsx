@@ -27,7 +27,7 @@ export const Timers = React.memo(
       }, 1000);
 
       return () => clearInterval(timer); // Clear timer on cleanup or turn change
-    }, [currentTurn, twoPeoplePresent, isFirstMove]);
+    }, [currentTurn, twoPeoplePresent, isFirstMove, winner]);
 
     // Increment effect: responsible for applying increment when the turn changes
     useEffect(() => {
@@ -41,7 +41,7 @@ export const Timers = React.memo(
           }
         };
       }
-    }, [currentTurn]);
+    }, [currentTurn, winner]);
 
     return (
       <div className="flex justify-between w-full mb-2">

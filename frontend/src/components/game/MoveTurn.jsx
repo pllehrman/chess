@@ -22,6 +22,7 @@ export const MoveTurn = ({
   sendDrawOffer,
   sendGameOver,
   setOutgoingDrawOffer,
+  setIncomingDrawOffer,
 }) => {
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [showDrawModal, setShowDrawModal] = useState(false);
@@ -41,7 +42,8 @@ export const MoveTurn = ({
       blackTime,
       sendDrawOffer,
       sendGameOver,
-      setOutgoingDrawOffer
+      setOutgoingDrawOffer,
+      setIncomingDrawOffer
     );
 
   const closeModal = () => {
@@ -55,32 +57,36 @@ export const MoveTurn = ({
     if (winner === "draw") {
       message = `Draw by ${result}`;
     } else if (winner === orientation) {
-      message = "You Won: Good Work!";
+      message = `You Won by ${result}!`;
     } else {
-      message = "You Lost: Nice Try!";
+      message = `You Lost by ${result}!`;
     }
   }
 
-  console.log("INcoming draw offer", incomingDrawOffer);
+  // console.log("INcoming draw offer", incomingDrawOffer);
 
   return (
     <div className="relative w-full bg-white dark:bg-gray-800 rounded-lg pb-2">
       {/* Handshake and Flag icons on the left */}
       <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex space-x-4">
-        <button onClick={() => setShowDrawModal(true)}>
-          {gameData.type === "pvp" && (
+        {!winner && (
+          <button onClick={() => setShowDrawModal(true)}>
+            {gameData.type === "pvp" && (
+              <FontAwesomeIcon
+                icon={faHandshake}
+                className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-2xl"
+              />
+            )}
+          </button>
+        )}
+        {!winner && (
+          <button onClick={() => setShowResignModal(true)}>
             <FontAwesomeIcon
-              icon={faHandshake}
-              className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-2xl"
+              icon={faFlag}
+              className="text-gray-600 dark:text-gray-300 hover:text-red-500 text-2xl"
             />
-          )}
-        </button>
-        <button onClick={() => setShowResignModal(true)}>
-          <FontAwesomeIcon
-            icon={faFlag}
-            className="text-gray-600 dark:text-gray-300 hover:text-red-500 text-2xl"
-          />
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Turn display or game result */}
@@ -208,7 +214,7 @@ export const MoveTurn = ({
               </button>
               <button
                 onClick={() => {
-                  declinDraw();
+                  declineDraw();
                 }}
                 className="bg-red-500 text-white px-4 py-2 rounded w-24"
               >

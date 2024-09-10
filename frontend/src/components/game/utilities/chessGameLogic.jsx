@@ -105,8 +105,8 @@ export function chessGameLogic(
     let gameResult = null;
     let gameWinner = null;
     if (game.isCheckmate()) {
-      console.log("Inside Checkmate");
-      gameResult = "checkmate";
+      // console.log("Inside Checkmate");
+      gameResult = "Checkmate";
       gameWinner = game.turn() === "w" ? "black" : "white";
     } else if (game.isDraw()) {
       gameWinner = "draw";
@@ -126,11 +126,11 @@ export function chessGameLogic(
     if (!winner) {
       if (whiteTime === 0) {
         // If White runs out of time
-        setResult("lost on time");
+        setResult("Insufficient Time");
         setWinner("black");
       } else if (blackTime === 0) {
         // If Black runs out of time
-        setResult("lost on time");
+        setResult("Insufficient Time");
         setWinner("white");
       }
     }
@@ -138,13 +138,14 @@ export function chessGameLogic(
 
   useEffect(() => {
     if (winner && result && !gameOver) {
-      sendGameOver(winner, whiteTime, blackTime);
+      sendGameOver(winner, result, whiteTime, blackTime);
     }
   }, [winner, result]);
 
   useEffect(() => {
     if (gameOver) {
       setWinner(gameData.winner);
+      setResult(gameData.result);
     }
   }, []);
 

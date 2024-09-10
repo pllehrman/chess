@@ -195,20 +195,19 @@ const getGameHistory = asyncWrapper(async (req, res) => {
   const inProgressGames = [];
   const completedGames = [];
 
-  // Add a field for the result (WIN, LOSS, TIE) based on sessionId
   games.forEach((game) => {
-    let result;
+    let outcome;
     if (!game.winner) {
-      result = "IN PROGRESS";
+      outcome = "IN PROGRESS";
     } else if (game.winner === "draw") {
-      result = "DRAW";
+      outcome = "DRAW";
     } else if (
       (game.playerWhiteSession === sessionId && game.winner === "white") ||
       (game.playwerBlackSession === sessionId && game.winner === "black")
     ) {
-      result = "WIN";
+      outcome = "WIN";
     } else {
-      result = "LOSS";
+      outcome = "LOSS";
     }
 
     // Determine opponent based on sessionId
@@ -233,13 +232,13 @@ const getGameHistory = asyncWrapper(async (req, res) => {
 
     const gameWithResult = {
       ...game.toJSON(),
-      result, // Add the result field
+      outcome, // Add the result field
       opponent,
       orientation,
     };
 
     // Sort games into in-progress and completed based on the result
-    if (result === "IN PROGRESS") {
+    if (outcome === "IN PROGRESS") {
       inProgressGames.push(gameWithResult);
     } else {
       completedGames.push(gameWithResult);
@@ -284,82 +283,15 @@ const updateGameByID = asyncWrapper(async (req, res) => {
     .json({ message: `Game with id ${gameId} successfully updated.` });
 });
 
-// FOR THESE INTERNAL METHODS USE TRANSACTIONS
 // INTERNAL METHOD
-const gameCapacity = async (gameId) => {
-  const transaction = await sequelize.transaction();
-  let game;
-
-  try {
-    game = await Game.findByPk(gameId, { transaction });
-    if (!game) {
-      throw createCustomError("Game could not be found", 404);
-    }
-
-    await transaction.commit();
-  } catch (error) {
-    if (transaction) await transaction.rollback();
-    throw createCustomError("Transaction could not be completed");
-  }
-  return game.numPlayers;
-};
-
-const increaseNumPlayers = async (gameId) => {
-  try {
-    const game = await Game.findByPk(gameId);
-
-    if (!game) {
-      throw createCustomError("Game could not be found", 404);
-    }
-
-    if (game.numPlayers < 2) {
-      game.numPlayers += 1;
-    } else {
-      throw createCustomError(
-        "Error increasing numPlayers in game with too many people",
-        400
-      );
-    }
-
-    await game.save();
-    return game.numPlayers;
-  } catch (error) {
-    throw createCustomError(
-      `error increasing numPlayers  ${error.message}`,
-      500
-    );
-  }
-};
-
-// INTERNAL METHOD
-const decreaseNumPlayers = async (gameId, orientation) => {
-  try {
-    const game = await Game.findByPk(gameId);
-
-    if (!game) {
-      throw createCustomError(
-        `Game with id ${gameId} could not be found.`,
-        404
-      );
-    }
-
-    if (game.numPlayers > 0) {
-      game.numPlayers -= 1;
-    } else {
-      throw createCustomError(
-        `error decreasing numPlayers in game with too few players`
-      );
-    }
-
-    await game.save();
-    return game.numPlayers;
-  } catch (error) {
-    throw createCustomError(`error decreasing numPlayers: ${error.message}`);
-  }
-};
-
-// INTERNAL METHOD
-const updateGame = async (gameId, fen, whiteTime, blackTime, winner) => {
+const updateGame = async (
+  gameId,
+  fen,
+  whiteTime,
+  blackTime,
+  winner,
+  result
+) => {
   try {
     // Find the game by its primary key (gameId)
     const game = await Game.findByPk(gameId);
@@ -388,6 +320,7 @@ const updateGame = async (gameId, fen, whiteTime, blackTime, winner) => {
     // Add winner if provided
     if (winner) {
       updateData.winner = winner;
+      updateData.result = result;
     }
 
     // Debugging: Log the updateData to ensure it has correct values
@@ -433,9 +366,6 @@ module.exports = {
   updateGameByID,
   updateGame,
   joinGame,
-  increaseNumPlayers,
-  decreaseNumPlayers,
-  gameCapacity,
   updateGame,
   getGameHistory,
   setGameSessionId,

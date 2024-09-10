@@ -11,7 +11,8 @@ export function gameControls(
   blackTime,
   sendDrawOffer,
   sendGameOver,
-  setOutgoingDrawOffer
+  setOutgoingDrawOffer,
+  setIncomingDrawOffer
 ) {
   const refreshGame = async () => {
     try {
@@ -47,7 +48,6 @@ export function gameControls(
 
   const resignGame = () => {
     const winnerColor = orientation === "white" ? "black" : "white";
-    sendGameOver(winnerColor, whiteTime, blackTime);
     setWinner(winnerColor);
     setResult("Resignation");
   };
@@ -57,5 +57,16 @@ export function gameControls(
     setOutgoingDrawOffer(true);
   };
 
-  return { refreshGame, resignGame, offerDraw };
+  const acceptDraw = () => {
+    setWinner("draw");
+    setResult("Mutual Agreement");
+    setIncomingDrawOffer(false);
+  };
+
+  const declineDraw = () => {
+    setIncomingDrawOffer(false);
+    sendDrawOffer(false);
+  };
+
+  return { refreshGame, resignGame, offerDraw, acceptDraw, declineDraw };
 }

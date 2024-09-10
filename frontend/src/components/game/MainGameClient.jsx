@@ -13,6 +13,7 @@ import { GameBanner } from "./GameBanner";
 import { requestCookie } from "../formatting/requestCookie";
 import { computerLogic } from "./utilities/computerLogic";
 import { MoveTurn } from "./MoveTurn";
+import { GameUnavailable } from "./GameUnavailable";
 
 export function MainGameClient({
   gameData,
@@ -34,7 +35,6 @@ export function MainGameClient({
   const [error, setError] = useState(null);
   const [incomingDrawOffer, setIncomingDrawOffer] = useState(null);
   const [outgoingDrawOffer, setOutgoingDrawOffer] = useState(null);
-  // BRIGN isGameOVer up to this level and spread it to useWEbsocket. Just have to iron out some of the kinks between history and should be ready to deploy tmrw/monday
 
   if (needsCookie) {
     requestCookie(sessionId);
@@ -64,7 +64,8 @@ export function MainGameClient({
     setError,
     setResult,
     setWinner,
-    setIncomingDrawOffer
+    setIncomingDrawOffer,
+    setOutgoingDrawOffer
   );
 
   const { game, safeGameMutate, invalidMove } = chessGameLogic(
@@ -92,8 +93,10 @@ export function MainGameClient({
     isFirstMove,
     setIsFirstMove
   );
-
+  console.log(error);
   if (error) return <GameUnavailable />;
+
+  console.log("winner", winner, "result", result);
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <GameBanner
@@ -108,7 +111,13 @@ export function MainGameClient({
 
       <div className="flex w-full max-w-full justify-between items-start px-5 h-full">
         {/* MoveHistory Component */}
-        <div className="w-1/4 pl-2 h-full flex flex-col">
+        <div
+          className="w-1/4 pl-2 pr-4 h-full flex flex-col"
+          style={{
+            width: "min(50vh, 30vw)", // Ensure the outer div is a square, constrained by the viewport
+            height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
+          }}
+        >
           <MoveHistory moveHistory={moveHistory} fen={game.fen()} />
         </div>
 
@@ -135,6 +144,7 @@ export function MainGameClient({
             sendGameOver={sendGameOver}
             sendDrawOffer={sendDrawOffer}
             setOutgoingDrawOffer={setOutgoingDrawOffer}
+            setIncomingDrawOffer={setIncomingDrawOffer}
           />
 
           {gameData.type !== "pvc" && (
@@ -172,7 +182,13 @@ export function MainGameClient({
         </div>
 
         {/* Chat Component */}
-        <div className="w-1/4 pr-2 h-full flex flex-col">
+        <div
+          className="w-1/4 pl-4 pr-2 h-full flex flex-col"
+          style={{
+            width: "min(50vh, 30vw)", // Ensure the outer div is a square, constrained by the viewport
+            height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
+          }}
+        >
           {" "}
           {gameData.type != "pvc" && (
             <Chat

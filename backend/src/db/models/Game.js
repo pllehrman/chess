@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      result: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       fen: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -87,7 +91,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       timeIncrement: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0,
         validate: {
           isInt: {
