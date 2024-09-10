@@ -1,7 +1,7 @@
 export async function getGameHistory(sessionId) {
   const response = await fetch(
     `${
-      process.env.NEXT_PUBLIC_BACKEND_URL
+      process.env.BACKEND_URL
     }/games/session/${sessionId}?t=${new Date().getTime()}`
   );
 

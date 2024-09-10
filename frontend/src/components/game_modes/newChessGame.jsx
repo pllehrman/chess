@@ -9,7 +9,10 @@ export async function newChessGame(
   let updatedDifficulty = type === "pvp" ? null : difficulty;
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games`, {
+    console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+    const apiURL = `${process.env.NEXT_PUBLIC_API_URL}/games`;
+    console.log("API_URL:", apiURL);
+    const response = await fetch(apiURL, {
       method: "POST",
       credentials: "include",
       headers: {

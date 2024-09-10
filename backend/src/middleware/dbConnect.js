@@ -22,25 +22,51 @@ const runMigrations = async () => {
     logger: console, // Optional: logs migration status to console
   });
 
-  // const pendingMigrations = await umzug.pending();
-  // console.log("Pending Migrations: ", pendingMigrations);
+  const pendingMigrations = await umzug.pending();
+  console.log("Pending Migrations: ", pendingMigrations);
 
   // await umzug.down({ to: 0 });
   await umzug.up();
   console.log("All migrations have been run.");
 };
 
-// Helper function to test database connection and run migrations
-const dbConnect = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
+const dbConnect = async (retries = 5, delay = 10000) => {
+  while (retries > 0) {
+    try {
+      await sequelize.authenticate();
+      console.log("Connection has been established successfully.");
 
-    // Run migrations after successful connection
-    await runMigrations();
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
+      await runMigrations();
+      return;
+    } catch (error) {
+      console.error(`Unable to connect to the database: ${error.message}`);
+
+      retries -= 1;
+      if (retries === 0) {
+        console.error(
+          "Max retries reached. Unable to connect to the database."
+        );
+        return;
+      }
+
+      console.log(
+        `Retrying in ${delay / 1000} seconds... (${retries} attempts left)`
+      );
+      await new Promise((res) => setTimeout(res, delay)); // Wait for the delay period
+    }
   }
 };
 
-module.exports = dbConnect;
+// Function to check the database connection
+const checkDatabaseConnection = async () => {
+  try {
+    // Run a simple query to check if the database connection is alive
+    await sequelize.authenticate();
+    return true;
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    return false;
+  }
+};
+
+module.exports = { dbConnect, checkDatabaseConnection };

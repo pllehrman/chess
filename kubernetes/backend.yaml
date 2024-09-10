@@ -4,6 +4,11 @@ metadata:
   name: backend
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: backend
@@ -15,7 +20,8 @@ spec:
       serviceAccountName: chessgambit
       containers:
         - name: backend
-          image: us-central1-docker.pkg.dev/chessgambit/chessgambit/backend:prod
+          image: us-central1-docker.pkg.dev/chessgambit/chessgambit/backend:prod-20240910160511
+          imagePullPolicy: Always
           env:
             - name: DB_HOST
               value: "localhost"
@@ -33,6 +39,8 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: db-password
+            - name: FRONTEND_URL
+              value: "http://34.134.185.143"
           resources:
             requests:
               memory: "256Mi"
@@ -40,6 +48,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+
         - name: cloud-sql-proxy
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.4
           args:
@@ -53,3 +62,16 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: ClusterIP

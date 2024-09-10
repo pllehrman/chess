@@ -1,8 +1,3 @@
-import dotenv from "dotenv";
-
-// Load environment variables from .env file
-dotenv.config();
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -24,10 +19,6 @@ const nextConfig = {
         ],
       },
     ];
-  },
-
-  env: {
-    // Add your environment variables here
   },
 };
 
