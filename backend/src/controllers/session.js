@@ -93,8 +93,8 @@ function setSessionCookie(res, session) {
     {
       httpOnly: true,
       expires: session.expiresAt,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      secure: true,
+      sameSite: "None",
     }
   );
 }

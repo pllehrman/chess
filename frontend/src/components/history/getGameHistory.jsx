@@ -1,4 +1,12 @@
 export async function getGameHistory(sessionId) {
+  if (!sessionId) {
+    return {
+      inProgressGames: [],
+      completedGames: [],
+    };
+  }
+
+  console.log("BACKEND_URL:", process.env.BACKEND_URL);
   const response = await fetch(
     `${
       process.env.BACKEND_URL

@@ -9,6 +9,7 @@ const sequelize = new Sequelize({
   database: process.env.DB_NAME,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  logging: false,
 });
 
 // Helper function to run migrations
@@ -19,7 +20,7 @@ const runMigrations = async () => {
     }, // Adjust this path to where your migrations are stored
     storage: new SequelizeStorage({ sequelize }), // Use Sequelize as migration storage
     context: sequelize.getQueryInterface(),
-    logger: console, // Optional: logs migration status to console
+    logger: false,
   });
 
   const pendingMigrations = await umzug.pending();

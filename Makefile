@@ -13,9 +13,7 @@ build-frontend:
 
 # Build and tag backend image with a timestamp
 build-backend:
-	docker build --build-arg NEXT_PUBLIC_API_URL=http://34.134.185.143/api \
-             --build-arg NEXT_PUBLIC_WS_URL=ws://34.134.185.143/api \
-			 --no-cache --platform linux/amd64 -t $(BACKEND_IMAGE):prod-$(TIMESTAMP) -f ./backend/Dockerfile.prod ./backend
+	docker build --no-cache --platform linux/amd64 -t $(BACKEND_IMAGE):prod-$(TIMESTAMP) -f ./backend/Dockerfile.prod ./backend
 
 # Push frontend image to Artifact Registry
 push-frontend:
@@ -35,8 +33,9 @@ update-k8s-frontend:
 deploy-backend: build-backend push-backend update-k8s-backend
 deploy-frontend: build-frontend push-frontend update-k8s-frontend
 
+
 # Build and push all images (frontend and backend)
-deploy: build-frontend build-backend push-frontend push-backend update-k8s-backend
+deploy: deploy-backend deploy-frontend
 
 # Clean up local images
 clean:

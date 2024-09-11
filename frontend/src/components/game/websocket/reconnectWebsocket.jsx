@@ -26,6 +26,18 @@ export const reconnectWebSocket = (
           retryCount.current += 1;
         }
       },
+      // Log detailed error information
+      onError: (event) => {
+        console.error("WebSocket Error:", {
+          url: process.env.NEXT_PUBLIC_WS_URL,
+          sessionId,
+          sessionUsername,
+          gameId,
+          gameType,
+          orientation,
+          errorDetails: event, // Log the entire error event
+        });
+      },
     }
   );
 

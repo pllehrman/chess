@@ -11,6 +11,7 @@ function setupWebSocket(server) {
     const { sessionId, sessionUsername, gameId, gameType, orientation } =
       url.parse(request.url, true).query;
 
+    console.log("tried to connect to websocket.");
     if (!sessionId || !gameId || !orientation) {
       console.log(
         "Missing sessionId, gameId, or orientation. Connection closed."

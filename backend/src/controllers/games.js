@@ -35,6 +35,16 @@ const startNewGame = asyncWrapper(async (req, res) => {
   let playerWhiteSession = null;
   let playerBlackSession = null;
 
+  console.log(
+    type,
+    orientation,
+    playerWhiteTimeRemaining,
+    playerBlackTimeRemaining,
+    timeIncrement,
+    sessionUsername,
+    difficulty
+  );
+
   try {
     const session = await checkAndUpdateCurrentSession(
       req,
@@ -82,7 +92,16 @@ const joinGame = asyncWrapper(async (req, res) => {
     session = await createSession(res, null);
     sessionId = session.id;
   }
-
+  console.log(
+    "GameId",
+    gameId,
+    "Orientation",
+    orientation,
+    "SessionId",
+    sessionId,
+    "Session",
+    session
+  );
   const game = await Game.findByPk(gameId, {
     include: [
       {
@@ -101,6 +120,7 @@ const joinGame = asyncWrapper(async (req, res) => {
   if (!game) {
     throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
   }
+  console.log("Game", game);
   if (
     orientation === "white" &&
     (!game.playerWhiteSession || game.playerWhiteSession === sessionId) &&
@@ -163,7 +183,7 @@ const deleteGame = asyncWrapper(async (req, res) => {
 
 const getGameHistory = asyncWrapper(async (req, res) => {
   const sessionId = req.params.sessionId;
-
+  console.log("SESSION ID", sessionId);
   // Fetch games where the sessionId was either the white or black player
   const games = await Game.findAll({
     where: {
