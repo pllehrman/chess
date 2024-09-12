@@ -37,3 +37,13 @@ CREATING AND LISTING DATABASES FOR A GIVEN INSTANCE:
 - gcloud sql databases list --instance=chessgambit-db
 
 
+PROVISIONING STATIC IP:
+gcloud compute addresses describe chessgambit-ip --global
+
+
+GENERATING SSL_CERTIFICATES:
+gcloud compute ssl-certificates create chessgambit-cert \
+    --domains=freechessgambit.com,www.freechessgambit.com \
+    --global
+
+CHANGES TO ingress.yaml

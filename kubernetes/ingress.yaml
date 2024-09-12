@@ -2,10 +2,12 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: chessgambit-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   rules:
-    - host: "" # Leave blank for IP-based routing or set to a domain when ready
+    - host: freechessgambit.com
       http:
         paths:
           - path: /
@@ -22,3 +24,23 @@ spec:
                 name: backend
                 port:
                   number: 3001
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: chessgambit-www-redirect
+#   annotations:
+#     nginx.ingress.kubernetes.io/permanent-redirect: "https://freechessgambit.com"
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - host: www.freechessgambit.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: frontend
+#                 port:
+#                   number: 3000

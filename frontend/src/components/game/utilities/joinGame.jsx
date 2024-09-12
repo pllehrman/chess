@@ -1,18 +1,21 @@
 export async function joinGame(gameId, orientation, sessionId) {
   try {
-    console.log("BACKEND_URL:", process.env.BACKEND_URL);
-    const response = await fetch(`${process.env.BACKEND_URL}/games/join`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        gameId,
-        orientation,
-        sessionId,
-      }),
-    });
+    console.log("BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/join`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameId,
+          orientation,
+          sessionId,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(

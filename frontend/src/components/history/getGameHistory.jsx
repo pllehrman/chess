@@ -6,10 +6,10 @@ export async function getGameHistory(sessionId) {
     };
   }
 
-  console.log("BACKEND_URL:", process.env.BACKEND_URL);
+  console.log("BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
   const response = await fetch(
     `${
-      process.env.BACKEND_URL
+      process.env.NEXT_PUBLIC_BACKEND_URL
     }/games/session/${sessionId}?t=${new Date().getTime()}`
   );
 

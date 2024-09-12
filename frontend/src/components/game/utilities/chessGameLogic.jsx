@@ -17,7 +17,8 @@ export function chessGameLogic(
   setResult,
   setWinner
 ) {
-  const [game, setGame] = useState(new Chess(gameData.fen));
+  // Use useRef to persist game state between renders
+  const gameRef = useRef(new Chess(gameData.fen));
   const [invalidMove, setInvalidMove] = useState(false);
 
   // Sounds
@@ -39,30 +40,26 @@ export function chessGameLogic(
     }
   }, []);
 
-  // add move validation here
+  // Modify safeGameMutate to use the gameRef
   const safeGameMutate = (modify) => {
-    setGame((currentGame) => {
+    try {
+      const gameCopy = new Chess(gameRef.current.fen());
+      const move = modify(gameCopy);
+      gameRef.current = gameCopy; // Update game state directly via useRef
+      console.log("Moving from safe game mutate");
+      sendMove(move, gameCopy.fen(), whiteTime, blackTime);
+      setMoveHistory((prev) => [...prev, move]);
+      setIsFirstMove(false);
+
       try {
-        const gameCopy = new Chess(currentGame.fen());
-        const move = modify(gameCopy);
-
-        sendMove(move, gameCopy.fen(), whiteTime, blackTime);
-        setMoveHistory((prev) => [...prev, move]);
-        setIsFirstMove(false);
-        // NEed to ensure this doesn't throw an error
-        try {
-          validMoveSound.current.play();
-        } catch (error) {
-          console.error("error playing valid move sound:", error);
-        }
-
-        return gameCopy;
+        validMoveSound.current.play();
       } catch (error) {
-        console.error("error in mutating game.");
-        handleInvalidMove();
-        return currentGame;
+        console.error("error playing valid move sound:", error);
       }
-    });
+    } catch (error) {
+      console.error("error in mutating game.");
+      handleInvalidMove();
+    }
   };
 
   const handleInvalidMove = () => {
@@ -71,7 +68,7 @@ export function chessGameLogic(
     try {
       invalidMoveSound.current.play();
     } catch (error) {
-      console.error("error playing valid move sound:", error);
+      console.error("error playing invalid move sound:", error);
     }
 
     setTimeout(() => {
@@ -79,57 +76,47 @@ export function chessGameLogic(
     }, 2000);
   };
 
+  // Listen to changes in moveHistory to update the game state
   useEffect(() => {
-    // Only update if there's a move in the moveHistory
     if (moveHistory.length > 0) {
       const lastMove = moveHistory[moveHistory.length - 1];
 
-      // Compare current game FEN with the FEN after the last move
-      if (game.turn() !== orientation[0] && game.fen() !== lastMove.after) {
-        setGame((currentGame) => {
-          // Clone the current game state using the FEN notation
-          const gameCopy = new Chess(currentGame.fen());
-
-          // Apply the move to the cloned game state
-          gameCopy.move(lastMove);
-          setIsFirstMove(false);
-
-          // Return the updated game state
-          return gameCopy;
-        });
+      if (
+        gameRef.current.turn() !== orientation[0] &&
+        gameRef.current.fen() !== lastMove.after
+      ) {
+        console.log("Moving from useEffect");
+        gameRef.current.move(lastMove);
+        setIsFirstMove(false);
       }
     }
-  }, [moveHistory, game, orientation]);
+  }, [moveHistory, orientation]);
 
   useEffect(() => {
     let gameResult = null;
     let gameWinner = null;
-    if (game.isCheckmate()) {
-      // console.log("Inside Checkmate");
+    if (gameRef.current.isCheckmate()) {
       gameResult = "Checkmate";
-      gameWinner = game.turn() === "w" ? "black" : "white";
-    } else if (game.isDraw()) {
+      gameWinner = gameRef.current.turn() === "w" ? "black" : "white";
+    } else if (gameRef.current.isDraw()) {
       gameWinner = "draw";
-    } else if (game.isStalemate()) {
+    } else if (gameRef.current.isStalemate()) {
       gameResult = "Stalemate";
-    } else if (game.isThreefoldRepetition()) {
+    } else if (gameRef.current.isThreefoldRepetition()) {
       gameResult = "Threefold Repetition";
-    } else if (game.isInsufficientMaterial()) {
+    } else if (gameRef.current.isInsufficientMaterial()) {
       gameResult = "Insufficient Material";
     }
     setResult(gameResult);
     setWinner(gameWinner);
-  }, [game]);
+  }, []);
 
   useEffect(() => {
-    // If there are two people present and no winner yet
     if (!winner) {
       if (whiteTime === 0) {
-        // If White runs out of time
         setResult("Insufficient Time");
         setWinner("black");
       } else if (blackTime === 0) {
-        // If Black runs out of time
         setResult("Insufficient Time");
         setWinner("white");
       }
@@ -149,7 +136,6 @@ export function chessGameLogic(
     }
   }, []);
 
-  // Sound effect play
   useEffect(() => {
     if (winner) {
       if (
@@ -166,7 +152,7 @@ export function chessGameLogic(
   }, [winner]);
 
   return {
-    game,
+    game: gameRef.current, // Return the current game state
     safeGameMutate,
     invalidMove,
   };

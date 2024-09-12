@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: chessgambit-cert
+spec:
+  domains:
+    - freechessgambit.com
+    - www.freechessgambit.com

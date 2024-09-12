@@ -2,6 +2,8 @@
 
 import { ReadyState } from "react-use-websocket";
 import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
 
 export const Chat = React.memo(
   ({
@@ -11,8 +13,29 @@ export const Chat = React.memo(
     sendChat,
     readyState,
     twoPeoplePresent,
+    playerColor, // Added to track whether player is white or black
   }) => {
     const isChatAvailable = readyState === ReadyState.OPEN && twoPeoplePresent;
+
+    // Share the URL function
+    const shareUrl = () => {
+      // Get the current URL
+      let currentUrl = window.location.href;
+
+      // If the player is black, change 'black' in the URL to 'white' so their friend can play as white
+      if (playerColor === "black") {
+        currentUrl = currentUrl.replace("black", "white");
+      } else {
+        currentUrl = currentUrl.replace("white", "black");
+      }
+
+      // Copy the URL to the clipboard
+      navigator.clipboard.writeText(currentUrl).then(() => {
+        alert(
+          "URL copied to clipboard! Share it with a friend to start playing."
+        );
+      });
+    };
 
     return (
       <div className="h-[75vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
@@ -36,6 +59,18 @@ export const Chat = React.memo(
             />
           </h1>
         )}
+
+        {/* Share button */}
+        {!twoPeoplePresent && (
+          <button
+            onClick={shareUrl}
+            className="mt-4 flex items-center px-4 py-2 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-300"
+          >
+            <FontAwesomeIcon icon={faShareFromSquare} className="mr-2" />
+            Invite Your Friend
+          </button>
+        )}
+
         <div className="mt-4 flex space-x-2">
           <input
             type="text"
@@ -69,8 +104,8 @@ export const Chat = React.memo(
               </p>
             ) : (
               messageHistory
-                .slice() // Create a shallow copy of the array to avoid mutating original data
-                .reverse() // Reverse the array to show most recent messages at the top
+                .slice()
+                .reverse()
                 .map((messageObject, index) => (
                   <div
                     key={index}
@@ -80,8 +115,8 @@ export const Chat = React.memo(
                         : "text-left bg-gray-100 dark:bg-gray-700"
                     } p-2 rounded-md text-gray-900 dark:text-gray-100`}
                     style={{
-                      wordBreak: "break-word", // Ensure long words break onto the next line
-                      overflowWrap: "break-word", // Additional rule to ensure proper wrapping
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
                     }}
                   >
                     <strong>
@@ -90,8 +125,7 @@ export const Chat = React.memo(
                         : `${messageObject.sessionUsername} (Opponent)`}
                       :
                     </strong>{" "}
-                    {messageObject.message.message}{" "}
-                    {/* Accessing the actual message content */}
+                    {messageObject.message.message}
                   </div>
                 ))
             )}

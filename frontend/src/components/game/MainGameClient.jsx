@@ -96,7 +96,6 @@ export function MainGameClient({
   console.log(error);
   if (error) return <GameUnavailable />;
 
-  console.log("winner", winner, "result", result);
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
       <GameBanner
