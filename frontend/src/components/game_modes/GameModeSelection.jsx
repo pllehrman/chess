@@ -57,9 +57,15 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 pb-16">
-      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-10 space-y-8 max-h-[80vh] overflow-y-auto">
-        {/* User Name Input */}
+    <div className="min-h-screen flex justify-center bg-gray-100 dark:bg-gray-900 px-4 pt-5">
+      <div
+        className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-10 space-y-8 overflow-y-auto"
+        style={{
+          WebkitOverflowScrolling: "touch", // Enables smooth scrolling on iOS
+          overscrollBehavior: "contain", // Prevents bounce scroll behavior on mobile
+          maxHeight: "80vh", // Ensures the div takes 80% of the viewport height
+        }}
+      >
         <div className="space-y-2">
           <label
             htmlFor="username"

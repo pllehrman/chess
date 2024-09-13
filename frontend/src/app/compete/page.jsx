@@ -5,11 +5,11 @@ export default function Page() {
   const { sessionId, sessionUsername } = retrieveSession();
 
   return (
-    <div>
+    <>
       <GameModeSelection
         sessionId={sessionId}
         sessionUsername={sessionUsername}
       />
-    </div>
+    </>
   );
 }

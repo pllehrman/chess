@@ -7,9 +7,6 @@ export function CompletedGames({ completedGames }) {
       className="w-full max-w-lg sm:max-w-2xl lg:max-w-4xl mx-auto h-auto flex flex-col border-2 border-green-500 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800"
       style={{ maxHeight: "calc(100vh - 40vh)" }} // Adjust the 100px according to your footer height
     >
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-4 text-center">
-        Completed Games
-      </h2>
       {completedGames.length > 0 ? (
         <div className="flex-grow overflow-y-auto max-h-[65vh] px-6 py-4 space-y-6">
           {completedGames.map((game, index) => {

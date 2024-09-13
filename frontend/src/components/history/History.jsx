@@ -7,17 +7,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 export function History({ inProgressGames, completedGames }) {
-  const [filter, setFilter] = useState("in-progress"); // Default filter is completed games
+  const [filter, setFilter] = useState("in-progress"); // Default filter is in-progress games
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-10">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col h-full pb-20">
-        <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-8">
-          Chess Game History
-        </h1>
-
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 dark:bg-gray-900 py-10">
+      <h1 className="text-2xl sm:text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4 sm:mb-8">
+        Chess Game History
+      </h1>
+      <div
+        className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md
+                  w-[95vw] sm:w-[70vw] md:w-[50vw] h-[85vh] max-h-[85vh]
+                  sm:max-h-[73vh] sm:max-w-[calc(100vw-60px)] overflow-hidden"
+      >
         {/* Filter Section */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4 sm:mb-6">
           <button
             className="flex items-center space-x-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-lg"
             onClick={() =>
@@ -34,7 +37,7 @@ export function History({ inProgressGames, completedGames }) {
         </div>
 
         {/* Conditional Rendering of Games based on Filter */}
-        <div className="flex-grow overflow-y-auto max-h-[calc(100vh-200px)]">
+        <div className="flex-grow overflow-y-auto w-full max-h-[calc(100vh-200px)]">
           {filter === "completed" ? (
             <CompletedGames completedGames={completedGames} />
           ) : (
