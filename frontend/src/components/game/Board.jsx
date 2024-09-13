@@ -55,6 +55,7 @@ export const Board = React.memo(function Board({
         sendDrawOffer={sendDrawOffer}
         setOutgoingDrawOffer={setOutgoingDrawOffer}
         setIncomingDrawOffer={setIncomingDrawOffer}
+        twoPeoplepresent={twoPeoplePresent}
       />
 
       {gameData.type !== "pvc" && (

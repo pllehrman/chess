@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 export function History({ inProgressGames, completedGames }) {
-  const [filter, setFilter] = useState("completed"); // Default filter is completed games
+  const [filter, setFilter] = useState("in-progress"); // Default filter is completed games
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-10">

@@ -18,7 +18,7 @@ export const MoveHistory = React.memo(function MoveHistory({
   fen,
 }) {
   return (
-    <div className="h-[75vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+    <div className="max-h-[70vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
       <CapturedPiecesDisplay fen={fen} />
       <hr className="my-4 border-gray-300 dark:border-gray-600" />
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">

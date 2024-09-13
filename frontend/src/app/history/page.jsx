@@ -6,12 +6,12 @@ export default async function Page() {
   const { sessionId, sessionUsername } = retrieveSession();
   const { inProgressGames, completedGames } = await getGameHistory(sessionId);
   return (
-    <div>
+    <>
       <History
         sessionId={sessionId}
         inProgressGames={inProgressGames}
         completedGames={completedGames}
       />
-    </div>
+    </>
   );
 }

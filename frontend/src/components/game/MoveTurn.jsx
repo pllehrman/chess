@@ -23,6 +23,7 @@ export const MoveTurn = ({
   sendGameOver,
   setOutgoingDrawOffer,
   setIncomingDrawOffer,
+  twoPeoplepresent,
 }) => {
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [showDrawModal, setShowDrawModal] = useState(false);
@@ -69,7 +70,7 @@ export const MoveTurn = ({
       <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex p-4 space-x-4">
         {!winner && (
           <button onClick={() => setShowDrawModal(true)}>
-            {gameData.type === "pvp" && (
+            {gameData.type === "pvp" && twoPeoplepresent && (
               <FontAwesomeIcon
                 icon={faHandshake}
                 className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-base sm:text-lg md:text-xl"
