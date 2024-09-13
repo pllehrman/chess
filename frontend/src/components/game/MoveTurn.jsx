@@ -64,15 +64,15 @@ export const MoveTurn = ({
   }
 
   return (
-    <div className="relative w-full bg-white dark:bg-gray-800 rounded-lg pb-2">
+    <div className="relative w-full bg-white dark:bg-gray-800 rounded-lg p-2">
       {/* Handshake and Flag icons on the left */}
-      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex space-x-4">
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex p-4 space-x-4">
         {!winner && (
           <button onClick={() => setShowDrawModal(true)}>
             {gameData.type === "pvp" && (
               <FontAwesomeIcon
                 icon={faHandshake}
-                className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-2xl"
+                className="text-gray-600 dark:text-gray-300 hover:text-green-500 text-base sm:text-lg md:text-xl"
               />
             )}
           </button>
@@ -81,7 +81,7 @@ export const MoveTurn = ({
           <button onClick={() => setShowResignModal(true)}>
             <FontAwesomeIcon
               icon={faFlag}
-              className="text-gray-600 dark:text-gray-300 hover:text-red-500 text-2xl"
+              className="text-gray-600 dark:text-gray-300 hover:text-red-500 text-base sm:text-lg md:text-xl"
             />
           </button>
         )}
@@ -90,7 +90,7 @@ export const MoveTurn = ({
       {/* Turn display or game result */}
       <div className="text-center py-2">
         <h2
-          className={`text-2xl font-bold ${
+          className={`text-lg sm:text-xl md:text-2xl font-bold ${
             currentTurn === "w"
               ? "text-gray-900 dark:text-gray-100"
               : "text-gray-400 dark:text-gray-500"
@@ -105,11 +105,11 @@ export const MoveTurn = ({
       </div>
 
       {/* Refresh icon on the right */}
-      <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 p-4">
         <button onClick={() => setShowNewGameModal(true)}>
           <FontAwesomeIcon
             icon={faArrowsRotate}
-            className="text-gray-600 dark:text-gray-300 hover:text-blue-500 text-2xl"
+            className="text-gray-600 dark:text-gray-300 hover:text-blue-500 text-base sm:text-lg md:text-xl"
           />
         </button>
       </div>
@@ -117,8 +117,8 @@ export const MoveTurn = ({
       {/* Modals */}
       {showNewGameModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
-            <p className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-white dark:bg-gray-800 w-80 sm:w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
+            <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
               Do you want to start a new game?
             </p>
             <div className="mt-4 flex justify-between">
@@ -144,8 +144,8 @@ export const MoveTurn = ({
 
       {showDrawModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
-            <p className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-white dark:bg-gray-800 w-80 sm:w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
+            <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
               Do you want to offer a draw?
             </p>
             <div className="mt-4 flex justify-between">
@@ -171,8 +171,8 @@ export const MoveTurn = ({
 
       {showResignModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
-            <p className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-white dark:bg-gray-800 w-80 sm:w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
+            <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
               Do you want to resign?
             </p>
             <div className="mt-4 flex justify-between">
@@ -198,8 +198,8 @@ export const MoveTurn = ({
 
       {incomingDrawOffer && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
-            <p className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-white dark:bg-gray-800 w-80 sm:w-96 h-48 p-6 rounded-lg shadow-lg flex flex-col justify-between text-center">
+            <p className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
               You have been offered a draw!
             </p>
             <div className="mt-4 flex justify-between">

@@ -3,7 +3,7 @@ TypeError: user.destroy is not a function -> ensure you mention 'await' before t
 helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-   --set global.leaderElection.namespace=cert-manager \
+  --set global.leaderElection.namespace=cert-manager \
   --create-namespace \
   --version v1.15.3 \
   --set crds.enabled=true

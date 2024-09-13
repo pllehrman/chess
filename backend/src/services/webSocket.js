@@ -36,8 +36,9 @@ function setupWebSocket(server) {
 
     games[gameId][orientation] = sessionId;
 
-    // Broadcast the updated capacity to all players
-    broadcastCapacityUpdate(sessionId, sessionUsername, gameId);
+    if (gameType === "pvp") {
+      broadcastCapacityUpdate(sessionId, sessionUsername, gameId);
+    }
 
     if (!connections[sessionId]) {
       connections[sessionId] = {}; // Initialize connections[sessionId] if it doesn't exist
@@ -60,7 +61,11 @@ function setupWebSocket(server) {
       // Remove the player from the game
       if (games[gameId]) {
         games[gameId][orientation] = null;
-        broadcastCapacityUpdate(sessionId, sessionUsername, gameId);
+
+        const { gameType } = connections[sessionId][gameId];
+        if (gameType === "pvp") {
+          broadcastCapacityUpdate(sessionId, sessionUsername, gameId);
+        }
 
         // Cleanup the user's connection to this game
         if (connections[sessionId]) {

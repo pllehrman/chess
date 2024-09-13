@@ -1,18 +1,13 @@
-// components/chess_game/MainGameClient.jsx
 "use client";
 import { useState, useEffect } from "react";
 import { Board } from "./Board";
-import { Timers } from "./Timers";
 import { chessGameLogic } from "./utilities/chessGameLogic";
-// import { useControlsLogic } from "./utilities/refreshGame";
-import { onDropHandler } from "./utilities/onDropHandler";
 import { useWebSocket } from "./websocket/useWebSocket";
 import { Chat } from "./Chat";
 import { MoveHistory } from "../history/MoveHistory";
 import { GameBanner } from "./GameBanner";
 import { requestCookie } from "../formatting/requestCookie";
 import { computerLogic } from "./utilities/computerLogic";
-import { MoveTurn } from "./MoveTurn";
 import { GameUnavailable } from "./GameUnavailable";
 
 export function MainGameClient({
@@ -35,6 +30,8 @@ export function MainGameClient({
   const [error, setError] = useState(null);
   const [incomingDrawOffer, setIncomingDrawOffer] = useState(null);
   const [outgoingDrawOffer, setOutgoingDrawOffer] = useState(null);
+  const [showMoveHistory, setShowMoveHistory] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   if (needsCookie) {
     requestCookie(sessionId);
@@ -93,111 +90,76 @@ export function MainGameClient({
     isFirstMove,
     setIsFirstMove
   );
-  console.log(error);
+
+  const closeModalOnOutsideClick = (e) => {
+    if (e.target.id === "modal-background") {
+      setShowMoveHistory(false);
+      setShowChat(false);
+    }
+  };
+
   if (error) return <GameUnavailable />;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-8">
+    <div className="min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 pt-2">
       <GameBanner
         twoPeoplePresent={twoPeoplePresent}
         invalidMove={invalidMove}
         inCheck={game.inCheck()}
         result={result}
         winner={winner}
-        orientation={orientation}
         outgoingDrawOffer={outgoingDrawOffer}
+        setShowMoveHistory={setShowMoveHistory}
+        setShowChat={setShowChat}
+        showMoveHistory={showMoveHistory}
+        showChat={showChat}
       />
 
-      <div className="flex w-full max-w-full justify-between items-start px-5 h-full">
-        {/* MoveHistory Component */}
-        <div
-          className="w-1/4 pl-2 pr-4 h-full flex flex-col"
-          style={{
-            width: "min(50vh, 30vw)", // Ensure the outer div is a square, constrained by the viewport
-            height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
-          }}
-        >
-          <MoveHistory moveHistory={moveHistory} fen={game.fen()} />
-        </div>
-
-        {/* Main Game Component */}
-        <div
-          className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-md pt-4 pr-8 pb-8 pl-8"
-          style={{
-            width: "min(65vh, 40vw)", // Ensure the outer div is a square, constrained by the viewport
-            height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
-          }}
-        >
-          <MoveTurn
-            gameData={gameData}
-            currentTurn={game.turn()}
-            winner={winner}
-            result={result}
-            orientation={orientation}
-            incomingDrawOffer={incomingDrawOffer}
-            sessionUsername={sessionUsername}
-            setResult={setResult}
-            setWinner={setWinner}
-            whiteTime={whiteTime}
-            blackTime={blackTime}
-            sendGameOver={sendGameOver}
-            sendDrawOffer={sendDrawOffer}
-            setOutgoingDrawOffer={setOutgoingDrawOffer}
-            setIncomingDrawOffer={setIncomingDrawOffer}
-          />
-
-          {gameData.type !== "pvc" && (
-            <Timers
-              whiteTime={whiteTime}
-              blackTime={blackTime}
-              setWhiteTime={setWhiteTime}
-              setBlackTime={setBlackTime}
-              increment={gameData.timeIncrement}
-              currentTurn={game.turn()}
-              twoPeoplePresent={twoPeoplePresent}
-              isFirstMove={isFirstMove}
-              winner={winner}
-            />
+      <div className="relative flex w-full max-w-full justify-center items-start px-2 h-full">
+        <div className="flex flex-grow justify-center items-start w-full max-w-6xl">
+          {/* MoveHistory Component */}
+          {showMoveHistory && (
+            <div className="w-1/4 mr-4">
+              <MoveHistory moveHistory={moveHistory} fen={game.fen()} />
+            </div>
           )}
 
-          {/* Chessboard should also resize according to the outer square */}
-          <div className="flex-1 w-full h-full">
+          {/* Board Component */}
+          <div
+            className={`${
+              showMoveHistory || showChat ? "w-2/4" : "w-full"
+            } flex justify-center`}
+          >
             <Board
+              gameData={gameData}
+              game={game}
+              winner={winner}
+              result={result}
               orientation={orientation}
-              position={game.fen()}
-              onDrop={onDropHandler(
-                orientation,
-                game,
-                twoPeoplePresent,
-                safeGameMutate,
-                winner
-              )}
-              boardStyle={{
-                width: "100%", // Fill the outer square
-                height: "100%", // Keep the chessboard square
-              }}
+              sessionUsername={sessionUsername}
+              setResult={setResult}
+              setWinner={setWinner}
+              whiteTime={whiteTime}
+              blackTime={blackTime}
+              sendGameOver={sendGameOver}
+              sendDrawOffer={sendDrawOffer}
+              twoPeoplePresent={twoPeoplePresent}
+              safeGameMutate={safeGameMutate}
             />
           </div>
-        </div>
 
-        {/* Chat Component */}
-        <div
-          className="w-1/4 pl-4 pr-2 h-full flex flex-col"
-          style={{
-            width: "min(50vh, 30vw)", // Ensure the outer div is a square, constrained by the viewport
-            height: "calc(min(65vh, 40vw) + 100px)", // Height is equal to width to maintain a square
-          }}
-        >
-          {" "}
-          {gameData.type != "pvc" && (
-            <Chat
-              messageHistory={messageHistory}
-              currentMessage={currentMessage}
-              setCurrentMessage={setCurrentMessage}
-              sendChat={sendChat}
-              readyState={readyState}
-              twoPeoplePresent={twoPeoplePresent}
-            />
+          {/* Chat Component */}
+          {showChat && (
+            <div className="w-1/4 ml-4">
+              <Chat
+                messageHistory={messageHistory}
+                currentMessage={currentMessage}
+                setCurrentMessage={setCurrentMessage}
+                sendChat={sendChat}
+                readyState={readyState}
+                twoPeoplePresent={twoPeoplePresent}
+              />
+            </div>
           )}
         </div>
       </div>

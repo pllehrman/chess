@@ -11,7 +11,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   const [timeControl, setTimeControl] = useState(10);
   const [increment, setIncrement] = useState(0);
   const [colorChoice, setColorChoice] = useState("random");
-  const [difficulty, setDifficulty] = useState(10); // New state for difficulty
+  const [difficulty, setDifficulty] = useState(10);
   const [username, setUsername] = useState(sessionUsername);
 
   const coinFlip = () => Math.random() < 0.5;
@@ -43,7 +43,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         timeControl,
         increment,
         username,
-        difficulty // Pass the difficulty to the newChessGame function
+        difficulty
       );
 
       if (!game) {
@@ -57,13 +57,13 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 pb-16">
-      <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-10 space-y-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 pb-16">
+      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-10 space-y-8 max-h-[80vh] overflow-y-auto">
         {/* User Name Input */}
         <div className="space-y-2">
           <label
             htmlFor="username"
-            className="block text-lg font-semibold text-gray-900 dark:text-gray-100 text-center"
+            className="block text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 text-center"
           >
             Enter Your Name
           </label>
@@ -73,28 +73,36 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             value={username || ""}
             onChange={(e) => setUsername(e.target.value)}
             placeholder={username || "Enter a Username"}
-            className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+            className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
           />
         </div>
 
         {/* Game Mode Selection */}
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100">
           Choose Game Mode
         </h2>
-        <div className="flex space-x-6">
+        <div className="flex space-x-4 sm:space-x-6">
           <button
             onClick={handlePlayAgainstComputer}
-            className="w-1/2 bg-indigo-900 text-white rounded-lg py-4 text-xl font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
+            className="w-1/2 bg-indigo-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
           >
             <span className="mb-2">Play Against Computer</span>
-            <img src="/computer.png" alt="Computer" className="h-20 w-20" />
+            <img
+              src="/computer.png"
+              alt="Computer"
+              className="h-16 sm:h-20 w-16 sm:w-20"
+            />
           </button>
           <button
             onClick={handlePlayAgainstFriend}
-            className="w-1/2 bg-green-900 text-white rounded-lg py-4 text-xl font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
+            className="w-1/2 bg-green-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
           >
             <span className="mb-2">Play Against Friend</span>
-            <img src="/friends.png" alt="Friends" className="h-20 w-20" />
+            <img
+              src="/friends.png"
+              alt="Friends"
+              className="h-16 sm:h-20 w-16 sm:w-20"
+            />
           </button>
         </div>
 
@@ -102,7 +110,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         {showComputerOptions && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
                 Choose Your Color
               </label>
               <div className="mt-2 flex space-x-4">
@@ -143,9 +151,8 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             </div>
 
             {/* Difficulty Selection */}
-            {/* Difficulty Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
                 Choose Difficulty (ELO)
               </label>
               <div className="mt-2">
@@ -158,17 +165,17 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
                   onChange={(e) => setDifficulty(e.target.value)}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                   <span>0 (Easy)</span>
                   <span>{difficulty} Difficulty</span>
-                  <span>20(Hard)</span>
+                  <span>20 (Hard)</span>
                 </div>
               </div>
             </div>
 
             <button
               onClick={handleStartGame}
-              className="w-full bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
+              className="w-full bg-blue-600 text-white rounded-lg py-2 sm:py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
             >
               Start Game
             </button>
@@ -181,7 +188,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             <div>
               <label
                 htmlFor="timeControl"
-                className="block text-sm font-medium text-gray-900 dark:text-gray-300"
+                className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300"
               >
                 Time Control (minutes per side)
               </label>
@@ -190,7 +197,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
                 id="timeControl"
                 value={timeControl}
                 onChange={(e) => setTimeControl(e.target.value)}
-                className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
                 min="1"
                 max="60"
               />
@@ -198,7 +205,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             <div>
               <label
                 htmlFor="increment"
-                className="block text-sm font-medium text-gray-900 dark:text-gray-300"
+                className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300"
               >
                 Increment (seconds per move)
               </label>
@@ -207,13 +214,13 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
                 id="increment"
                 value={increment}
                 onChange={(e) => setIncrement(e.target.value)}
-                className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
                 min="0"
                 max="10"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
+              <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
                 Choose Your Color
               </label>
               <div className="mt-2 flex space-x-4">
@@ -254,7 +261,7 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
             </div>
             <button
               onClick={handleStartGame}
-              className="w-full bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
+              className="w-full bg-blue-600 text-white rounded-lg py-2 sm:py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
             >
               Start Game
             </button>

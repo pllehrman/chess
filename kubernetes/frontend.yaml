@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: us-central1-docker.pkg.dev/chessgambit/chessgambit/frontend:prod-20240910171624
+          image: us-central1-docker.pkg.dev/chessgambit/chessgambit/frontend:prod-20240912085951
           ports:
             - containerPort: 3000
           resources:
