@@ -3,6 +3,12 @@ const crypto = require("crypto");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const { createCustomError } = require("../middleware/customError");
 
+const newSession = asyncWrapper(async (req, res) => {
+  const session = await createSession(null);
+  // console.log(session);
+  res.status(200).json({ session });
+});
+
 async function getRandomUsername() {
   try {
     const fetch = (await import("node-fetch")).default;
@@ -60,6 +66,7 @@ async function updateUsernameBySessionId(sessionId, newUsername) {
 }
 
 module.exports = {
+  newSession,
   createSession,
   updateUsernameBySessionId,
 };

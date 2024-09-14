@@ -1,11 +1,32 @@
 import { MainGame } from "@/components/game/MainGame";
+import { retrieveSession } from "@/components/formatting/retrieveSession";
+import { MainGameClient } from "@/components/game/MainGameClient";
+import { getGame } from "@/components/game/utilities/getGame";
+import { headers } from "next/headers";
+import { getSession } from "@/components/game/utilities/getSession";
 
-export default function Page({ params }) {
+export default async function Page({ params }) {
   const { gameId, orientation } = params;
+  let { sessionId, sessionUsername } = retrieveSession();
+  const gameData = await getGame(gameId);
+  let needsCookie = false;
+
+  if (!sessionId) {
+    needsCookie = true;
+    const newSession = await getSession();
+    sessionId = newSession.id;
+    sessionUsername = newSession.username;
+  }
 
   return (
     <div>
-      <MainGame gameId={gameId} orientation={orientation} />
+      <MainGameClient
+        gameData={gameData}
+        orientation={orientation}
+        sessionId={sessionId}
+        sessionUsername={sessionUsername}
+        needsCookie={needsCookie}
+      />
     </div>
   );
 }

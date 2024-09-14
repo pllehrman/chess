@@ -25,7 +25,9 @@ app.use(cookieParser());
 
 // Routes
 const games = require("./routes/games");
+const sessions = require("./routes/sessions");
 app.use("/api/games", games);
+app.use("/api/sessions", sessions);
 
 // Database connection
 dbConnect();

@@ -15,9 +15,9 @@ export function History({ inProgressGames, completedGames }) {
         Chess Game History
       </h1>
       <div
-        className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md
-                  w-[95vw] sm:w-[70vw] md:w-[50vw] h-[85vh] max-h-[85vh]
-                  sm:max-h-[73vh] sm:max-w-[calc(100vw-60px)] overflow-hidden"
+        className="flex flex-col items-center justify-center dark:bg-gray-800 rounded-lg p-4 shadow-md
+                  sm:w-[90vw] md:w-[75vw] max-h-[85vh]
+                  sm:max-h-[40vh] overflow-hidden"
       >
         {/* Filter Section */}
         <div className="flex justify-center mb-4 sm:mb-6">

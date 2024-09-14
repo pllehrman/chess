@@ -14,7 +14,6 @@ export async function setServerSideCookie(sessionId, sessionUsername) {
     expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days expiry
     secure: true,
     path: "/",
-    sameSite: "None",
   });
 }
 export async function updateCookieUsername(sessionUsername) {

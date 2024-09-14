@@ -4,8 +4,7 @@ import { faForward } from "@fortawesome/free-solid-svg-icons";
 export function CompletedGames({ completedGames }) {
   return (
     <div
-      className="w-full max-w-lg sm:max-w-2xl lg:max-w-4xl mx-auto h-auto flex flex-col border-2 border-green-500 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800"
-      style={{ maxHeight: "calc(100vh - 40vh)" }} // Adjust the 100px according to your footer height
+      className="w-full h-full flex-col border-2 border-green-500 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800" // Adjust the 100px according to your footer height
     >
       {completedGames.length > 0 ? (
         <div className="flex-grow overflow-y-auto max-h-[65vh] px-6 py-4 space-y-6">

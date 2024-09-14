@@ -294,7 +294,9 @@ const updateGame = async (
   whiteTime,
   blackTime,
   winner,
-  result
+  result,
+  sessionId,
+  orientation
 ) => {
   try {
     const game = await Game.findByPk(gameId);
@@ -307,6 +309,11 @@ const updateGame = async (
     }
 
     const updateData = {};
+    if (orientation === "white" && !game.playerWhiteSession) {
+      updateData.playerWhiteSession = sessionId;
+    } else if (orientation === "black" && !game.playerBlackSession) {
+      updateData.playerBlackSession = sessionId;
+    }
 
     if (fen) {
       updateData.fen = fen;

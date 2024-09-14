@@ -26,7 +26,6 @@ function setupWebSocket(server) {
 
     // If the game is full (both white and black are assigned), close the connection
     if (games[gameId][orientation]) {
-      // If the slot (white or black) is taken by another player (not the current sessionId)
       console.error("Error joining a game: tried to join a full game.");
       broadcastError(connection, "tried to join a full game");
       connection.close();
@@ -52,7 +51,7 @@ function setupWebSocket(server) {
     };
 
     connection.on("message", (message) =>
-      handleMessage(sessionId, sessionUsername, gameId, message)
+      handleMessage(sessionId, sessionUsername, gameId, message, orientation)
     );
 
     // Handle connection close
@@ -95,7 +94,13 @@ function setupWebSocket(server) {
     }
   }
 
-  async function handleMessage(sessionId, sessionUsername, gameId, message) {
+  async function handleMessage(
+    sessionId,
+    sessionUsername,
+    gameId,
+    message,
+    orientation
+  ) {
     try {
       const parsedMessage = JSON.parse(message);
 
@@ -111,7 +116,11 @@ function setupWebSocket(server) {
           gameId,
           parsedMessage.fen,
           parsedMessage.whiteTime,
-          parsedMessage.blackTime
+          parsedMessage.blackTime,
+          null,
+          null,
+          sessionId,
+          orientation
         );
       } else if (parsedMessage.type === "chat") {
         broadcastMessage(
@@ -126,7 +135,11 @@ function setupWebSocket(server) {
           gameId,
           null,
           parsedMessage.whiteTime,
-          parsedMessage.blackTime
+          parsedMessage.blackTime,
+          null,
+          null,
+          null,
+          null
         );
       } else if (parsedMessage.type === "gameOver") {
         broadcastMessage(
@@ -142,7 +155,9 @@ function setupWebSocket(server) {
           parsedMessage.whiteTime,
           parsedMessage.blackTime,
           parsedMessage.winner,
-          parsedMessage.result
+          parsedMessage.result,
+          null,
+          null
         );
       } else if (parsedMessage.type === "drawOffer") {
         broadcastMessage(

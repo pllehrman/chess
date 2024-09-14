@@ -4,15 +4,19 @@ import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
 import { joinGame } from "./utilities/joinGame";
-import { retrieveSession } from "../formatting/retrieveSession";
 
-export async function MainGame({ gameId, orientation }) {
-  let { sessionId, sessionUsername } = retrieveSession();
-
+export async function MainGame({
+  gameId,
+  orientation,
+  sessionId,
+  sessionUsername,
+}) {
   let isAvailable = false;
   let game = null;
   let error = null;
   let needsCookie = false;
+  let newSessionId = sessionId;
+  let newSessionUsername = sessionUsername;
 
   try {
     const response = await joinGame(gameId, orientation, sessionId);
@@ -20,8 +24,8 @@ export async function MainGame({ gameId, orientation }) {
     game = response.game;
 
     if (!sessionId && isAvailable) {
-      sessionId = response.sessionId;
-      sessionUsername = response.sessionUsername;
+      newSessionId = response.sessionId;
+      newSessionUsername = response.sessionUsername;
       needsCookie = true;
     }
   } catch (err) {
@@ -40,7 +44,7 @@ export async function MainGame({ gameId, orientation }) {
       gameData={game}
       orientation={orientation}
       sessionId={sessionId}
-      sessionUsername={sessionUsername}
+      sessionUsername={newSessionUsername}
       needsCookie={needsCookie}
     />
   );

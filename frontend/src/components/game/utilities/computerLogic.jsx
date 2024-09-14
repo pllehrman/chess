@@ -16,7 +16,15 @@ export function computerLogic(
   const firstRender = useRef(true);
 
   useEffect(() => {
-    // Check if we are in the browser environment
+    // Detect mobile browsers
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+    let stockfishScript;
+    if (isMobile) {
+      stockfishScript = "/stockfish/stockfish-16.1-lite-single.js";
+    } else {
+      stockfishScript = "/stockfish/stockfish-16.1.js";
+    }
     if (typeof window !== "undefined" && type !== "pvp") {
       // Dynamically load the Stockfish Web Worker from the public folder
       const stockfishWorker = new Worker("/stockfish/stockfish-16.1-lite.js");

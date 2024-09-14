@@ -34,7 +34,6 @@ export function MainGameClient({
   const [showChat, setShowChat] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
 
-  // Check for screen size to determine layout (modal or adjacent)
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobileView(window.innerWidth < 768); // Example breakpoint for mobile (768px)
@@ -183,6 +182,7 @@ export function MainGameClient({
             safeGameMutate={safeGameMutate}
             incomingDrawOffer={incomingDrawOffer}
             setIncomingDrawOffer={setIncomingDrawOffer}
+            isFirstMove={isFirstMove}
           />
         </div>
 
