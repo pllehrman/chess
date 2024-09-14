@@ -1,17 +1,15 @@
 export async function newChessGame(
   type,
-  orientation,
   timeRemaining,
   timeIncrement,
+  sessionId,
   sessionUsername,
   difficulty
 ) {
   let updatedDifficulty = type === "pvp" ? null : difficulty;
 
   try {
-    console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
     const apiURL = `${process.env.NEXT_PUBLIC_API_URL}/games`;
-    console.log("API_URL:", apiURL);
     const response = await fetch(apiURL, {
       method: "POST",
       credentials: "include",
@@ -20,10 +18,10 @@ export async function newChessGame(
       },
       body: JSON.stringify({
         type,
-        orientation,
         playerWhiteTimeRemaining: timeRemaining * 60, // convert to seconds
         playerBlackTimeRemaining: timeRemaining * 60, // convert to seconds
         timeIncrement,
+        sessionId,
         sessionUsername,
         difficulty: updatedDifficulty,
       }),
@@ -36,7 +34,7 @@ export async function newChessGame(
     }
 
     const data = await response.json();
-    return data.game;
+    return { game: data.game, session: data.session };
   } catch (error) {
     console.error("error starting new game:", error);
   }

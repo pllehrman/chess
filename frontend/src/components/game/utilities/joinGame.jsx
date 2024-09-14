@@ -1,6 +1,5 @@
 export async function joinGame(gameId, orientation, sessionId) {
   try {
-    console.log("BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/join`,
       {
@@ -23,6 +22,7 @@ export async function joinGame(gameId, orientation, sessionId) {
       );
     }
     const data = await response.json();
+
     if (!sessionId) {
       return {
         isAvailable: true,

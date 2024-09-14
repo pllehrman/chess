@@ -3,7 +3,7 @@ const asyncWrapper = (fn) => {
     try {
       await fn(req, res, next);
     } catch (error) {
-      console.log(`an error occurred: ${error.message}`);
+      console.error(`an error occurred: ${error.message}`);
       next(error);
     }
   };

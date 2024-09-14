@@ -1,3 +1,5 @@
+"use server";
+
 import { GameUnavailable } from "./GameUnavailable";
 import { Loading } from "../formatting/Loading";
 import { MainGameClient } from "./MainGameClient";
@@ -5,7 +7,7 @@ import { joinGame } from "./utilities/joinGame";
 import { retrieveSession } from "../formatting/retrieveSession";
 
 export async function MainGame({ gameId, orientation }) {
-  let { sessionId, sessionUsername } = await retrieveSession();
+  let { sessionId, sessionUsername } = retrieveSession();
 
   let isAvailable = false;
   let game = null;
@@ -18,9 +20,9 @@ export async function MainGame({ gameId, orientation }) {
     game = response.game;
 
     if (!sessionId && isAvailable) {
-      needsCookie = true;
       sessionId = response.sessionId;
       sessionUsername = response.sessionUsername;
+      needsCookie = true;
     }
   } catch (err) {
     console.error(`error in joining game: ${err.message}`);

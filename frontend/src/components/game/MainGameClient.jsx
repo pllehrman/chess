@@ -6,9 +6,9 @@ import { useWebSocket } from "./websocket/useWebSocket";
 import { Chat } from "./Chat";
 import { MoveHistory } from "../history/MoveHistory";
 import { GameBanner } from "./GameBanner";
-import { requestCookie } from "../formatting/requestCookie";
 import { computerLogic } from "./utilities/computerLogic";
 import { GameUnavailable } from "./GameUnavailable";
+import { setServerSideCookie } from "./utilities/setServerSideCookie";
 
 export function MainGameClient({
   gameData,
@@ -46,9 +46,11 @@ export function MainGameClient({
     return () => window.removeEventListener("resize", checkScreenSize); // Clean up listener on unmount
   }, []);
 
-  if (needsCookie) {
-    requestCookie(sessionId);
-  }
+  useEffect(() => {
+    if (needsCookie) {
+      setServerSideCookie(sessionId, sessionUsername);
+    }
+  }, []);
 
   const {
     messageHistory,
@@ -179,6 +181,8 @@ export function MainGameClient({
             setOutgoingDrawOffer={setOutgoingDrawOffer}
             twoPeoplePresent={twoPeoplePresent}
             safeGameMutate={safeGameMutate}
+            incomingDrawOffer={incomingDrawOffer}
+            setIncomingDrawOffer={setIncomingDrawOffer}
           />
         </div>
 

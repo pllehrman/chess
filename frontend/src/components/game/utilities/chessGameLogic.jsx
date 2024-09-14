@@ -46,7 +46,6 @@ export function chessGameLogic(
       const gameCopy = new Chess(gameRef.current.fen());
       const move = modify(gameCopy);
       gameRef.current = gameCopy; // Update game state directly via useRef
-      console.log("Moving from safe game mutate");
       sendMove(move, gameCopy.fen(), whiteTime, blackTime);
       setMoveHistory((prev) => [...prev, move]);
       setIsFirstMove(false);
@@ -85,7 +84,6 @@ export function chessGameLogic(
         gameRef.current.turn() !== orientation[0] &&
         gameRef.current.fen() !== lastMove.after
       ) {
-        console.log("Moving from useEffect");
         gameRef.current.move(lastMove);
         setIsFirstMove(false);
       }
@@ -109,7 +107,7 @@ export function chessGameLogic(
     }
     setResult(gameResult);
     setWinner(gameWinner);
-  }, []);
+  }, [gameRef.current]);
 
   useEffect(() => {
     if (!winner) {

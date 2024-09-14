@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 export const retrieveSession = () => {
-  const cookie = cookies().get("session_cookie");
+  const cookie = cookies().get("chessgambit_session");
   let sessionId = null;
   let sessionUsername = null;
 

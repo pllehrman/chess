@@ -3,15 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { newChessGame } from "./newChessGame";
-
+import { ShowComputerOptions } from "./ShowComputerOptions";
+import { ShowFriendOptions } from "./ShowFriendOptions";
+import {
+  setServerSideCookie,
+  updateCookieUsername,
+} from "../game/utilities/setServerSideCookie";
 export default function GameModeSelection({ sessionId, sessionUsername }) {
-  const router = useRouter();
   const [showFriendOptions, setShowFriendOptions] = useState(false);
   const [showComputerOptions, setShowComputerOptions] = useState(false);
   const [timeControl, setTimeControl] = useState(10);
   const [increment, setIncrement] = useState(0);
   const [colorChoice, setColorChoice] = useState("random");
-  const [difficulty, setDifficulty] = useState(10);
+  const [difficulty, setDifficulty] = useState("10");
   const [username, setUsername] = useState(sessionUsername);
 
   const coinFlip = () => Math.random() < 0.5;
@@ -37,14 +41,21 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
     }
 
     try {
-      const game = await newChessGame(
+      const { game, session } = await newChessGame(
         type,
-        orientation,
         timeControl,
         increment,
+        sessionId,
         username,
         difficulty
       );
+
+      console.log("Client side session", session);
+      if (!sessionId) {
+        await setServerSideCookie(session.id, session.username);
+      } else if (username != sessionUsername) {
+        await updateCookieUsername(session.username);
+      }
 
       if (!game) {
         throw new Error("error in starting a new chess game");
@@ -55,224 +66,80 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
       console.error(`error in starting a new chess game: ${error.message}`);
     }
   }
-
   return (
-    <div className="min-h-screen flex justify-center bg-gray-100 dark:bg-gray-900 px-4 pt-5">
-      <div
-        className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-10 space-y-8 overflow-y-auto"
-        style={{
-          WebkitOverflowScrolling: "touch", // Enables smooth scrolling on iOS
-          overscrollBehavior: "contain", // Prevents bounce scroll behavior on mobile
-          maxHeight: "80vh", // Ensures the div takes 80% of the viewport height
-        }}
-      >
-        <div className="space-y-2">
-          <label
-            htmlFor="username"
-            className="block text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 text-center"
-          >
-            Enter Your Name
-          </label>
-          <input
-            type="text"
-            id="username"
-            value={username || ""}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder={username || "Enter a Username"}
-            className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 dark:bg-gray-900 ">
+      <div className="flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-900">
+        <div
+          className="flex flex-grow flex-col items-center space-y-4 p-6 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md
+                w-full max-w-md max-h-[80vh] overflow-y-auto touch-pan-y"
+        >
+          {/* Username Input Section */}
+          <div className="w-full space-y-2">
+            <label
+              htmlFor="username"
+              className="block text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 text-center"
+            >
+              Enter Your Name
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username || ""}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={username || "Enter a Username"}
+              className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+            />
+          </div>
+
+          {/* Game Mode Selection */}
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100">
+            Choose Game Mode
+          </h2>
+          <div className="flex w-full space-x-4 sm:space-x-6">
+            <button
+              onClick={handlePlayAgainstComputer}
+              className="w-1/2 bg-indigo-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
+            >
+              <span className="mb-2">Play Against Computer</span>
+              <img
+                src="/computer.png"
+                alt="Computer"
+                className="h-16 sm:h-20 w-16 sm:w-20"
+              />
+            </button>
+            <button
+              onClick={handlePlayAgainstFriend}
+              className="w-1/2 bg-green-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
+            >
+              <span className="mb-2">Play Against Friend</span>
+              <img
+                src="/friends.png"
+                alt="Friends"
+                className="h-16 sm:h-20 w-16 sm:w-20"
+              />
+            </button>
+          </div>
+
+          {/* Game Options */}
+          <ShowComputerOptions
+            showComputerOptions={showComputerOptions}
+            handleStartGame={handleStartGame}
+            difficulty={difficulty}
+            colorChoice={colorChoice}
+            setColorChoice={setColorChoice}
+            setDifficulty={setDifficulty}
+          />
+          <ShowFriendOptions
+            showFriendOptions={showFriendOptions}
+            timeControl={timeControl}
+            setTimeControl={setTimeControl}
+            increment={increment}
+            setIncrement={setIncrement}
+            colorChoice={colorChoice}
+            setColorChoice={setColorChoice}
+            handleStartGame={handleStartGame}
           />
         </div>
-
-        {/* Game Mode Selection */}
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100">
-          Choose Game Mode
-        </h2>
-        <div className="flex space-x-4 sm:space-x-6">
-          <button
-            onClick={handlePlayAgainstComputer}
-            className="w-1/2 bg-indigo-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
-          >
-            <span className="mb-2">Play Against Computer</span>
-            <img
-              src="/computer.png"
-              alt="Computer"
-              className="h-16 sm:h-20 w-16 sm:w-20"
-            />
-          </button>
-          <button
-            onClick={handlePlayAgainstFriend}
-            className="w-1/2 bg-green-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
-          >
-            <span className="mb-2">Play Against Friend</span>
-            <img
-              src="/friends.png"
-              alt="Friends"
-              className="h-16 sm:h-20 w-16 sm:w-20"
-            />
-          </button>
-        </div>
-
-        {/* Options for Playing Against Computer */}
-        {showComputerOptions && (
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
-                Choose Your Color
-              </label>
-              <div className="mt-2 flex space-x-4">
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="colorChoice"
-                    value="white"
-                    checked={colorChoice === "white"}
-                    onChange={() => setColorChoice("white")}
-                    className="mr-2"
-                  />
-                  White
-                </label>
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="colorChoice"
-                    value="black"
-                    checked={colorChoice === "black"}
-                    onChange={() => setColorChoice("black")}
-                    className="mr-2"
-                  />
-                  Black
-                </label>
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="colorChoice"
-                    value="random"
-                    checked={colorChoice === "random"}
-                    onChange={() => setColorChoice("random")}
-                    className="mr-2"
-                  />
-                  Random
-                </label>
-              </div>
-            </div>
-
-            {/* Difficulty Selection */}
-            <div>
-              <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
-                Choose Difficulty (ELO)
-              </label>
-              <div className="mt-2">
-                <input
-                  type="range"
-                  min="0"
-                  max="20"
-                  step="1"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                />
-                <div className="flex justify-between text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  <span>0 (Easy)</span>
-                  <span>{difficulty} Difficulty</span>
-                  <span>20 (Hard)</span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={handleStartGame}
-              className="w-full bg-blue-600 text-white rounded-lg py-2 sm:py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
-            >
-              Start Game
-            </button>
-          </div>
-        )}
-
-        {/* Options for Playing Against Friend */}
-        {showFriendOptions && (
-          <div className="space-y-6">
-            <div>
-              <label
-                htmlFor="timeControl"
-                className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300"
-              >
-                Time Control (minutes per side)
-              </label>
-              <input
-                type="number"
-                id="timeControl"
-                value={timeControl}
-                onChange={(e) => setTimeControl(e.target.value)}
-                className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
-                min="1"
-                max="60"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="increment"
-                className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300"
-              >
-                Increment (seconds per move)
-              </label>
-              <input
-                type="number"
-                id="increment"
-                value={increment}
-                onChange={(e) => setIncrement(e.target.value)}
-                className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
-                min="0"
-                max="10"
-              />
-            </div>
-            <div>
-              <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
-                Choose Your Color
-              </label>
-              <div className="mt-2 flex space-x-4">
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="colorChoice"
-                    value="white"
-                    checked={colorChoice === "white"}
-                    onChange={() => setColorChoice("white")}
-                    className="mr-2"
-                  />
-                  White
-                </label>
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="colorChoice"
-                    value="black"
-                    checked={colorChoice === "black"}
-                    onChange={() => setColorChoice("black")}
-                    className="mr-2"
-                  />
-                  Black
-                </label>
-                <label className="text-gray-900 dark:text-gray-300">
-                  <input
-                    type="radio"
-                    name="colorChoice"
-                    value="random"
-                    checked={colorChoice === "random"}
-                    onChange={() => setColorChoice("random")}
-                    className="mr-2"
-                  />
-                  Random
-                </label>
-              </div>
-            </div>
-            <button
-              onClick={handleStartGame}
-              className="w-full bg-blue-600 text-white rounded-lg py-2 sm:py-3 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md"
-            >
-              Start Game
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

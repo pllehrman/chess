@@ -4,7 +4,7 @@ const {
   createCustomError,
   CustomAPIError,
 } = require("../middleware/customError");
-const { checkAndUpdateCurrentSession, createSession } = require("./session");
+const { updateUsernameBySessionId, createSession } = require("./session");
 const sequelize = require("../db/models/index").sequelize;
 const { Op, or } = require("sequelize");
 
@@ -22,40 +22,34 @@ const getAllGames = asyncWrapper(async (req, res) => {
 
 // POST
 const startNewGame = asyncWrapper(async (req, res) => {
+  // console.log(req.body);
   const {
     type,
-    orientation,
     playerWhiteTimeRemaining,
     playerBlackTimeRemaining,
     timeIncrement,
+    sessionId,
     sessionUsername,
     difficulty,
   } = req.body;
 
-  let playerWhiteSession = null;
-  let playerBlackSession = null;
+  let session = { id: sessionId, username: sessionUsername };
 
   try {
-    const session = await checkAndUpdateCurrentSession(
-      req,
-      res,
-      sessionUsername,
-    );
-
-    if (orientation === "white") {
-      playerWhiteSession = session.id;
-    } else if (orientation === "black") {
-      playerBlackSession = session.id;
-    } else {
-      throw createCustomError(`that game color is not supported`, 404);
+    if (!sessionId) {
+      // console.log("Sessionusername", sessionUsername);
+      session = await createSession(sessionUsername);
+    } else if (sessionUsername) {
+      session.username = await updateUsernameBySessionId(
+        sessionId,
+        sessionUsername
+      );
     }
 
     const game = await Game.create({
       type,
-      playerWhiteSession,
       initialTime: playerWhiteTimeRemaining,
       playerWhiteTimeRemaining,
-      playerBlackSession,
       playerBlackTimeRemaining,
       timeIncrement,
       difficulty,
@@ -65,11 +59,11 @@ const startNewGame = asyncWrapper(async (req, res) => {
       throw createCustomError(`error creating new game.`, 500);
     }
 
-    res.status(200).json({ game });
+    res.status(200).json({ game, session });
   } catch (error) {
     throw createCustomError(
       `error in checking session and creating new game: ${error.message}`,
-      500,
+      500
     );
   }
 });
@@ -79,8 +73,9 @@ const joinGame = asyncWrapper(async (req, res) => {
   let { sessionId } = req.body;
   let session;
 
+  // console.log("LOG 1", gameId, orientation, sessionId);
   if (!sessionId) {
-    session = await createSession(res, null);
+    session = await createSession(null);
     sessionId = session.id;
   }
 
@@ -102,25 +97,44 @@ const joinGame = asyncWrapper(async (req, res) => {
   if (!game) {
     throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
   }
+  // console.log(
+  //   "playerWhiteSession",
+  //   game.playerWhiteSession,
+  //   "playerBlackSession"
+  // );
 
+  // console.log(
+  //   "If statements: 1",
+  //   orientation === "black",
+  //   "2",
+  //   !game.playerBlackSession,
+  //   "3",
+  //   game.playerBlackSession === sessionId,
+  //   "4",
+  //   sessionId !== game.playerWhiteSession
+  // );
+
+  // console.log("LOG 1.5", game);
   if (
     orientation === "white" &&
     (!game.playerWhiteSession || game.playerWhiteSession === sessionId) &&
-    sessionId != game.playerBlackSession
+    sessionId !== game.playerBlackSession
   ) {
     game.playerWhiteSession = sessionId;
   } else if (
     orientation === "black" &&
     (!game.playerBlackSession || game.playerBlackSession === sessionId) &&
-    sessionId != game.playerWhiteSession
+    sessionId !== game.playerWhiteSession
   ) {
     game.playerBlackSession = sessionId;
   } else {
     throw createCustomError(
       `tried to join a game where the user didn't belong`,
-      400,
+      400
     );
   }
+
+  // console.log("LOG 2", game);
 
   await game.save();
   res.status(200).json({ game, session });
@@ -150,7 +164,7 @@ const deleteGame = asyncWrapper(async (req, res) => {
   if (!game) {
     throw createCustomError(
       `Game with ${gameId} ID was unable to be found.`,
-      404,
+      404
     );
   }
   await game.destroy();
@@ -213,16 +227,16 @@ const getGameHistory = asyncWrapper(async (req, res) => {
         game.type === "pvc"
           ? "Stockfish"
           : game.blackSession
-            ? game.blackSession.username
-            : null;
+          ? game.blackSession.username
+          : null;
     } else if (game.playerBlackSession === sessionId) {
       orientation = "black";
       opponent =
         game.type === "pvc"
           ? "Stockfish"
           : game.whiteSession
-            ? game.whiteSession.username
-            : null;
+          ? game.whiteSession.username
+          : null;
     }
 
     const gameWithResult = {
@@ -254,7 +268,7 @@ const updateGameByID = asyncWrapper(async (req, res) => {
     if (!game) {
       throw createCustomError(
         `Game with ${gameId} ID could not be found while trying to update.`,
-        404,
+        404
       );
     }
 
@@ -280,7 +294,7 @@ const updateGame = async (
   whiteTime,
   blackTime,
   winner,
-  result,
+  result
 ) => {
   try {
     const game = await Game.findByPk(gameId);
@@ -288,7 +302,7 @@ const updateGame = async (
     if (!game) {
       throw createCustomError(
         `Game with ${gameId} ID could not be found while trying to update.`,
-        404,
+        404
       );
     }
 
@@ -308,8 +322,6 @@ const updateGame = async (
       updateData.result = result;
     }
 
-    console.log("updateData:", updateData);
-
     if (Object.keys(updateData).length > 0) {
       await game.update(updateData);
     }
@@ -326,7 +338,7 @@ const setGameSessionId = async (gameId, orientation, sessionId) => {
     if (!game) {
       throw createCustomError(
         `Game with ${gameId} ID could not be found while trying to update.`,
-        404,
+        404
       );
     }
     if (orientation === "white") {

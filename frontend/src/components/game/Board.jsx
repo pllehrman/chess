@@ -32,12 +32,10 @@ export const Board = React.memo(function Board({
   return (
     <div
       className="
-    flex flex-col items-center 
-    bg-white dark:bg-gray-800 rounded-lg shadow-md
-    w-[min(95vh,95vw)] h-[min(130vh,130vw)]  // Mobile sizes
-    sm: w-[55vh] // Desktop sizes
-    max-h-[calc(80vh)] max-w-[calc(100vw-10px)] 
-    sm:max-h-[73vh] sm:max-w-[calc(100vh-60px)]"
+      flex flex-col items-center 
+      bg-white dark:bg-gray-800 rounded-lg shadow-md
+      md:w-[calc(60vh)] h-[calc(55vh + 40px)] // Desktop Size
+      sm: w-[55vh] sm:max-h-[73vh] sm:max-w-[calc(100vh-60px)] //Mobile Size"
     >
       <MoveTurn
         gameData={gameData}

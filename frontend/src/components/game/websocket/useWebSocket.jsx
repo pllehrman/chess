@@ -32,7 +32,6 @@ export const useWebSocket = (
   );
 
   const handleMessage = (messageData) => {
-    console.log(messageData);
     switch (messageData.type) {
       case "chat":
         setMessageHistory((prev) => [...prev, messageData]);
@@ -53,10 +52,8 @@ export const useWebSocket = (
         }
         break;
       case "gameOver":
-        console.log(messageData.message.winner);
         setResult(messageData.message.result);
         setWinner(messageData.message.winner);
-
         break;
       case "drawOffer":
         if (messageData.message.answer != null) {
@@ -66,6 +63,7 @@ export const useWebSocket = (
         }
         break;
       case "error":
+        console.log("websocket error");
         setError(messageData.message);
         break;
       default:

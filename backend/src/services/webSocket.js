@@ -11,9 +11,8 @@ function setupWebSocket(server) {
     const { sessionId, sessionUsername, gameId, gameType, orientation } =
       url.parse(request.url, true).query;
 
-    console.log("tried to connect to websocket.");
     if (!sessionId || !gameId || !orientation) {
-      console.log(
+      console.error(
         "Missing sessionId, gameId, or orientation. Connection closed."
       );
       connection.close();
@@ -99,7 +98,7 @@ function setupWebSocket(server) {
   async function handleMessage(sessionId, sessionUsername, gameId, message) {
     try {
       const parsedMessage = JSON.parse(message);
-      console.log("Message data on the backend", parsedMessage);
+
       if (parsedMessage.type === "move") {
         broadcastMessage(
           "move",

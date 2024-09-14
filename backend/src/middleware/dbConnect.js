@@ -24,11 +24,9 @@ const runMigrations = async () => {
   });
 
   const pendingMigrations = await umzug.pending();
-  console.log("Pending Migrations: ", pendingMigrations);
 
   // await umzug.down({ to: 0 });
   await umzug.up();
-  console.log("All migrations have been run.");
 };
 
 const dbConnect = async (retries = 5, delay = 10000) => {

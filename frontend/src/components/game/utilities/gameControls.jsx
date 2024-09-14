@@ -40,7 +40,7 @@ export function gameControls(
       }
 
       const data = await response.json();
-      window.open(`/compete/${data.game.id}/${orientation}`, "_blank");
+      window.location.href = `/compete/${data.game.id}/${orientation}`;
     } catch (error) {
       console.error("error starting new game:", error);
     }

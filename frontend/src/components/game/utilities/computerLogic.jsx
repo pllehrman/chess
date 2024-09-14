@@ -24,7 +24,7 @@ export function computerLogic(
 
       stockfishWorker.onmessage = (e) => {
         const message = e.data;
-        // console.log("Stockfish says:", message);
+        console.log("Stockfish says:", message);
 
         if (message.startsWith("bestmove")) {
           const bestMove = message.split(" ")[1];
