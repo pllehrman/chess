@@ -89,14 +89,14 @@ export const CapturedPiecesDisplay = ({ fen }) => {
 
       <div className="mb-4">
         <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
-          White Captures:
+          Black Captures:
         </h3>
         {Object.keys(capturedPieces.b).length === 0 ? (
           <p className="text-gray-600 dark:text-gray-300">No captures yet.</p>
         ) : (
           <div className="flex space-x-4">
             {Object.entries(capturedPieces.b).map(([piece, count]) =>
-              renderCapturedPiece("b", piece, count)
+              renderCapturedPiece("w", piece, count)
             )}
           </div>
         )}
@@ -107,14 +107,14 @@ export const CapturedPiecesDisplay = ({ fen }) => {
 
       <div>
         <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
-          Black Captures:
+          White Captures:
         </h3>
         {Object.keys(capturedPieces.w).length === 0 ? (
           <p className="text-gray-600 dark:text-gray-300">No captures yet.</p>
         ) : (
           <div className="flex space-x-4">
             {Object.entries(capturedPieces.w).map(([piece, count]) =>
-              renderCapturedPiece("w", piece, count)
+              renderCapturedPiece("b", piece, count)
             )}
           </div>
         )}

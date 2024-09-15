@@ -21,13 +21,15 @@ export function computerLogic(
 
     let stockfishScript;
     if (isMobile) {
+      console.log("Stockfish-lite-single");
       stockfishScript = "/stockfish/stockfish-16.1-lite-single.js";
     } else {
-      stockfishScript = "/stockfish/stockfish-16.1.js";
+      console.log("Stockfish-lite");
+      stockfishScript = "/stockfish/stockfish-16.1-lite.js";
     }
     if (typeof window !== "undefined" && type !== "pvp") {
       // Dynamically load the Stockfish Web Worker from the public folder
-      const stockfishWorker = new Worker("/stockfish/stockfish-16.1-lite.js");
+      const stockfishWorker = new Worker(stockfishScript);
       setWorker(stockfishWorker);
 
       stockfishWorker.onmessage = (e) => {
@@ -57,6 +59,9 @@ export function computerLogic(
       stockfishWorker.postMessage(
         `setoption name Skill Level value ${skillLevel}`
       );
+
+      stockfishWorker.postMessage("setoption name Threads value 1");
+      stockfishWorker.postMessage("setoption name Hash value 16");
 
       return () => {
         stockfishWorker.terminate(); // Clean up the worker when the component unmounts

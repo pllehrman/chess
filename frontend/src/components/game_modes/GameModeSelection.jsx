@@ -61,22 +61,15 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         throw new Error("error in starting a new chess game");
       }
 
-      if (!window.redirectTriggered) {
-        window.redirectTriggered = true;
-        window.location.href = `/compete/${game.id}/${orientation}`;
-      }
+      window.location.href = `/compete/${game.id}/${orientation}`;
     } catch (error) {
       console.error(`error in starting a new chess game: ${error.message}`);
     }
   }
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 dark:bg-gray-900 ">
-      <div className="flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-900">
-        <div
-          className="flex flex-grow flex-col items-center space-y-4 p-6 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md
-                w-full sm:max-w-[calc(100vh-20px)] max-h-[80vh] overflow-y-auto touch-pan-y"
-        >
-          {/* Username Input Section */}
+      <div className="flex flex-col max-h-[40vh] max-w-[90vh] items-center justify-center p-8 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
+        <div className="flex flex-grow flex-col items-center space-y-4 p-6 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md">
           <div className="w-full space-y-2">
             <label
               htmlFor="username"
