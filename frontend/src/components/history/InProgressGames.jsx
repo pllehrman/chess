@@ -16,9 +16,9 @@ export function InProgressGames({ inProgressGames }) {
   };
 
   return (
-    <div className="w-full h-full flex-col border-2 border-blue-300 dark:border-gray-600 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800">
+    <div className="flex-col max-h-[50vh] md:w-[75vh] md:max-h-[60vh] border-2 border-blue-300 dark:border-gray-600 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 overflow-y-auto">
       {inProgressGames.length > 0 ? (
-        <div className="flex-grow overflow-y-auto max-h-[65vh] px-6 py-4 space-y-6">
+        <div className="px-6 space-y-6">
           {inProgressGames.map((game, index) => (
             <div
               key={index}

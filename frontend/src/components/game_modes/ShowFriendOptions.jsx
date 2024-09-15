@@ -10,7 +10,7 @@ export function ShowFriendOptions({
 }) {
   return (
     showFriendOptions && (
-      <div className="space-y-4">
+      <div className="w-full space-y-4">
         {" "}
         {/* Reduced vertical spacing */}
         {/* Time Control and Increment side by side */}
@@ -22,14 +22,14 @@ export function ShowFriendOptions({
               htmlFor="timeControl"
               className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300"
             >
-              Time Control (mins)
+              Time (mins)
             </label>
             <input
               type="number"
               id="timeControl"
               value={timeControl}
               onChange={(e) => setTimeControl(e.target.value)}
-              className="mt-0 block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-1 sm:p-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+              className="mt-0 w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-lg p-1 sm:p-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
               min="1"
               max="60"
             />
@@ -53,11 +53,11 @@ export function ShowFriendOptions({
           </div>
         </div>
         {/* Color Choice Section */}
-        <div>
-          <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
+        <div className="flex flex-col">
+          <label className="text-center block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
             Choose Your Color
           </label>
-          <div className="mt-1 flex space-x-4">
+          <div className="mt-1 justify-center flex space-x-4">
             {" "}
             {/* Reduced spacing between elements */}
             <label className="text-gray-900 dark:text-gray-300">

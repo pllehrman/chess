@@ -68,8 +68,8 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
   }
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 dark:bg-gray-900 ">
-      <div className="flex flex-col max-h-[40vh] max-w-[90vh] items-center justify-center p-8 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
-        <div className="flex flex-grow flex-col items-center space-y-4 p-6 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <div className="flex flex-col w-full max-h-[85vh] max-w-[100 vw] md:max-h-[80vh] md:max-w-[45vw] pt-1 pr-2 pl-2 pb-2 md:p-8 bg-gray-100 dark:bg-gray-900 overflow-y-auto">
+        <div className="flex flex-grow flex-col items-center space-y-4 p-3 md:p-6 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md">
           <div className="w-full space-y-2">
             <label
               htmlFor="username"
@@ -91,27 +91,27 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100">
             Choose Game Mode
           </h2>
-          <div className="flex w-full space-x-4 sm:space-x-6">
+          <div className="flex w-full space-x-2 sm:space-x-4 md:space-x-6">
             <button
               onClick={handlePlayAgainstComputer}
-              className="w-1/2 bg-indigo-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
+              className="w-1/2 bg-indigo-900 text-white rounded-lg p-2 sm:p-4 md:p-6 text-sm sm:text-base md:text-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
             >
-              <span className="mb-2">Play Against Computer</span>
+              <span className="mb-1">Play Against Computer</span>
               <img
                 src="/computer.png"
                 alt="Computer"
-                className="h-16 sm:h-20 w-16 sm:w-20"
+                className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16"
               />
             </button>
             <button
               onClick={handlePlayAgainstFriend}
-              className="w-1/2 bg-green-900 text-white rounded-lg py-2 sm:py-4 text-base sm:text-xl font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
+              className="w-1/2 bg-green-900 text-white rounded-lg p-2 sm:p-4 md:p-6 text-sm sm:text-base md:text-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex flex-col items-center shadow-md transform transition hover:scale-105"
             >
               <span className="mb-2">Play Against Friend</span>
               <img
                 src="/friends.png"
                 alt="Friends"
-                className="h-16 sm:h-20 w-16 sm:w-20"
+                className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16"
               />
             </button>
           </div>

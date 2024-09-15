@@ -10,12 +10,36 @@ export function ShowComputerOptions({
 }) {
   return (
     showComputerOptions && (
-      <div className="space-y-6">
+      <div className="w-full space-y-3">
         <div>
-          <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
+          <label className="block text-center text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
+            Choose Difficulty (ELO)
+          </label>
+          <div className="">
+            <input
+              type="range"
+              min="0"
+              max="20"
+              step="1"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            />
+            <div className="flex justify-between text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <span>0 (Easy)</span>
+              <span>{difficulty} Difficulty</span>
+              <span>20 (Hard)</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-center block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
             Choose Your Color
           </label>
-          <div className="mt-2 flex space-x-4">
+          <div className="mt-1 justify-center flex space-x-4">
+            {" "}
+            {/* Reduced spacing between elements */}
             <label className="text-gray-900 dark:text-gray-300">
               <input
                 type="radio"
@@ -49,28 +73,6 @@ export function ShowComputerOptions({
               />
               Random
             </label>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm sm:text-base font-medium text-gray-900 dark:text-gray-300">
-            Choose Difficulty (ELO)
-          </label>
-          <div className="mt-2">
-            <input
-              type="range"
-              min="0"
-              max="20"
-              step="1"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-            />
-            <div className="flex justify-between text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-              <span>0 (Easy)</span>
-              <span>{difficulty} Difficulty</span>
-              <span>20 (Hard)</span>
-            </div>
           </div>
         </div>
 

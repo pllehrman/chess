@@ -14,11 +14,7 @@ export function History({ inProgressGames, completedGames }) {
       <h1 className="text-2xl sm:text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4 sm:mb-8">
         Chess Game History
       </h1>
-      <div
-        className="flex flex-col items-center justify-center dark:bg-gray-800 rounded-lg p-4 shadow-md
-                  sm:w-[90vw] md:w-[75vw] max-h-[85vh]
-                  sm:max-h-[40vh] overflow-hidden"
-      >
+      <div className="flex flex-col items-center justify-center dark:bg-gray-800 rounded-lg p-4 shadow-md">
         {/* Filter Section */}
         <div className="flex justify-center mb-4 sm:mb-6">
           <button

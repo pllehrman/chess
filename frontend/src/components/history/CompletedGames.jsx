@@ -4,10 +4,10 @@ import { faForward } from "@fortawesome/free-solid-svg-icons";
 export function CompletedGames({ completedGames }) {
   return (
     <div
-      className="w-full h-full flex-col border-2 border-green-500 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800" // Adjust the 100px according to your footer height
+      className="flex-col max-h-[50vh] md:w-[75vh] md:max-h-[60vh] overflow-y-auto border-2 border-green-500 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800" // Adjust the 100px according to your footer height
     >
       {completedGames.length > 0 ? (
-        <div className="flex-grow overflow-y-auto max-h-[65vh] px-6 py-4 space-y-6">
+        <div className="px-6 py-4 space-y-6">
           {completedGames.map((game, index) => {
             const opponent = game.opponent ? game.opponent : "Unknown";
 
