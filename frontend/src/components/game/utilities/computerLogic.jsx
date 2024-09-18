@@ -21,10 +21,8 @@ export function computerLogic(
 
     let stockfishScript;
     if (isMobile) {
-      console.log("Stockfish-lite-single");
       stockfishScript = "/stockfish/stockfish-16.1-lite-single.js";
     } else {
-      console.log("Stockfish-lite");
       stockfishScript = "/stockfish/stockfish-16.1-lite.js";
     }
     if (typeof window !== "undefined" && type !== "pvp") {
@@ -34,7 +32,7 @@ export function computerLogic(
 
       stockfishWorker.onmessage = (e) => {
         const message = e.data;
-        console.log("Stockfish says:", message);
+        // console.log("Stockfish says:", message);
 
         if (message.startsWith("bestmove")) {
           const bestMove = message.split(" ")[1];

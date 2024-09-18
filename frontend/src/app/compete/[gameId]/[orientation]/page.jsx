@@ -1,8 +1,6 @@
-import { MainGame } from "@/components/game/MainGame";
 import { retrieveSession } from "@/components/formatting/retrieveSession";
 import { MainGameClient } from "@/components/game/MainGameClient";
 import { getGame } from "@/components/game/utilities/getGame";
-import { headers } from "next/headers";
 import { getSession } from "@/components/game/utilities/getSession";
 
 export default async function Page({ params }) {

@@ -4,12 +4,7 @@ import { getGameHistory } from "@/components/history/getGameHistory";
 
 export default async function Page() {
   const { sessionId, sessionUsername } = retrieveSession();
-  console.log(
-    "History: sessionId",
-    sessionId,
-    "sessionUsername",
-    sessionUsername
-  );
+
   const { inProgressGames, completedGames } = await getGameHistory(sessionId);
   return (
     <>

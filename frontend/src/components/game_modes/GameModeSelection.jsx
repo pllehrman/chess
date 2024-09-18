@@ -50,7 +50,6 @@ export default function GameModeSelection({ sessionId, sessionUsername }) {
         difficulty
       );
 
-      // console.log("Client side session", session);
       if (!sessionId) {
         await setServerSideCookie(session.id, session.username);
       } else if (username != sessionUsername) {

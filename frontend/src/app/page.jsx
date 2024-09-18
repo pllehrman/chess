@@ -1,9 +1,5 @@
-'use client';
-
-import { HomePage } from '@/components/formatting/HomePage'
+import { HomePage } from "@/components/formatting/HomePage";
 
 export default function Home() {
-  return (
-    <HomePage />
-  );
+  return <HomePage />;
 }

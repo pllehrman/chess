@@ -6,7 +6,7 @@ export default function Footer() {
           &copy; 2024 Peter Lehrman
         </p>
         <a
-          href="/credits.pdf"
+          href="/docs/credits.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] text-blue-400 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-600"
@@ -14,7 +14,7 @@ export default function Footer() {
           Credits
         </a>
         <a
-          href="/terms-of-use.pdf"
+          href="/docs/terms-of-use.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] text-blue-400 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-600"
@@ -22,7 +22,7 @@ export default function Footer() {
           Terms of Use
         </a>
         <a
-          href="/privacy-policy.pdf"
+          href="/docs/privacy-policy.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[0.75rem] sm:text-[0.875rem] md:text-[1rem] text-blue-400 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-600"
