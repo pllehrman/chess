@@ -19,7 +19,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     env_file:
-      - backend/.env
+      - backend/.env.development
     ports:
       - "3001:3001" #Websocket and app listening here
     volumes:

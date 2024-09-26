@@ -1,16 +1,32 @@
 const { Sequelize } = require("sequelize");
 const { Umzug, SequelizeStorage } = require("umzug");
+const dbConfig = require("../db/config/config.js");
 const path = require("path");
 
+const NODE_ENV = process.env.NODE_ENV || "development";
+const dbENV = dbConfig[NODE_ENV];
+
 const sequelize = new Sequelize({
-  dialect: "postgres",
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  logging: false,
+  dialect: dbENV.dialect,
+  host: dbENV.host,
+  port: dbENV.port,
+  database: dbENV.database,
+  username: dbENV.username,
+  password: dbENV.password,
+  logging: dbENV.logging,
 });
+
+console.log(
+  "TEST ENVS",
+  dbENV.dialect,
+  dbENV.host,
+  dbENV.port,
+  dbENV.database,
+  dbENV.username,
+  dbENV.password,
+  dbENV.logging
+);
+console.log(sequelize);
 
 // Helper function to run migrations
 const runMigrations = async () => {

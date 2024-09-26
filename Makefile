@@ -30,8 +30,8 @@ update-k8s-backend:
 update-k8s-frontend:
 	kubectl set image deployment/frontend frontend=$(FRONTEND_IMAGE):prod-$(TIMESTAMP) --namespace=$(KUBE_NAMESPACE)
 
-deploy-backend: build-backend push-backend update-k8s-backend
-deploy-frontend: build-frontend push-frontend update-k8s-frontend
+deploy-backend: build-backend push-backend 
+deploy-frontend: build-frontend push-frontend 
 
 
 # Build and push all images (frontend and backend)
@@ -41,3 +41,5 @@ deploy: deploy-backend deploy-frontend
 clean:
 	docker rmi $(FRONTEND_IMAGE):prod-$(TIMESTAMP)
 	docker rmi $(BACKEND_IMAGE):prod-$(TIMESTAMP)
+
+	
