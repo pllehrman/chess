@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const app = express();
 const cors = require("cors");
+const fs = require("fs");
 const webSocketServer = require("./services/webSocket");
 
 // Middleware
@@ -16,11 +17,17 @@ app.use(express.json()); // Middleware to parse JSON bodies
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "UPDATE", "DELETE"],
+    methods: ["GET", "POST", "UPDATE", "DELETE", "OPTIONS"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Upgrade-Insecure-Requests",
+    ],
+    exposedHeaders: ["Authorization"],
   })
 );
+
 app.use(cookieParser());
 
 // Routes
@@ -31,6 +38,9 @@ app.use("/api/sessions", sessions);
 
 // Database connection
 dbConnect();
+
+// Cronjob
+require("./middleware/cronjob.js");
 
 app.get("/api/health", async (req, res) => {
   const dbHealth = await checkDatabaseConnection(); // Hypothetical function
@@ -51,7 +61,7 @@ app.get("/api", (req, res) => {
 
 app.use(errorHandler);
 
-const server = http.createServer(app);
+server = http.createServer(app);
 webSocketServer(server);
 
 const port = process.env.PORT || 3001;

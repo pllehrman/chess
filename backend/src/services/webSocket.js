@@ -1,5 +1,5 @@
 const { WebSocketServer } = require("ws");
-const url = require("url");
+const { URL } = require("url");
 const { updateGame } = require("../controllers/games");
 
 function setupWebSocket(server) {
@@ -8,8 +8,12 @@ function setupWebSocket(server) {
   const games = {}; // To store the current game participants
 
   wsServer.on("connection", async (connection, request) => {
-    const { sessionId, sessionUsername, gameId, gameType, orientation } =
-      url.parse(request.url, true).query;
+    const requestUrl = new URL(request.url, `wss://${request.headers.host}`);
+    const sessionId = requestUrl.searchParams.get("sessionId");
+    const sessionUsername = requestUrl.searchParams.get("sessionUsername");
+    const gameId = requestUrl.searchParams.get("gameId");
+    const gameType = requestUrl.searchParams.get("gameType");
+    const orientation = requestUrl.searchParams.get("orientation");
 
     if (!sessionId || !gameId || !orientation) {
       console.error(

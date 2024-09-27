@@ -22,7 +22,6 @@ const getAllGames = asyncWrapper(async (req, res) => {
 
 // POST
 const startNewGame = asyncWrapper(async (req, res) => {
-  // console.log(req.body);
   const {
     type,
     playerWhiteTimeRemaining,
@@ -37,7 +36,6 @@ const startNewGame = asyncWrapper(async (req, res) => {
 
   try {
     if (!sessionId) {
-      // console.log("Sessionusername", sessionUsername);
       session = await createSession(sessionUsername);
     } else if (sessionUsername) {
       session.username = await updateUsernameBySessionId(
@@ -73,7 +71,6 @@ const joinGame = asyncWrapper(async (req, res) => {
   let { sessionId } = req.body;
   let session;
 
-  // console.log("LOG 1", gameId, orientation, sessionId);
   if (!sessionId) {
     session = await createSession(null);
     sessionId = session.id;
@@ -97,24 +94,7 @@ const joinGame = asyncWrapper(async (req, res) => {
   if (!game) {
     throw createCustomError(`error in finding game with ID: ${gameId}`, 404);
   }
-  // console.log(
-  //   "playerWhiteSession",
-  //   game.playerWhiteSession,
-  //   "playerBlackSession"
-  // );
 
-  // console.log(
-  //   "If statements: 1",
-  //   orientation === "black",
-  //   "2",
-  //   !game.playerBlackSession,
-  //   "3",
-  //   game.playerBlackSession === sessionId,
-  //   "4",
-  //   sessionId !== game.playerWhiteSession
-  // );
-
-  // console.log("LOG 1.5", game);
   if (
     orientation === "white" &&
     (!game.playerWhiteSession || game.playerWhiteSession === sessionId) &&
@@ -133,8 +113,6 @@ const joinGame = asyncWrapper(async (req, res) => {
       400
     );
   }
-
-  // console.log("LOG 2", game);
 
   await game.save();
   res.status(200).json({ game, session });

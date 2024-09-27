@@ -32,7 +32,6 @@ export const useWebSocket = (
   );
 
   const handleMessage = (messageData) => {
-    console.log("WS Message:", messageData);
     switch (messageData.type) {
       case "chat":
         setMessageHistory((prev) => [...prev, messageData]);
@@ -43,7 +42,6 @@ export const useWebSocket = (
         setBlackTime(messageData.message.blackTime);
         break;
       case "capacityUpdate":
-        console.log("Capacity update:", messageData.message.capacity);
         if (gameData.type === "pvp") {
           setTwoPeoplePresent((prev) => {
             if (prev && messageData.message.capacity == 1) {

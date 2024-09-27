@@ -5,7 +5,6 @@ const { createCustomError } = require("../middleware/customError");
 
 const newSession = asyncWrapper(async (req, res) => {
   const session = await createSession(null);
-  // console.log(session);
   res.status(200).json({ session });
 });
 

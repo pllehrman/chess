@@ -16,33 +16,22 @@ const sequelize = new Sequelize({
   logging: dbENV.logging,
 });
 
-console.log(
-  "TEST ENVS",
-  dbENV.dialect,
-  dbENV.host,
-  dbENV.port,
-  dbENV.database,
-  dbENV.username,
-  dbENV.password,
-  dbENV.logging
-);
-console.log(sequelize);
-
 // Helper function to run migrations
 const runMigrations = async () => {
   const umzug = new Umzug({
     migrations: {
-      glob: path.resolve(__dirname, "../db/migrations/*.js"), // Use absolute path
-    }, // Adjust this path to where your migrations are stored
-    storage: new SequelizeStorage({ sequelize }), // Use Sequelize as migration storage
+      glob: path.resolve(__dirname, "../db/migrations/*.js"),
+    },
+    storage: new SequelizeStorage({ sequelize }),
     context: sequelize.getQueryInterface(),
-    logger: false,
+    logger: console,
   });
 
   const pendingMigrations = await umzug.pending();
-
+  if (pendingMigrations.length > 0) {
+    await umzug.up();
+  }
   // await umzug.down({ to: 0 });
-  await umzug.up();
 };
 
 const dbConnect = async (retries = 5, delay = 10000) => {

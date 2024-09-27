@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+
   // Define security headers for SharedArrayBuffer support
   async headers() {
     return [
